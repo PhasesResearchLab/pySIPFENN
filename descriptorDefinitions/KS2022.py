@@ -30,7 +30,7 @@ attribute_matrix = attribute_matrix[:,
 
 # A prototype function which computes a weighted average over neighbors,
 # weighted by the area of the voronoi cell between them.
-def local_env_function(local_env, site, element_dict):
+def local_env_function(local_env, site):
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
         local_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -73,27 +73,18 @@ def local_env_function(local_env, site, element_dict):
 # A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
 # a function which computes the local environment attributes.
 class LocalAttributeGenerator:
-    def __init__(self, struct, local_env_func, element_dict, nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(self, struct, local_env_func, nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
-        self.element_dict = element_dict
 
     def generate_local_attributes(self, n):
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
-        return self.function(local_env, self.struct[n], self.element_dict)
+        return self.function(local_env, self.struct[n])
 
 
 def generate_voronoi_attributes(struct, local_funct=local_env_function):
-    # Collect stoichiometry of structure for use in WC parameter calculation.
-    element_dict = {}
-    for composition in struct.species_and_occu:
-        for key, value in composition.get_el_amt_dict().items():
-            if key in element_dict:
-                element_dict[key] += value / len(struct.species_and_occu)
-            else:
-                element_dict[key] = value / len(struct.species_and_occu)
-    local_generator = LocalAttributeGenerator(struct, local_funct, element_dict)
+    local_generator = LocalAttributeGenerator(struct, local_funct)
     attribute_list = list()
     equivalentSitesMultiplicities = get_equivalentSitesMultiplicities(struct)
     for siteN in equivalentSitesMultiplicities:
