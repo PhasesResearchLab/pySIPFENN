@@ -83,7 +83,7 @@ def local_env_function(local_env, site, element_dict):
 # a function which computes the local environment attributes.
 class LocalAttributeGenerator:
   
-  def __init__(self, struct, local_env_func, element_dict, nn_generator=VoronoiNN()):
+  def __init__(self, struct, local_env_func, element_dict, nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
     self.generator = nn_generator
     self.struct = struct
     self.function = local_env_func
