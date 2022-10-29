@@ -25,7 +25,7 @@ attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_el
 attribute_matrix = np.nan_to_num(attribute_matrix)
 # Only select attributes actually used in Magpie.
 attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
+                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
 
 # A prototype function which computes a weighted average over neighbors,
@@ -118,20 +118,20 @@ def get_equivalentSitesMultiplicities(struct: Structure):
 
 def generate_descriptor(struct: Structure, include_WC=True):
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
-    properties = np.concatenate((np.stack((np.mean(diff_properties, axis=0),
-                                           np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
-                                           np.min(diff_properties, axis=0),
-                                           np.max(diff_properties, axis=0),
-                                           np.max(diff_properties, axis=0) -
-                                           np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
-                                 np.stack((np.mean(attribute_properties, axis=0),
-                                           np.max(attribute_properties, axis=0) -
-                                           np.min(attribute_properties, axis=0),
-                                           np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)),
-                                                   axis=0),
-                                           np.max(attribute_properties, axis=0),
-                                           np.min(attribute_properties, axis=0),
-                                           magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+    properties = np.concatenate(
+        (np.stack(
+            (np.mean(diff_properties, axis=0),
+             np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
+             np.min(diff_properties, axis=0),
+             np.max(diff_properties, axis=0),
+             np.max(diff_properties, axis=0) - np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
+        np.stack(
+            (np.mean(attribute_properties, axis=0),
+             np.max(attribute_properties, axis=0) - np.min(attribute_properties, axis=0),
+             np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
+             np.max(attribute_properties, axis=0),
+             np.min(attribute_properties, axis=0),
+             magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
     # Normalize Bond Length properties.
     properties[6] /= properties[5]
     properties[7] /= properties[5]
@@ -150,7 +150,7 @@ def generate_descriptor(struct: Structure, include_WC=True):
                 element_dict[key] += value / len(struct.species_and_occu)
             else:
                 element_dict[key] = value / len(struct.species_and_occu)
-    position = 126
+    position = 121
     for p in [10, 7, 5, 3, 2]:
         properties = np.insert(properties, position,
                                math.pow(sum(math.pow(value, p) for value in element_dict.values()), 1.0 / p))
