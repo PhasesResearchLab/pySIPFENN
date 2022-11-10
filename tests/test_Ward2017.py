@@ -20,6 +20,8 @@ exampleInputFiles = natsorted(os.listdir('testCaseFiles/exampleInputFiles/'))
 testStructures = [Structure.from_file(f'testCaseFiles/exampleInputFiles/{eif}') for eif in exampleInputFiles]
 
 functionOutput = [Ward2017.generate_descriptor(s) for s in tqdm(testStructures[:5])]
+with open('Ward2017_TestResult.csv', 'w+') as f:
+    f.writelines([f'{v}\n' for v in functionOutput[0]])
 
 class TestWard2017(unittest.TestCase):
     def test_resutls(self):
