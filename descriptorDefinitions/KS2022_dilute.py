@@ -171,8 +171,8 @@ class LocalAttributeGenerator:
         return local_env_result
 
 
-def generate_descriptor(struct: Structure):
-    diff_properties, attribute_properties = generate_voronoi_attributes(struct)
+def generate_descriptor(struct: Structure, baseStruct='pure'):
+    diff_properties, attribute_properties = generate_voronoi_attributes(struct, baseStruct=baseStruct)
     properties = np.concatenate(
         (np.stack(
             (np.mean(diff_properties, axis=0),
