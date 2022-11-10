@@ -117,7 +117,7 @@ def get_equivalentSitesMultiplicities(struct: Structure):
     return dict(Counter(list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
 
 
-def generate_descriptor(struct: Structure, include_WC=True):
+def generate_descriptor(struct: Structure):
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
         (np.stack(
@@ -151,7 +151,7 @@ def generate_descriptor(struct: Structure, include_WC=True):
                 element_dict[key] += value / len(struct.species_and_occu)
             else:
                 element_dict[key] = value / len(struct.species_and_occu)
-    position = 121
+    position = 118
     for p in [10, 7, 5, 3, 2]:
         properties = np.insert(properties, position,
                                math.pow(sum(math.pow(value, p) for value in element_dict.values()), 1.0 / p))

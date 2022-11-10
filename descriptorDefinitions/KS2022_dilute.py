@@ -205,7 +205,7 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
                 element_dict[key] += value / len(struct.species_and_occu)
             else:
                 element_dict[key] = value / len(struct.species_and_occu)
-    position = 121
+    position = 118
     for p in [10, 7, 5, 3, 2]:
         properties = np.insert(properties, position,
                                math.pow(sum(math.pow(value, p) for value in element_dict.values()), 1.0 / p))
