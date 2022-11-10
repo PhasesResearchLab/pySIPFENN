@@ -178,7 +178,7 @@ def generate_descriptor(struct: Structure, include_WC=True):
             av_ionic_char += ionic_char * value1 * value2
     properties = np.append(properties, max_ionic_char)
     properties = np.append(properties, av_ionic_char)
-    return properties
+    return properties.tolist()
 
 def cite():
     return citation
@@ -218,8 +218,8 @@ def profileParallel(test='JVASP-10001'):
     return 1
 
 if __name__ == "__main__":
-    #profile(test='JVASP-10001')
-    profile(test='diluteNiAlloy')
+    profile(test='JVASP-10001')
+    #profile(test='diluteNiAlloy')
     #profileDilute(test='diluteNiAlloy')
     #profileParallel(test='JVASP-10001')
-    profileParallel(test='diluteNiAlloy')
+    #profileParallel(test='diluteNiAlloy')

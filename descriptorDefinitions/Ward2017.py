@@ -254,7 +254,7 @@ def generate_descriptor(struct):
   properties = np.append(properties, (float) (has_anions and has_cations))
   properties = np.append(properties, max_ionic_char)
   properties = np.append(properties, av_ionic_char)
-  return properties
+  return properties.tolist()
 
 def cite():
   return citation
@@ -294,8 +294,7 @@ def profileParallel(test='JVASP-10001'):
   return 1
 
 if __name__ == "__main__":
-  # profile(test='JVASP-10001')
+  #profile(test='JVASP-10001')
   profile(test='diluteNiAlloy')
-  # profileDilute(test='diluteNiAlloy')
   # profileParallel(test='JVASP-10001')
   #profileParallel(test='diluteNiAlloy')
