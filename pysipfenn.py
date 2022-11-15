@@ -13,9 +13,15 @@ import requests
 import json
 from concurrent import futures
 from pymongo import MongoClient
+from tqdm import tqdm
+from tqdm.contrib.concurrent import process_map
+
+from typing import List
 
 # Descriptor Generators
 Ward2017 = __import__('descriptorDefinitions.Ward2017', fromlist=[''])
+KS2022 = __import__('descriptorDefinitions.KS2022', fromlist=[''])
+KS2022_dilute = __import__('descriptorDefinitions.KS2022_dilute', fromlist=[''])
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=4)
 process_pool_executor = futures.ProcessPoolExecutor(max_workers=12)
@@ -69,4 +75,49 @@ def downloadModels(network='all'):
     else:
         print('Network name not recognized')
 
-downloadModels()
+#downloadModels()
+
+
+def calculate_Ward2017(structList: List[Structure], mode='serial', max_workers=10):
+
+    if mode=='serial':
+        descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
+        print('Done!')
+        return descList
+    elif mode=='parallel':
+        descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
+        print('Done!')
+        return descList
+
+def calculate_KS2022(structList: List[Structure], mode='serial', max_workers=10):
+
+    if mode=='serial':
+        descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
+        print('Done!')
+        return descList
+    elif mode=='parallel':
+        descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
+        print('Done!')
+        return descList
+
+
+def calculate_KS2022_dilute(structList: List[Structure], baseStruct='pure', mode='serial', max_workers=10):
+    if baseStruct=='pure' or isinstance(baseStruct, Structure):
+        if mode=='serial':
+            descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
+            print('Done!')
+            return descList
+        elif mode=='parallel':
+            descList = process_map(Ward2017.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
+            print('Done!')
+            return descList
+
+    elif isinstance(baseStruct, List) and len(baseStruct)==len(structList):
+        if mode=='serial':
+            descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
+            print('Done!')
+            return descList
+        elif mode=='parallel':
+            descList = process_map(Ward2017.generate_descriptor, structList, baseStruct, max_workers=max_workers)
+            print('Done!')
+            return descList
