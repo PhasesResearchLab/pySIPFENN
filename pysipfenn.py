@@ -26,174 +26,194 @@ from typing import List
 Ward2017 = __import__('descriptorDefinitions.Ward2017', fromlist=[''])
 KS2022 = __import__('descriptorDefinitions.KS2022', fromlist=[''])
 KS2022_dilute = __import__('descriptorDefinitions.KS2022_dilute', fromlist=[''])
+# - add new ones here if extending the code
 
-thread_pool_executor = futures.ThreadPoolExecutor(max_workers=4)
-process_pool_executor = futures.ProcessPoolExecutor(max_workers=12)
-descriptor_thread_executor = futures.ThreadPoolExecutor(max_workers=13)
+class Calculator:
+    def __init__(self):
 
-models = json.load(open('models.json'))
+        self.thread_pool_executor = futures.ThreadPoolExecutor(max_workers=4)
+        self.process_pool_executor = futures.ProcessPoolExecutor(max_workers=12)
+        self.descriptor_thread_executor = futures.ThreadPoolExecutor(max_workers=13)
 
-network_list = list(models.keys())
-network_list_names = [models[net]['name'] for net in network_list]
+        # Create a context for mxnet
+        self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
 
-def updateModelAvailability():
-    all_files = os.listdir('modelsSIPFENN')
-    detectedNets = []
-    for net, netName in zip(network_list, network_list_names):
-        if all_files.__contains__(net + '.params') and all_files.__contains__(net + '.json'):
-            detectedNets.append(net)
-            print('\u2714 ' + netName)
-        else:
-            print('\u292B ' + netName)
-    return detectedNets
+        # dictionary with all model information
+        self.models = json.load(open('models.json'))
+        # networks list
+        self.network_list = list(self.models.keys())
+        # network names
+        self.network_list_names = [self.models[net]['name'] for net in self.network_list]
+        self.network_list_available = []
+        self.updateModelAvailability()
 
-network_list_available = updateModelAvailability()
+        self.loadedModels = {}
+        self.loadModels()
 
-def downloadModels(network='all'):
-    # Fetch all
-    if network=='all':
-        print('Fetching all networks!')
-        for net in network_list:
-            if net not in network_list_available:
-                print(f'Fetching: {net}')
-                wget.download(models[net]['URLjson'], f'modelsSIPFENN/{net}.json')
-                print('\nArchitecture Successfully Fetched.')
-                print('Downloading the Network Parameters. This process can take a few minutes.')
-                wget.download(models[net]['URLparams'], f'modelsSIPFENN/{net}.params')
-                print('\nNetwork Parameters Fetched.')
+        self.toRun = []
+        self.descriptorData = []
+        self.predictions = []
+        print(f'*********  PySIPFENN Successfully Initialized  **********')
+
+
+
+
+    def updateModelAvailability(self):
+        all_files = os.listdir('modelsSIPFENN')
+        detectedNets = []
+        for net, netName in zip(self.network_list, self.network_list_names):
+            if all_files.__contains__(net + '.params') and all_files.__contains__(net + '.json'):
+                detectedNets.append(net)
+                print('\u2714 ' + netName)
             else:
-                print(f'{net} detected on disk. Ready to use.')
+                print('\u292B ' + netName)
+        self.network_list_available = detectedNets
 
-        if network_list==network_list_available:
-            print('All networks available!')
+    def downloadModels(self, network='all'):
+        # Fetch all
+        if network=='all':
+            print('Fetching all networks!')
+            for net in self.network_list:
+                if net not in self.network_list_available:
+                    print(f'Fetching: {net}')
+                    wget.download(self.models[net]['URLjson'], f'modelsSIPFENN/{net}.json')
+                    print('\nArchitecture Successfully Fetched.')
+                    print('Downloading the Network Parameters. This process can take a few minutes.')
+                    wget.download(self.models[net]['URLparams'], f'modelsSIPFENN/{net}.params')
+                    print('\nNetwork Parameters Fetched.')
+                else:
+                    print(f'{net} detected on disk. Ready to use.')
+
+            if self.network_list==self.network_list_available:
+                print('All networks available!')
+            else:
+                print('Problem occurred.')
+
+        # Fetch single
+        elif network in self.network_list:
+            print(f'Fetching: {network}')
+            wget.download(self.models[network]['URLjson'], f'modelsSIPFENN/{network}.json')
+            print('\nArchitecture Successfully Fetched.')
+            print('Downloading the Network Parameters. This process can take a few minutes.')
+            wget.download(self.models[network]['URLparams'], f'modelsSIPFENN/{network}.params')
+            print('\nNetwork Parameters Fetched.')
+        # Not recognized
         else:
-            print('Problem occurred.')
+            print('Network name not recognized')
+        self.updateModelAvailability()
 
-    # Fetch single
-    elif network in network_list:
-        print(f'Fetching: {network}')
-        wget.download(models[network]['URLjson'], f'modelsSIPFENN/{network}.json')
-        print('\nArchitecture Successfully Fetched.')
-        print('Downloading the Network Parameters. This process can take a few minutes.')
-        wget.download(models[network]['URLparams'], f'modelsSIPFENN/{network}.params')
-        print('\nNetwork Parameters Fetched.')
-    # Not recognized
-    else:
-        print('Network name not recognized')
+    def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10):
 
-#downloadModels()
-network_list_available = updateModelAvailability()
-
-def calculate_Ward2017(structList: List[Structure], mode='serial', max_workers=10):
-
-    if mode=='serial':
-        descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
-        print('Done!')
-        return descList
-    elif mode=='parallel':
-        descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
-        print('Done!')
-        return descList
-
-def calculate_KS2022(structList: List[Structure], mode='serial', max_workers=10):
-
-    if mode=='serial':
-        descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
-        print('Done!')
-        return descList
-    elif mode=='parallel':
-        descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
-        print('Done!')
-        return descList
-
-
-def calculate_KS2022_dilute(structList: List[Structure], baseStruct='pure', mode='serial', max_workers=10):
-    if baseStruct=='pure' or isinstance(baseStruct, Structure):
         if mode=='serial':
-            descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
+            descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
             return descList
         elif mode=='parallel':
-            descList = process_map(Ward2017.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
+            descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
             return descList
 
-    elif isinstance(baseStruct, List) and len(baseStruct)==len(structList):
+    def calculate_KS2022(self, structList: List[Structure], mode='serial', max_workers=10):
+
         if mode=='serial':
-            descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
+            descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
             return descList
         elif mode=='parallel':
-            descList = process_map(Ward2017.generate_descriptor, structList, baseStruct, max_workers=max_workers)
+            descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
             return descList
 
-# Create a context for mxnet
-ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
 
-# Create available models dictionary with loaded model neural networks
-loadedModels = {}
-def loadModels():
-    for net in network_list_available:
-        loadedModels.update({net: gluon.nn.SymbolBlock.imports(
-            f'modelsSIPFENN/{net}.json',    # architecture file
-            ['Input'],
-            f'modelsSIPFENN/{net}.params',  # parameters file
-            ctx=ctx)})
+    def calculate_KS2022_dilute(self, structList: List[Structure], baseStruct='pure', mode='serial', max_workers=10):
+        if baseStruct=='pure' or isinstance(baseStruct, Structure):
+            if mode=='serial':
+                descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
+                print('Done!')
+                return descList
+            elif mode=='parallel':
+                descList = process_map(Ward2017.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
+                print('Done!')
+                return descList
 
-loadModels()
+        elif isinstance(baseStruct, List) and len(baseStruct)==len(structList):
+            if mode=='serial':
+                descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
+                print('Done!')
+                return descList
+            elif mode=='parallel':
+                descList = process_map(Ward2017.generate_descriptor, structList, baseStruct, max_workers=max_workers)
+                print('Done!')
+                return descList
 
-def makePredictions(models, toRun, dataIn):
-    dataOuts = []
-    for net in toRun:
-        input = dataIn.as_in_context(ctx)
-        model = models[net]
-        tempOut = model(input)
-        dataOuts.append(list(tempOut.asnumpy()))
-    return dataOuts
+    # Create available models dictionary with loaded model neural networks
+    def loadModels(self):
+        for net in self.network_list_available:
+            self.loadedModels.update({net: gluon.nn.SymbolBlock.imports(
+                f'modelsSIPFENN/{net}.json',    # architecture file
+                ['Input'],
+                f'modelsSIPFENN/{net}.params',  # parameters file
+                ctx=self.ctx)})
 
-def findCompatibleModels(descriptor):
-    compatibleList = []
-    for net in models:
-        if descriptor in models[net]['descriptor']:
-            compatibleList.append(net)
-    return compatibleList
+    def makePredictions(self, models, toRun, dataInList):
+        dataOuts = []
+        # Run for each network
+        for net in toRun:
+            dataIn = nd.array(dataInList)
+            input = dataIn.as_in_context(self.ctx)
+            model = models[net]
+            tempOut = model(input)
+            dataOuts.append(list(tempOut.asnumpy()))
+
+        # Transpose the predictions
+        dataOuts = np.array(dataOuts).T.tolist()[0]
+        return dataOuts
+
+    def findCompatibleModels(self, descriptor):
+        compatibleList = []
+        for net in self.models:
+            if descriptor in self.models[net]['descriptor']:
+                compatibleList.append(net)
+        return compatibleList
+
+    def runModels(self, descriptor: str, structList: list, mode='serial', max_workers=4):
+
+        self.toRun = list(set(self.findCompatibleModels(descriptor)).union(set(self.network_list_available)))
+        if len(self.toRun)==0:
+            print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
+                  'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
+                  'the downloadModels() function if you are using base models.')
+            raise AssertionError
+
+        if descriptor=='Ward2017':
+            self.descriptorData = self.calculate_Ward2017(structList, mode=mode, max_workers=max_workers)
+        elif descriptor=='KS2022':
+            self.descriptorData = self.calculate_KS2022(structList, mode=mode, max_workers=max_workers)
+        else:
+            print('Descriptor handing not implemented. Check spelling.')
+            raise AssertionError
+
+        self.predictions = self.makePredictions(models=self.loadedModels, toRun=self.toRun, dataInList=self.descriptorData)
+
+        return self.predictions
 
 
-def runModels(descriptor: str, structList: list, mode='serial', max_workers=4):
+    def runModels_dilute(self, descriptor: str, structList: list, baseStruct = 'pure', mode='serial', max_workers=4):
 
-    toRun = set(findCompatibleModels(descriptor)).union(set(network_list_available))
-    if len(toRun)==0:
-        print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
-              'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
-              'the downloadModels() function if you are using base models.')
-        raise AssertionError
+        self.toRun = list(set(self.findCompatibleModels(descriptor)).union(set(self.network_list_available)))
+        if len(self.toRun)==0:
+            print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
+                  'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
+                  'the downloadModels() function if you are using base models.')
+            raise TypeError
 
-    if descriptor=='Ward2017':
-        dataIn = calculate_Ward2017(structList, mode=mode, max_workers=max_workers)
-    elif descriptor=='KS2022':
-        dataIn = calculate_KS2022(structList, mode=mode, max_workers=max_workers)
-    else:
-        print('Descriptor handing not implemented. Check spelling.')
-        raise AssertionError
+        if descriptor=='KS2022_dilute':
+            self.descriptorData = self.calculate_KS2022_dilute(structList, baseStruct=baseStruct, mode=mode, max_workers=max_workers)
+        else:
+            print('Descriptor handing not implemented. Check spelling.')
+            raise AssertionError
 
-    return makePredictions(models=loadedModels, toRun=toRun, dataIn=dataIn)
+        self.predictions = self.makePredictions(models=self.loadedModels, toRun=self.toRun, dataInList=self.descriptorData)
 
-
-def runModels_dilute(descriptor: str, structList: list, baseStruct = 'pure', mode='serial', max_workers=4):
-
-    toRun = set(findCompatibleModels(descriptor)).union(set(network_list_available))
-    if len(toRun)==0:
-        print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
-              'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
-              'the downloadModels() function if you are using base models.')
-        raise TypeError
-
-    if descriptor=='KS2022_dilute':
-        dataIn = calculate_KS2022_dilute(structList, baseStruct=baseStruct, mode=mode, max_workers=max_workers)
-    else:
-        print('Descriptor handing not implemented. Check spelling.')
-        raise AssertionError
-
-    return makePredictions(models=loadedModels, toRun=toRun, dataIn=dataIn)
+        return self.predictions
 
