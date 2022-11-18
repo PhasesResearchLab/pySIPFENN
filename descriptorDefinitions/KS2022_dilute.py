@@ -249,7 +249,8 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
             av_ionic_char += ionic_char * value1 * value2
     properties = np.append(properties, max_ionic_char)
     properties = np.append(properties, av_ionic_char)
-    return properties.tolist()
+    properties = properties.astype(np.float32)
+    return properties
 
 def cite():
     return citation
