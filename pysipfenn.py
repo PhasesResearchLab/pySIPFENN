@@ -53,6 +53,7 @@ class Calculator:
         self.toRun = []
         self.descriptorData = []
         self.predictions = []
+        self.inputFiles = []
         print(f'*********  PySIPFENN Successfully Initialized  **********')
 
 
@@ -219,5 +220,15 @@ class Calculator:
 
     def get_resultDicts(self):
         return [dict(zip(self.toRun, pred)) for pred in self.predictions]
+
+    def runFromDirectory(self, directory: str, descriptor: str, mode='serial', max_workers=4):
+        self.inputFiles = os.listdir(directory)
+        structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
+        self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
+
+    def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct = 'pure', mode='serial', max_workers=4):
+        self.inputFiles = os.listdir(directory)
+        structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
+        self.runModels_dilute(descriptor=descriptor, structList=structList, baseStruct = baseStruct, mode=mode, max_workers=max_workers)
 
     
