@@ -17,7 +17,6 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 import json
 from tqdm import tqdm
 from collections import Counter
-from KS2022 import magpie_mode
 
 citation = 'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.'
 
@@ -170,6 +169,24 @@ class LocalAttributeGenerator:
 
         return local_env_result
 
+# Calculates the attributes corresponding to the most common elements.
+def magpie_mode(attribute_properties, axis=0):
+    scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
+    max_occurrence = 0
+    top_elements = []
+    for score in scores:
+        template = (attribute_properties[:, 0] == score)
+        count = np.expand_dims(np.sum(template, axis), axis)[0]
+        if count > max_occurrence:
+            top_elements.clear()
+            top_elements.append(score)
+            max_occurrence = count
+        elif count == max_occurrence:
+            top_elements.append(score)
+    output = np.zeros_like(attribute_properties[0, :])
+    for elem in top_elements:
+        output += attribute_matrix[int(elem) - 1, :]
+    return output / len(top_elements)
 
 def generate_descriptor(struct: Structure, baseStruct='pure'):
     diff_properties, attribute_properties = generate_voronoi_attributes(struct, baseStruct=baseStruct)
