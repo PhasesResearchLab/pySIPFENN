@@ -120,12 +120,12 @@ class Calculator:
     def calculate_KS2022(self, structList: List[Structure], mode='serial', max_workers=10):
 
         if mode=='serial':
-            descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
+            descList = [KS2022.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
             self.descriptorData = descList
             return descList
         elif mode=='parallel':
-            descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
+            descList = process_map(KS2022.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
             self.descriptorData = descList
             return descList
