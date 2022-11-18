@@ -27,7 +27,7 @@ emptyLabelsIndx = [labels.index(l) for l in emptyLabels]
 exampleInputFiles = natsorted(os.listdir('testCaseFiles/exampleInputFiles/'))
 testStructures = [Structure.from_file(f'testCaseFiles/exampleInputFiles/{eif}') for eif in exampleInputFiles]
 
-functionOutput = [KS2022.generate_descriptor(s) for s in tqdm(testStructures[:5])]
+functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:5])]
 with open('KS2022_TestResult.csv', 'w+') as f:
     f.writelines([f'{v}\n' for v in functionOutput[0]])
 
