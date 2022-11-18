@@ -158,6 +158,7 @@ class Calculator:
 
     def makePredictions(self, models, toRun, dataInList):
         dataOuts = []
+        print('Making predictions...')
         # Run for each network
         for net in toRun:
             dataIn = nd.array(dataInList)
@@ -165,6 +166,7 @@ class Calculator:
             model = models[net]
             tempOut = model(input)
             dataOuts.append(list(tempOut.asnumpy()))
+            print(f'Obtained predictions from:  {net}')
 
         # Transpose the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
@@ -185,7 +187,10 @@ class Calculator:
                   'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
                   'the downloadModels() function if you are using base models.')
             raise AssertionError
+        else:
+            print(f'Running {self.toRun} models')
 
+        print('Calculating descriptors...')
         if descriptor=='Ward2017':
             self.descriptorData = self.calculate_Ward2017(structList, mode=mode, max_workers=max_workers)
         elif descriptor=='KS2022':
@@ -207,7 +212,10 @@ class Calculator:
                   'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
                   'the downloadModels() function if you are using base models.')
             raise TypeError
+        else:
+            print(f'Running {self.toRun} models')
 
+        print('Calculating descriptors...')
         if descriptor=='KS2022_dilute':
             self.descriptorData = self.calculate_KS2022_dilute(structList, baseStruct=baseStruct, mode=mode, max_workers=max_workers)
         else:
@@ -221,14 +229,37 @@ class Calculator:
     def get_resultDicts(self):
         return [dict(zip(self.toRun, pred)) for pred in self.predictions]
 
+    def get_resultDictsWithNames(self):
+        assert self.inputFiles is not []
+        return [
+            dict(zip(['name']+self.toRun, [name]+pred))
+            for name, pred in
+            zip(self.inputFiles, self.predictions)]
+
     def runFromDirectory(self, directory: str, descriptor: str, mode='serial', max_workers=4):
+        print('Importing structures...')
         self.inputFiles = os.listdir(directory)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
+        print('Done!')
 
     def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct = 'pure', mode='serial', max_workers=4):
+        print('Importing structures...')
         self.inputFiles = os.listdir(directory)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels_dilute(descriptor=descriptor, structList=structList, baseStruct = baseStruct, mode=mode, max_workers=max_workers)
+        print('Done!')
 
-    
+    def writeResultsToCSV(self, file: str):
+        assert self.toRun is not []
+        with open(file, 'w+') as f:
+            f.write('Name,'+','.join(self.toRun)+'\n')
+            if len(self.inputFiles)==len(self.predictions):
+                for name, pred in zip(self.inputFiles, self.predictions):
+                    assert len(pred)==len(self.toRun)
+                    f.write(f'{name},{",".join(str(v) for v in pred)}\n')
+            else:
+                i = 1
+                for pred in self.predictions:
+                    f.write(f'{i},{",".join(str(v) for v in pred)}\n')
+                    i+=1
