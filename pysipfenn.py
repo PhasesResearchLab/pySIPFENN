@@ -6,6 +6,7 @@ import wget
 import wx
 import wx.adv
 import re
+import csv
 import numpy as np
 from pymatgen.core import Structure
 from datetime import datetime
@@ -108,10 +109,12 @@ class Calculator:
         if mode=='serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
+            self.descriptorData = descList
             return descList
         elif mode=='parallel':
             descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
+            self.descriptorData = descList
             return descList
 
     def calculate_KS2022(self, structList: List[Structure], mode='serial', max_workers=10):
@@ -119,10 +122,12 @@ class Calculator:
         if mode=='serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
+            self.descriptorData = descList
             return descList
         elif mode=='parallel':
             descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
+            self.descriptorData = descList
             return descList
 
 
@@ -131,20 +136,24 @@ class Calculator:
             if mode=='serial':
                 descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
                 print('Done!')
+                self.descriptorData = descList
                 return descList
             elif mode=='parallel':
                 descList = process_map(Ward2017.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
                 print('Done!')
+                self.descriptorData = descList
                 return descList
 
         elif isinstance(baseStruct, List) and len(baseStruct)==len(structList):
             if mode=='serial':
                 descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
                 print('Done!')
+                self.descriptorData = descList
                 return descList
             elif mode=='parallel':
                 descList = process_map(Ward2017.generate_descriptor, structList, baseStruct, max_workers=max_workers)
                 print('Done!')
+                self.descriptorData = descList
                 return descList
 
     # Create available models dictionary with loaded model neural networks
@@ -170,6 +179,8 @@ class Calculator:
 
         # Transpose the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
+
+        self.predictions = dataOuts
         return dataOuts
 
     def findCompatibleModels(self, descriptor):
@@ -262,4 +273,23 @@ class Calculator:
                 i = 1
                 for pred in self.predictions:
                     f.write(f'{i},{",".join(str(v) for v in pred)}\n')
+                    i+=1
+
+    def writeDescriptorsToCSV(self, descriptor: str, file: str):
+        # Load descriptor labels
+        with open(f'descriptorDefinitions/labels_{descriptor}.csv', 'r') as f:
+            reader = csv.reader(f)
+            labels = [v[0] for v in list(reader)]
+
+        # Write descriptor data
+        with open(file, 'w+') as f:
+            f.write(f'Name,{",".join(labels)}\n')
+            if len(self.inputFiles) == len(self.descriptorData):
+                for name, dd in zip(self.inputFiles, self.descriptorData):
+                    assert len(dd) == len(labels)
+                    f.write(f'{name},{",".join(str(v) for v in dd.tolist())}\n')
+            else:
+                i = 1
+                for dd in self.descriptorData:
+                    f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i+=1
