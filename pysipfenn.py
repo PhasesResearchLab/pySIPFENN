@@ -217,3 +217,7 @@ class Calculator:
 
         return self.predictions
 
+    def get_resultDicts(self):
+        return [dict(zip(self.toRun, pred)) for pred in self.predictions]
+
+    
