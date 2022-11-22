@@ -84,11 +84,22 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
 
     # Generate a base structure of pure elemental solid or take one as input
     if isinstance(baseStruct, Structure):
-        pass
+        diluteSite = []
+        for i, (s1s, s2s) in enumerate(zip(baseStruct.sites, struct.sites)):
+            if s1s != s2s:
+                diluteSite.append(i)
+                continue
+        if len(diluteSite)==1:
+            diluteSite = diluteSite[0]
+        else:
+            print('Sites in the provided base structure matched the investigated one exactly')
+            raise TypeError
     elif baseStruct=='pure':
         baseStruct = struct.copy()
         for sp in set(baseStruct.species):
             baseStruct.replace_species({sp: 'A'})
+        # Find position of the 1 dilute atom and calculate output for it
+        diluteSite = findDilute(struct)
     else:
         raise TypeError
 
@@ -98,8 +109,6 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
 
     # Output list
     attribute_list = list()
-    # Find position of the 1 dilute atom and calculate output for it
-    diluteSite = findDilute(struct)
     attribute_list.append(local_generator.generate_local_attributes_diluteSite(diluteSite))
 
     # Based on the dilute atom output, identify its neighbors
