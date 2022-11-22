@@ -1,21 +1,15 @@
 # General Imports
 import os
-import time
-import sys
 import wget
-import wx
-import wx.adv
-import re
 import csv
 import numpy as np
 from pymatgen.core import Structure
-from datetime import datetime
-import requests
 import json
 from concurrent import futures
-from pymongo import MongoClient
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
+
+from importlib import resources
 
 import mxnet as mx
 from mxnet import nd
@@ -24,9 +18,7 @@ from mxnet import gluon
 from typing import List
 
 # Descriptor Generators
-Ward2017 = __import__('descriptorDefinitions.Ward2017', fromlist=[''])
-KS2022 = __import__('descriptorDefinitions.KS2022', fromlist=[''])
-KS2022_dilute = __import__('descriptorDefinitions.KS2022_dilute', fromlist=[''])
+from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
 # - add new ones here if extending the code
 
 class Calculator:
@@ -40,7 +32,8 @@ class Calculator:
         self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
 
         # dictionary with all model information
-        self.models = json.load(open('models.json'))
+        with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
+            self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
         # network names
@@ -61,7 +54,8 @@ class Calculator:
 
 
     def updateModelAvailability(self):
-        all_files = os.listdir('modelsSIPFENN')
+        with resources.files('pysipfenn.modelsSIPFENN') as p:
+            all_files = os.listdir(p)
         detectedNets = []
         for net, netName in zip(self.network_list, self.network_list_names):
             if all_files.__contains__(net + '.params') and all_files.__contains__(net + '.json'):
@@ -72,36 +66,37 @@ class Calculator:
         self.network_list_available = detectedNets
 
     def downloadModels(self, network='all'):
-        # Fetch all
-        if network=='all':
-            print('Fetching all networks!')
-            for net in self.network_list:
-                if net not in self.network_list_available:
-                    print(f'Fetching: {net}')
-                    wget.download(self.models[net]['URLjson'], f'modelsSIPFENN/{net}.json')
-                    print('\nArchitecture Successfully Fetched.')
-                    print('Downloading the Network Parameters. This process can take a few minutes.')
-                    wget.download(self.models[net]['URLparams'], f'modelsSIPFENN/{net}.params')
-                    print('\nNetwork Parameters Fetched.')
+        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+            # Fetch all
+            if network=='all':
+                print('Fetching all networks!')
+                for net in self.network_list:
+                    if net not in self.network_list_available:
+                        print(f'Fetching: {net}')
+                        wget.download(self.models[net]['URLjson'], f'{modelPath}/{net}.json')
+                        print('\nArchitecture Successfully Fetched.')
+                        print('Downloading the Network Parameters. This process can take a few minutes.')
+                        wget.download(self.models[net]['URLparams'], f'{modelPath}/{net}.params')
+                        print('\nNetwork Parameters Fetched.')
+                    else:
+                        print(f'{net} detected on disk. Ready to use.')
+
+                if self.network_list==self.network_list_available:
+                    print('All networks available!')
                 else:
-                    print(f'{net} detected on disk. Ready to use.')
+                    print('Problem occurred.')
 
-            if self.network_list==self.network_list_available:
-                print('All networks available!')
+            # Fetch single
+            elif network in self.network_list:
+                print(f'Fetching: {network}')
+                wget.download(self.models[network]['URLjson'], f'{modelPath}/{network}.json')
+                print('\nArchitecture Successfully Fetched.')
+                print('Downloading the Network Parameters. This process can take a few minutes.')
+                wget.download(self.models[network]['URLparams'], f'{modelPath}/{network}.params')
+                print('\nNetwork Parameters Fetched.')
+            # Not recognized
             else:
-                print('Problem occurred.')
-
-        # Fetch single
-        elif network in self.network_list:
-            print(f'Fetching: {network}')
-            wget.download(self.models[network]['URLjson'], f'modelsSIPFENN/{network}.json')
-            print('\nArchitecture Successfully Fetched.')
-            print('Downloading the Network Parameters. This process can take a few minutes.')
-            wget.download(self.models[network]['URLparams'], f'modelsSIPFENN/{network}.params')
-            print('\nNetwork Parameters Fetched.')
-        # Not recognized
-        else:
-            print('Network name not recognized')
+                print('Network name not recognized')
         self.updateModelAvailability()
 
     def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10):
@@ -158,12 +153,13 @@ class Calculator:
 
     # Create available models dictionary with loaded model neural networks
     def loadModels(self):
-        for net in self.network_list_available:
-            self.loadedModels.update({net: gluon.nn.SymbolBlock.imports(
-                f'modelsSIPFENN/{net}.json',    # architecture file
-                ['Input'],
-                f'modelsSIPFENN/{net}.params',  # parameters file
-                ctx=self.ctx)})
+        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+            for net in self.network_list_available:
+                self.loadedModels.update({net: gluon.nn.SymbolBlock.imports(
+                    f'{modelPath}/{net}.json',    # architecture file
+                    ['Input'],
+                    f'{modelPath}/{net}.params',  # parameters file
+                    ctx=self.ctx)})
 
     def makePredictions(self, models, toRun, dataInList):
         dataOuts = []
@@ -192,7 +188,7 @@ class Calculator:
 
     def runModels(self, descriptor: str, structList: list, mode='serial', max_workers=4):
 
-        self.toRun = list(set(self.findCompatibleModels(descriptor)).union(set(self.network_list_available)))
+        self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         if len(self.toRun)==0:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
                   'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
@@ -217,7 +213,7 @@ class Calculator:
 
     def runModels_dilute(self, descriptor: str, structList: list, baseStruct = 'pure', mode='serial', max_workers=4):
 
-        self.toRun = list(set(self.findCompatibleModels(descriptor)).union(set(self.network_list_available)))
+        self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         if len(self.toRun)==0:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
                   'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'

@@ -5,10 +5,12 @@ from pymatgen.core import Structure
 from tqdm import tqdm
 import numpy as np
 from natsort import natsorted
+from importlib import resources
 
-KS2022 = __import__('descriptorDefinitions.KS2022', fromlist=[''])
+from pysipfenn.descriptorDefinitions import KS2022
 
-with open('testCaseFiles/exampleInputFilesDescriptorTable.csv', newline='') as f:
+with resources.files('pysipfenn').\
+        joinpath('tests/testCaseFiles/exampleInputFilesDescriptorTable.csv').open('r', newline='') as f:
     reader = csv.reader(f)
     referenceDescriptorTable = list(reader)
 
@@ -24,11 +26,12 @@ emptyLabels = [
 emptyLabels.reverse()
 emptyLabelsIndx = [labels.index(l) for l in emptyLabels]
 
-exampleInputFiles = natsorted(os.listdir('testCaseFiles/exampleInputFiles/'))
-testStructures = [Structure.from_file(f'testCaseFiles/exampleInputFiles/{eif}') for eif in exampleInputFiles]
+with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
+    exampleInputFiles = natsorted(os.listdir(exampleInputsDir))
+    testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
 
 functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:5])]
-with open('KS2022_TestResult.csv', 'w+') as f:
+with resources.files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
     f.writelines([f'{v}\n' for v in functionOutput[0]])
 
 class TestWard2017(unittest.TestCase):
