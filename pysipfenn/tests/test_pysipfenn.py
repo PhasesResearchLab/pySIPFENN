@@ -15,13 +15,25 @@ class TestCore(unittest.TestCase):
         self.c.updateModelAvailability()
         self.assertIsInstance(self.c.network_list_available, list)
 
-    def test_from_poscar(self):
-        if self.c.network_list_available!=[]:
+    def testFromPOSCAR_Ward2017(self):
+        self.c.updateModelAvailability()
+        toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
+        if toRun!=[]:
             with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
         else:
-            print('Did not detect any models to run')
+            print('Did not detect any Ward2017 models to run')
+
+    def testFromPOSCAR_KS2022(self):
+        self.c.updateModelAvailability()
+        toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
+        if toRun!=[]:
+            with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
+                print(testFileDir)
+                self.c.runFromDirectory(testFileDir, 'KS2022')
+        else:
+            print('Did not detect any KS2022 models to run')
 
 if __name__ == '__main__':
     unittest.main()
