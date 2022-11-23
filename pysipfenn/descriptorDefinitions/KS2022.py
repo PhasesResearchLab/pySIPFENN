@@ -113,7 +113,7 @@ def magpie_mode(attribute_properties, axis=0):
     return output / len(top_elements)
 
 def get_equivalentSitesMultiplicities(struct: Structure):
-    spgA = SpacegroupAnalyzer(struct, angle_tolerance=1, symprec=0.1)
+    spgA = SpacegroupAnalyzer(struct, angle_tolerance=0.1, symprec=0.001)
     return dict(Counter(list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
 
 

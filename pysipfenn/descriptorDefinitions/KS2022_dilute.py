@@ -104,7 +104,7 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
         raise TypeError
 
     # Find equivalent positions in the original base structure
-    spgAbase = SpacegroupAnalyzer(baseStruct)
+    spgAbase = SpacegroupAnalyzer(baseStruct, symprec=0.001, angle_tolerance=0.1)
     originalEquivalents = list(spgAbase.get_symmetry_dataset()['equivalent_atoms'])
 
     # Output list
@@ -156,23 +156,12 @@ class LocalAttributeGenerator:
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         local_env_result = self.function(local_env, self.struct[n], self.struct)
 
-        possibleNeighborSites = list(range(len(self.struct.sites)))
-        identifiedSites = []
-        for value in local_env.values():
-            neighborSite = value['site']
-            for structSiteN in possibleNeighborSites:
-                if self.struct.sites[structSiteN] == neighborSite:
-                    identifiedSites.append(structSiteN)
-                    possibleNeighborSites.remove(structSiteN)
-                    continue
-                elif self.struct.sites[structSiteN].is_periodic_image(neighborSite):
-                    identifiedSites.append(structSiteN)
-                    possibleNeighborSites.remove(structSiteN)
-                    continue
-        neighbor_dict = dict(
-            zip(identifiedSites,
-                [[str(value['site'].species), round(value['face_dist'], 4), round(value['area'], 4), value['n_verts']]
-                 for value in local_env.values()]))
+        neighbor_dict = {value['site'].index:
+                             [str(value['site'].species),
+                              round(value['face_dist'], 2),
+                              round(value['area'], 2),
+                              value['n_verts']]
+                         for value in local_env.values()}
 
         local_env_result.append(neighbor_dict)
 
