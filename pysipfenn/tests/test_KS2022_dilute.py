@@ -19,18 +19,34 @@ matStrList = ['{"@module": "pymatgen.core.structure", "@class": "Structure", "ch
 
 testStructures = [Structure.from_str(matStr,fmt='json') for matStr in matStrList]
 [s.make_supercell([2,2,2]) for s in testStructures]
+baseStructures = [s.copy() for s in testStructures]
 [s.replace(0, 'Al') for s in testStructures]
 testStructures = [s.copy() for s in testStructures]
 
-testReferenceData = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:3])]
-functionOutput = [KS2022_dilute.generate_descriptor(s).tolist() for s in tqdm(testStructures[:3])]
+testReferenceData = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures)]
+
+functionOutput_assumePure = [KS2022_dilute.generate_descriptor(s, baseStruct='pure').tolist()
+                             for s in tqdm(testStructures[:3])]
+functionOutput_explicitBase = [KS2022_dilute.generate_descriptor(s, baseStruct=bs).tolist()
+                             for s, bs in tqdm(zip(testStructures, baseStructures))]
 
 with resources.files('pysipfenn').joinpath('tests/KS2022_dilute_TestResult.csv').open('w+', newline='') as f:
-    f.writelines([f'{name},{trd},{fo}\n' for fo, trd, name in zip(functionOutput[0], testReferenceData[0], labels)])
+    f.writelines([f'{name},{trd},{fo1},{fo2}\n' for fo2, fo1, trd, name in zip(functionOutput_explicitBase[0], functionOutput_assumePure[0], testReferenceData[0], labels)])
 
 class TestKS2022(unittest.TestCase):
-    def test_resutls(self):
-        for fo, trd, name in zip(functionOutput, testReferenceData, testMaterialsLabels):
+    def test_resutls_assumePure(self):
+        for fo, trd, name in zip(functionOutput_assumePure, testReferenceData, testMaterialsLabels):
+            for p_fo, p_trd, l in zip(fo, trd, labels):
+                if p_trd>0.01 and p_fo>0.01:
+                    p_fo_relative = p_fo/p_trd
+                    with self.subTest(msg=f'{name:<16} diff in {l}'):
+                        self.assertAlmostEqual(p_fo_relative, 1, places=2)
+                else:
+                    with self.subTest(msg=f'{name:<16} diff in {l}'):
+                        self.assertAlmostEqual(p_fo, p_trd, places=6)
+
+    def test_resutls_explicitBase(self):
+        for fo, trd, name in zip(functionOutput_explicitBase, testReferenceData, testMaterialsLabels):
             for p_fo, p_trd, l in zip(fo, trd, labels):
                 if p_trd>0.01 and p_fo>0.01:
                     p_fo_relative = p_fo/p_trd
