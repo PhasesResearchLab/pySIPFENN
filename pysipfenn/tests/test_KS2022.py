@@ -34,7 +34,7 @@ functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStruc
 with resources.files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
     f.writelines([f'{v}\n' for v in functionOutput[0]])
 
-class TestWard2017(unittest.TestCase):
+class TestKS2022(unittest.TestCase):
     def test_resutls(self):
         for fo, trd, name in zip(functionOutput, testReferenceData, exampleInputFiles):
             for eli in emptyLabelsIndx:
