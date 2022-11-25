@@ -11,9 +11,9 @@ from tqdm.contrib.concurrent import process_map
 
 from importlib import resources
 
-import mxnet as mx
-from mxnet import nd
-from mxnet import gluon
+import torch
+import onnx2torch
+import onnx
 
 from typing import List
 
@@ -58,7 +58,7 @@ class Calculator:
             all_files = os.listdir(p)
         detectedNets = []
         for net, netName in zip(self.network_list, self.network_list_names):
-            if all_files.__contains__(net + '.params') and all_files.__contains__(net + '.json'):
+            if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
                 print('\u2714 ' + netName)
             else:
@@ -94,6 +94,32 @@ class Calculator:
                 print('Downloading the Network Parameters. This process can take a few minutes.')
                 wget.download(self.models[network]['URLparams'], f'{modelPath}/{network}.params')
                 print('\nNetwork Parameters Fetched.')
+            # Not recognized
+            else:
+                print('Network name not recognized')
+
+    def downloadModels(self, network='all'):
+        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+            # Fetch all
+            if network=='all':
+                print('Fetching all networks!')
+                for net in self.network_list:
+                    if net not in self.network_list_available:
+                        print(f'Fetching: {net}')
+                        wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
+                        print('\nONNX Network Successfully Fetched.')
+                    else:
+                        print(f'{net} detected on disk. Ready to use.')
+                if self.network_list==self.network_list_available:
+                    print('All networks available!')
+                else:
+                    print('Problem occurred.')
+
+            # Fetch single
+            elif network in self.network_list:
+                print(f'Fetching: {network}')
+                wget.download(self.models[network]['URL_ONNX'], f'{modelPath}/{network}.onnx')
+                print('\nONNX Network Successfully Fetched.')
             # Not recognized
             else:
                 print('Network name not recognized')
@@ -176,6 +202,26 @@ class Calculator:
         # Transpose the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
 
+        self.predictions = dataOuts
+        return dataOuts
+
+    def makePredictions(self, models, toRun, dataInList):
+        dataOuts = []
+        print('Making predictions...')
+        # Run for each network
+        dataIn = torch.from_numpy(np.array(dataInList)).float()
+        for net in toRun:
+            model = models[net]
+            model.training = False
+            if hasattr(model, 'Dropout_0'):
+                tempOut = model(dataIn, None)
+            else:
+                tempOut = model(dataIn)
+            dataOuts.append(tempOut.cpu().detach().numpy())
+            print(f'Obtained predictions from:  {net}')
+
+        # Transpose and round the predictions
+        dataOuts = np.array(dataOuts).T.round(6).tolist()[0]
         self.predictions = dataOuts
         return dataOuts
 
