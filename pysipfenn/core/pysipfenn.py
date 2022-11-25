@@ -28,9 +28,6 @@ class Calculator:
         self.process_pool_executor = futures.ProcessPoolExecutor(max_workers=12)
         self.descriptor_thread_executor = futures.ThreadPoolExecutor(max_workers=13)
 
-        # Create a context for mxnet
-        self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
-
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             self.models = json.load(f)
@@ -65,7 +62,7 @@ class Calculator:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
 
-    def downloadModels(self, network='all'):
+    def downloadModels_legacyMxNet(self, network='all'):
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
             if network=='all':
@@ -181,20 +178,40 @@ class Calculator:
     def loadModels(self):
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             for net in self.network_list_available:
-                self.loadedModels.update({net: gluon.nn.SymbolBlock.imports(
+                self.loadedModels.update({
+                    net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
+                })
+
+
+    def makePredictions_legacyMxNet(self, mxnet_networks, dataInList):
+        # Import MxNet
+        import mxnet as mx
+        from mxnet import nd
+        from mxnet import gluon
+        # Create a context for mxnet
+        self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
+        # Verify if the nexts are avaialble
+        with resources.files('pysipfenn.modelsSIPFENN') as p:
+            all_files = os.listdir(p)
+        for net in mxnet_networks:
+            assert all_files.__contains__(net + '.json')
+            assert all_files.__contains__(net + '.params')
+        # Load the models
+        loadedModels = {}
+        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+            for net in mxnet_networks:
+                loadedModels.update({net: gluon.nn.SymbolBlock.imports(
                     f'{modelPath}/{net}.json',    # architecture file
                     ['Input'],
                     f'{modelPath}/{net}.params',  # parameters file
                     ctx=self.ctx)})
-
-    def makePredictions(self, models, toRun, dataInList):
         dataOuts = []
         print('Making predictions...')
         # Run for each network
-        for net in toRun:
+        for net in loadedModels:
             dataIn = nd.array(dataInList)
             input = dataIn.as_in_context(self.ctx)
-            model = models[net]
+            model = loadedModels[net]
             tempOut = model(input)
             dataOuts.append(list(tempOut.asnumpy()))
             print(f'Obtained predictions from:  {net}')
@@ -241,7 +258,7 @@ class Calculator:
                   'the downloadModels() function if you are using base models.')
             raise AssertionError
         else:
-            print(f'Running {self.toRun} models')
+            print(f'\nModels that will be run: {self.toRun}')
 
         print('Calculating descriptors...')
         if descriptor=='Ward2017':
