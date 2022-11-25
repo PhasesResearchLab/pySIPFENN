@@ -177,7 +177,8 @@ class Calculator:
     # Create available models dictionary with loaded model neural networks
     def loadModels(self):
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-            for net in self.network_list_available:
+            print('Loading models:')
+            for net in tqdm(self.network_list_available):
                 self.loadedModels.update({
                     net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
                 })
