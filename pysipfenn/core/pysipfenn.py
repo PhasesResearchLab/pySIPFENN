@@ -134,7 +134,7 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
             elif mode=='parallel':
-                descList = process_map(Ward2017.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
+                descList = process_map(KS2022_dilute.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
                 return descList
@@ -146,7 +146,7 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
             elif mode=='parallel':
-                descList = process_map(Ward2017.generate_descriptor, structList, baseStruct, max_workers=max_workers)
+                descList = process_map(KS2022_dilute.generate_descriptor, structList, baseStruct, max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
                 return descList
