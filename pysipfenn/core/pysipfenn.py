@@ -1,5 +1,7 @@
 # General Imports
 import os
+
+import natsort
 import wget
 import csv
 import numpy as np
@@ -230,7 +232,7 @@ class Calculator:
         dataIn = torch.from_numpy(np.array(dataInList)).float()
         for net in toRun:
             model = models[net]
-            model.training = False
+            model.eval()
             if hasattr(model, 'Dropout_0'):
                 tempOut = model(dataIn, None)
             else:
@@ -239,7 +241,7 @@ class Calculator:
             print(f'Obtained predictions from:  {net}')
 
         # Transpose and round the predictions
-        dataOuts = np.array(dataOuts).T.round(6).tolist()[0]
+        dataOuts = np.array(dataOuts).T.tolist()[0]
         self.predictions = dataOuts
         return dataOuts
 
@@ -253,6 +255,7 @@ class Calculator:
     def runModels(self, descriptor: str, structList: list, mode='serial', max_workers=4):
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
+        self.toRun = natsort.natsorted(self.toRun)
         if len(self.toRun)==0:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
                   'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
@@ -310,6 +313,7 @@ class Calculator:
     def runFromDirectory(self, directory: str, descriptor: str, mode='serial', max_workers=4):
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
+        self.inputFiles = natsort.natsorted(self.inputFiles)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
         print('Done!')
@@ -317,6 +321,7 @@ class Calculator:
     def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct = 'pure', mode='serial', max_workers=4):
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
+        self.inputFiles = natsort.natsorted(self.inputFiles)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels_dilute(descriptor=descriptor, structList=structList, baseStruct = baseStruct, mode=mode, max_workers=max_workers)
         print('Done!')
