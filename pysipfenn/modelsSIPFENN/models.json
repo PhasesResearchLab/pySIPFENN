@@ -3,18 +3,21 @@
     "name": "SIPFENN_Krajewski2020 Standard Materials Model",
     "URLjson": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN9.json",
     "URLparams": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN9.params",
+    "URL_ONNX": "",
     "descriptor": "Ward2017"
   },
   "SIPFENN_Krajewski2020_NN20": {
     "name": "SIPFENN_Krajewski2020 Novel Materials Model",
     "URLjson": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN20.json",
     "URLparams": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN20.params",
+    "URL_ONNX": "",
     "descriptor": "Ward2017"
   },
   "SIPFENN_Krajewski2020_NN24": {
     "name": "SIPFENN_Krajewski2020 Light Model",
     "URLjson": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN24.json",
     "URLparams": "https://zenodo.org/record/4279640/files/SIPFENN_Krajewski2020_NN24.params",
+    "URL_ONNX": "",
     "descriptor": "Ward2017"
   }
 }
