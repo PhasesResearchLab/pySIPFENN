@@ -358,3 +358,24 @@ class Calculator:
                 for dd in self.descriptorData:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i+=1
+
+def ward2ks2022(ward2017: np.ndarray):
+    assert isinstance(ward2017, np.ndarray)
+    ward2017split = np.split(ward2017, [12, 15, 121, 126, 258, 264, 268, 269, 271])
+    ks2022 = np.concatenate((
+        ward2017split[0],
+        ward2017split[2],
+        ward2017split[4],
+        ward2017split[6],
+        ward2017split[8]
+        ), axis=-1, dtype=np.float32)
+
+    #Join[d[[1, 1;; 12]], d[[1, 16;; 121]], d[[1, 127;; 258]],
+    #d[[1, 265;; 268]], d[[1, 270;; 271]]]
+
+    return ks2022
+
+
+
+
+
