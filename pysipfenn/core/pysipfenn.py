@@ -1,5 +1,5 @@
 # General Imports
-import os, sys
+import os
 
 import natsort
 import wget
@@ -18,9 +18,6 @@ import onnx2torch
 import onnx
 
 from typing import List
-
-sys.stdin.reconfigure(encoding='utf-8')
-sys.stdout.reconfigure(encoding='utf-8')
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
