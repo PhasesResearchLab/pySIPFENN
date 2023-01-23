@@ -30,7 +30,7 @@ with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFile
     exampleInputFiles = natsorted(os.listdir(exampleInputsDir))
     testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
 
-functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:5])]
+functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:25])]
 with resources.files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
     f.writelines([f'{v}\n' for v in functionOutput[0]])
 

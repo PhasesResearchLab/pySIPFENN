@@ -7,7 +7,7 @@ import pysipfenn
 testFile = '0-Cr8Fe18Ni4.POSCAR'
 toTest = ['SIPFENN_Krajewski2020_NN9', 'SIPFENN_Krajewski2020_NN20', 'SIPFENN_Krajewski2020_NN24']
 referenceEnergies_MxNet = [0.0790368840098381, 0.0498688854277133, 0.0871851742267608]
-referenceEnergies_ONNX = [0.07903697341680527, 0.04986897483468056, 0.08718511462211609]
+referenceEnergies_ONNX =  [0.0790369734168053, 0.0498689748346806, 0.0871851146221161]
 
 with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
     testStructure = Structure.from_file(f'{exampleInputsDir}/{testFile}')

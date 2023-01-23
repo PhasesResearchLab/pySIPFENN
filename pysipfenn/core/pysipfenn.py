@@ -1,5 +1,5 @@
 # General Imports
-import os
+import os, sys
 
 import natsort
 import wget
@@ -18,6 +18,9 @@ import onnx2torch
 import onnx
 
 from typing import List
+
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
@@ -328,7 +331,7 @@ class Calculator:
 
     def writeResultsToCSV(self, file: str):
         assert self.toRun is not []
-        with open(file, 'w+') as f:
+        with open(file, 'w+', encoding="utf-8") as f:
             f.write('Name,'+','.join(self.toRun)+'\n')
             if len(self.inputFiles)==len(self.predictions):
                 for name, pred in zip(self.inputFiles, self.predictions):
@@ -347,7 +350,7 @@ class Calculator:
             labels = [v[0] for v in list(reader)]
 
         # Write descriptor data
-        with open(file, 'w+') as f:
+        with open(file, 'w+', encoding="utf-8") as f:
             f.write(f'Name,{",".join(labels)}\n')
             if len(self.inputFiles) == len(self.descriptorData):
                 for name, dd in zip(self.inputFiles, self.descriptorData):
@@ -369,9 +372,6 @@ def ward2ks2022(ward2017: np.ndarray):
         ward2017split[6],
         ward2017split[8]
         ), axis=-1, dtype=np.float32)
-
-    #Join[d[[1, 1;; 12]], d[[1, 16;; 121]], d[[1, 127;; 258]],
-    #d[[1, 265;; 268]], d[[1, 270;; 271]]]
 
     return ks2022
 
