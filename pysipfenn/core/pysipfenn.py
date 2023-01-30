@@ -104,9 +104,12 @@ class Calculator:
                 print('Fetching all networks!')
                 for net in self.network_list:
                     if net not in self.network_list_available:
-                        print(f'Fetching: {net}')
-                        wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
-                        print('\nONNX Network Successfully Fetched.')
+                        if 'URL_ONNX' in self.models[net]:
+                            print(f'Fetching: {net}')
+                            wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
+                            print('\nONNX Network Successfully Fetched.')
+                        else:
+                            print(f'{net} not detected on disk and ONNX URL has not been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
                 if self.network_list==self.network_list_available:
