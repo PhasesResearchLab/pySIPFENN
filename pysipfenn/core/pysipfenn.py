@@ -10,6 +10,7 @@ import json
 from concurrent import futures
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
+from time import perf_counter
 
 from importlib import resources
 
@@ -234,6 +235,7 @@ class Calculator:
         # Run for each network
         dataIn = torch.from_numpy(np.array(dataInList)).float()
         for net in toRun:
+            t0 = perf_counter()
             model = models[net]
             model.eval()
             if hasattr(model, 'Dropout_0'):
@@ -241,7 +243,9 @@ class Calculator:
             else:
                 tempOut = model(dataIn)
             dataOuts.append(tempOut.cpu().detach().numpy())
-            print(f'Obtained predictions from:  {net}')
+            t1 = perf_counter()
+            print(f'Prediction rate: {round(len(tempOut)/(t1-t0), 1)} pred/s')
+            print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
         # Transpose and round the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
