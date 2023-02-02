@@ -242,8 +242,8 @@ class Calculator:
                 tempOut = model(dataIn, None)
             else:
                 tempOut = model(dataIn)
-            dataOuts.append(tempOut.cpu().detach().numpy())
             t1 = perf_counter()
+            dataOuts.append(tempOut.cpu().detach().numpy())
             print(f'Prediction rate: {round(len(tempOut)/(t1-t0), 1)} pred/s')
             print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
