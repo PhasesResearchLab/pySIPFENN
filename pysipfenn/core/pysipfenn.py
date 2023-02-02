@@ -24,6 +24,7 @@ from typing import List
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
 # - add new ones here if extending the code
 
+
 class Calculator:
     def __init__(self):
 
@@ -50,9 +51,6 @@ class Calculator:
         self.inputFiles = []
         print(f'*********  PySIPFENN Successfully Initialized  **********')
 
-
-
-
     def updateModelAvailability(self):
         with resources.files('pysipfenn.modelsSIPFENN') as p:
             all_files = os.listdir(p)
@@ -68,7 +66,7 @@ class Calculator:
     def downloadModels_legacyMxNet(self, network='all'):
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
-            if network=='all':
+            if network == 'all':
                 print('Fetching all networks!')
                 for net in self.network_list:
                     if net not in self.network_list_available:
@@ -81,7 +79,7 @@ class Calculator:
                     else:
                         print(f'{net} detected on disk. Ready to use.')
 
-                if self.network_list==self.network_list_available:
+                if self.network_list == self.network_list_available:
                     print('All networks available!')
                 else:
                     print('Problem occurred.')
@@ -101,7 +99,7 @@ class Calculator:
     def downloadModels(self, network='all'):
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
-            if network=='all':
+            if network == 'all':
                 print('Fetching all networks!')
                 for net in self.network_list:
                     if net not in self.network_list_available:
@@ -113,7 +111,7 @@ class Calculator:
                             print(f'{net} not detected on disk and ONNX URL has not been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
-                if self.network_list==self.network_list_available:
+                if self.network_list == self.network_list_available:
                     print('All networks available!')
                 else:
                     print('Problem occurred.')
@@ -130,12 +128,12 @@ class Calculator:
 
     def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10):
 
-        if mode=='serial':
+        if mode == 'serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
             self.descriptorData = descList
             return descList
-        elif mode=='parallel':
+        elif mode == 'parallel':
             descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
             self.descriptorData = descList
@@ -143,39 +141,41 @@ class Calculator:
 
     def calculate_KS2022(self, structList: List[Structure], mode='serial', max_workers=10):
 
-        if mode=='serial':
+        if mode == 'serial':
             descList = [KS2022.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
             self.descriptorData = descList
             return descList
-        elif mode=='parallel':
+        elif mode == 'parallel':
             descList = process_map(KS2022.generate_descriptor, structList, max_workers=max_workers)
             print('Done!')
             self.descriptorData = descList
             return descList
 
-
     def calculate_KS2022_dilute(self, structList: List[Structure], baseStruct='pure', mode='serial', max_workers=10):
-        if baseStruct=='pure' or isinstance(baseStruct, Structure):
-            if mode=='serial':
+        if baseStruct == 'pure' or isinstance(baseStruct, Structure):
+            if mode == 'serial':
                 descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
                 print('Done!')
                 self.descriptorData = descList
                 return descList
-            elif mode=='parallel':
-                descList = process_map(KS2022_dilute.generate_descriptor(baseStruct=baseStruct), structList, max_workers=max_workers)
+            elif mode == 'parallel':
+                descList = process_map(KS2022_dilute.generate_descriptor(baseStruct=baseStruct),
+                                       structList,
+                                       max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
                 return descList
 
-        elif isinstance(baseStruct, List) and len(baseStruct)==len(structList):
-            if mode=='serial':
+        elif isinstance(baseStruct, List) and len(baseStruct) == len(structList):
+            if mode == 'serial':
                 descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
                 print('Done!')
                 self.descriptorData = descList
                 return descList
-            elif mode=='parallel':
-                descList = process_map(KS2022_dilute.generate_descriptor, structList, baseStruct, max_workers=max_workers)
+            elif mode == 'parallel':
+                descList = process_map(KS2022_dilute.generate_descriptor,
+                                       structList, baseStruct, max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
                 return descList
@@ -189,7 +189,6 @@ class Calculator:
                     net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
                 })
 
-
     def makePredictions_legacyMxNet(self, mxnet_networks, dataInList):
         # Import MxNet
         import mxnet as mx
@@ -197,7 +196,7 @@ class Calculator:
         from mxnet import gluon
         # Create a context for mxnet
         self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
-        # Verify if the nexts are avaialble
+        # Verify if the nets are available
         with resources.files('pysipfenn.modelsSIPFENN') as p:
             all_files = os.listdir(p)
         for net in mxnet_networks:
@@ -217,9 +216,9 @@ class Calculator:
         # Run for each network
         for net in loadedModels:
             dataIn = nd.array(dataInList)
-            input = dataIn.as_in_context(self.ctx)
+            dataInCTX = dataIn.as_in_context(self.ctx)
             model = loadedModels[net]
-            tempOut = model(input)
+            tempOut = model(dataInCTX)
             dataOuts.append(list(tempOut.asnumpy()))
             print(f'Obtained predictions from:  {net}')
 
@@ -263,47 +262,57 @@ class Calculator:
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         self.toRun = natsort.natsorted(self.toRun)
-        if len(self.toRun)==0:
-            print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
-                  'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
-                  'the downloadModels() function if you are using base models.')
+        if len(self.toRun) == 0:
+            print('The list of models to run is empty. This may be caused by selecting a descriptor not '
+                  'defined/available, or if the selected descriptor does not correspond to any available network. '
+                  'Check spelling and invoke the downloadModels() function if you are using base models.')
             raise AssertionError
         else:
             print(f'\nModels that will be run: {self.toRun}')
 
         print('Calculating descriptors...')
-        if descriptor=='Ward2017':
-            self.descriptorData = self.calculate_Ward2017(structList, mode=mode, max_workers=max_workers)
-        elif descriptor=='KS2022':
-            self.descriptorData = self.calculate_KS2022(structList, mode=mode, max_workers=max_workers)
+        if descriptor == 'Ward2017':
+            self.descriptorData = self.calculate_Ward2017(structList=structList,
+                                                          mode=mode,
+                                                          max_workers=max_workers)
+        elif descriptor == 'KS2022':
+            self.descriptorData = self.calculate_KS2022(structList=structList,
+                                                        mode=mode,
+                                                        max_workers=max_workers)
         else:
             print('Descriptor handing not implemented. Check spelling.')
             raise AssertionError
 
-        self.predictions = self.makePredictions(models=self.loadedModels, toRun=self.toRun, dataInList=self.descriptorData)
+        self.predictions = self.makePredictions(models=self.loadedModels,
+                                                toRun=self.toRun,
+                                                dataInList=self.descriptorData)
 
         return self.predictions
 
-
-    def runModels_dilute(self, descriptor: str, structList: list, baseStruct = 'pure', mode='serial', max_workers=4):
+    def runModels_dilute(self, descriptor: str, structList: list, baseStruct='pure', mode='serial', max_workers=4):
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
-        if len(self.toRun)==0:
-            print('The list of models to run is empty. This may be caused by selecting a descriptor not defined/available, '
-                  'or if the selected descriptor does not correspond to any available network. Check spelling and invoke'
-                  'the downloadModels() function if you are using base models.')
+        if len(self.toRun) == 0:
+            print('The list of models to run is empty. This may be caused by selecting a descriptor not '
+                  'defined/available, or if the selected descriptor does not correspond to any available network. '
+                  'Check spelling and invoke the downloadModels() function if you are using base models.')
             raise TypeError
         else:
             print(f'Running {self.toRun} models')
 
         print('Calculating descriptors...')
-        if descriptor=='KS2022_dilute':
-            self.descriptorData = self.calculate_KS2022_dilute(structList, baseStruct=baseStruct, mode=mode, max_workers=max_workers)
+        if descriptor == 'KS2022_dilute':
+            self.descriptorData = self.calculate_KS2022_dilute(structList=structList,
+                                                               baseStruct=baseStruct,
+                                                               mode=mode,
+                                                               max_workers=max_workers)
         else:
             print('Descriptor handing not implemented. Check spelling.')
             raise AssertionError
 
-        self.predictions = self.makePredictions(models=self.loadedModels, toRun=self.toRun, dataInList=self.descriptorData)
+        self.predictions = self.makePredictions(models=self.loadedModels,
+                                                toRun=self.toRun,
+                                                dataInList=self.descriptorData)
 
         return self.predictions
 
@@ -325,27 +334,31 @@ class Calculator:
         self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
         print('Done!')
 
-    def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct = 'pure', mode='serial', max_workers=4):
+    def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct='pure', mode='serial', max_workers=4):
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
         self.inputFiles = natsort.natsorted(self.inputFiles)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
-        self.runModels_dilute(descriptor=descriptor, structList=structList, baseStruct = baseStruct, mode=mode, max_workers=max_workers)
+        self.runModels_dilute(descriptor=descriptor,
+                              structList=structList,
+                              baseStruct=baseStruct,
+                              mode=mode,
+                              max_workers=max_workers)
         print('Done!')
 
     def writeResultsToCSV(self, file: str):
         assert self.toRun is not []
         with open(file, 'w+', encoding="utf-8") as f:
             f.write('Name,'+','.join(self.toRun)+'\n')
-            if len(self.inputFiles)==len(self.predictions):
+            if len(self.inputFiles) == len(self.predictions):
                 for name, pred in zip(self.inputFiles, self.predictions):
-                    assert len(pred)==len(self.toRun)
+                    assert len(pred) == len(self.toRun)
                     f.write(f'{name},{",".join(str(v) for v in pred)}\n')
             else:
                 i = 1
                 for pred in self.predictions:
                     f.write(f'{i},{",".join(str(v) for v in pred)}\n')
-                    i+=1
+                    i += 1
 
     def writeDescriptorsToCSV(self, descriptor: str, file: str):
         # Load descriptor labels
@@ -364,7 +377,8 @@ class Calculator:
                 i = 1
                 for dd in self.descriptorData:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
-                    i+=1
+                    i += 1
+
 
 def ward2ks2022(ward2017: np.ndarray):
     assert isinstance(ward2017, np.ndarray)
@@ -378,8 +392,3 @@ def ward2ks2022(ward2017: np.ndarray):
         ), axis=-1, dtype=np.float32)
 
     return ks2022
-
-
-
-
-
