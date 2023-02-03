@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pysipfenn.tests package &mdash; pySIPFENN 0.10.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="pysipfenn.modelsSIPFENN package" href="pysipfenn.modelsSIPFENN.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pySIPFENN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install pySIPFENN</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pysipfenn.html">pysipfenn package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pysipfenn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pysipfenn.core.html">pysipfenn.core package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pysipfenn.descriptorDefinitions.html">pysipfenn.descriptorDefinitions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pysipfenn.modelsSIPFENN.html">pysipfenn.modelsSIPFENN package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pysipfenn.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_AllCompatibleONNX_Ward2017">pysipfenn.tests.test_AllCompatibleONNX_Ward2017 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_KS2022">pysipfenn.tests.test_KS2022 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_KS2022_dilute">pysipfenn.tests.test_KS2022_dilute module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX">pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_Ward2017">pysipfenn.tests.test_Ward2017 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests.test_pysipfenn">pysipfenn.tests.test_pysipfenn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pysipfenn.html#module-pysipfenn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://doi.org/10.1016/j.commatsci.2022.111254">Journal Article</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../py-modindex.html">Module Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pySIPFENN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="pysipfenn.html">pysipfenn package</a></li>
+      <li class="breadcrumb-item active">pysipfenn.tests package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/PhasesResearchLab/pySIPFENN/blob/main/docs/source/pysipfenn.tests.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pysipfenn-tests-package">
+<h1>pysipfenn.tests package<a class="headerlink" href="#pysipfenn-tests-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-pysipfenn.tests.test_AllCompatibleONNX_Ward2017">
+<span id="pysipfenn-tests-test-allcompatibleonnx-ward2017-module"></span><h2>pysipfenn.tests.test_AllCompatibleONNX_Ward2017 module<a class="headerlink" href="#module-pysipfenn.tests.test_AllCompatibleONNX_Ward2017" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_AllCompatibleONNX_Ward2017.TestAllCompatibleONNX_Ward2017">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_AllCompatibleONNX_Ward2017.</span></span><span class="sig-name descname"><span class="pre">TestAllCompatibleONNX_Ward2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_AllCompatibleONNX_Ward2017.py#L6-L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_AllCompatibleONNX_Ward2017.TestAllCompatibleONNX_Ward2017" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_AllCompatibleONNX_Ward2017.TestAllCompatibleONNX_Ward2017.test_runtime">
+<span class="sig-name descname"><span class="pre">test_runtime</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_AllCompatibleONNX_Ward2017.py#L7-L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_AllCompatibleONNX_Ward2017.TestAllCompatibleONNX_Ward2017.test_runtime" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests.test_KS2022">
+<span id="pysipfenn-tests-test-ks2022-module"></span><h2>pysipfenn.tests.test_KS2022 module<a class="headerlink" href="#module-pysipfenn.tests.test_KS2022" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_KS2022.TestKS2022">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_KS2022.</span></span><span class="sig-name descname"><span class="pre">TestKS2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_KS2022.py#L37-L49"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_KS2022.TestKS2022" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_KS2022.TestKS2022.test_resutls">
+<span class="sig-name descname"><span class="pre">test_resutls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_KS2022.py#L38-L49"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_KS2022.TestKS2022.test_resutls" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests.test_KS2022_dilute">
+<span id="pysipfenn-tests-test-ks2022-dilute-module"></span><h2>pysipfenn.tests.test_KS2022_dilute module<a class="headerlink" href="#module-pysipfenn.tests.test_KS2022_dilute" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_KS2022_dilute.TestKS2022">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_KS2022_dilute.</span></span><span class="sig-name descname"><span class="pre">TestKS2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_KS2022_dilute.py#L36-L57"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_KS2022_dilute.TestKS2022" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_KS2022_dilute.TestKS2022.test_resutls_assumePure">
+<span class="sig-name descname"><span class="pre">test_resutls_assumePure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_KS2022_dilute.py#L37-L46"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_KS2022_dilute.TestKS2022.test_resutls_assumePure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_KS2022_dilute.TestKS2022.test_resutls_explicitBase">
+<span class="sig-name descname"><span class="pre">test_resutls_explicitBase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_KS2022_dilute.py#L48-L57"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_KS2022_dilute.TestKS2022.test_resutls_explicitBase" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX">
+<span id="pysipfenn-tests-test-krajewski2020-nn9nn20nn24-onnx-module"></span><h2>pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX module<a class="headerlink" href="#module-pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX.TestKrajewski2020ModelsFromONNX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX.</span></span><span class="sig-name descname"><span class="pre">TestKrajewski2020ModelsFromONNX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_Krajewski2020_NN9NN20NN24_ONNX.py#L15-L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX.TestKrajewski2020ModelsFromONNX" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX.TestKrajewski2020ModelsFromONNX.test_resutls">
+<span class="sig-name descname"><span class="pre">test_resutls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_Krajewski2020_NN9NN20NN24_ONNX.py#L16-L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_Krajewski2020_NN9NN20NN24_ONNX.TestKrajewski2020ModelsFromONNX.test_resutls" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests.test_Ward2017">
+<span id="pysipfenn-tests-test-ward2017-module"></span><h2>pysipfenn.tests.test_Ward2017 module<a class="headerlink" href="#module-pysipfenn.tests.test_Ward2017" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_Ward2017.TestWard2017">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_Ward2017.</span></span><span class="sig-name descname"><span class="pre">TestWard2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_Ward2017.py#L30-L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_Ward2017.TestWard2017" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_Ward2017.TestWard2017.test_resutls">
+<span class="sig-name descname"><span class="pre">test_resutls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_Ward2017.py#L31-L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_Ward2017.TestWard2017.test_resutls" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests.test_pysipfenn">
+<span id="pysipfenn-tests-test-pysipfenn-module"></span><h2>pysipfenn.tests.test_pysipfenn module<a class="headerlink" href="#module-pysipfenn.tests.test_pysipfenn" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.tests.test_pysipfenn.</span></span><span class="sig-name descname"><span class="pre">TestCore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L5-L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore.detectModels">
+<span class="sig-name descname"><span class="pre">detectModels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L14-L16"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore.detectModels" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L6-L8"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore.setUp" title="Permalink to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore.testFromPOSCAR_KS2022">
+<span class="sig-name descname"><span class="pre">testFromPOSCAR_KS2022</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L28-L36"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore.testFromPOSCAR_KS2022" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore.testFromPOSCAR_Ward2017">
+<span class="sig-name descname"><span class="pre">testFromPOSCAR_Ward2017</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L18-L26"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore.testFromPOSCAR_Ward2017" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.tests.test_pysipfenn.TestCore.testInit">
+<span class="sig-name descname"><span class="pre">testInit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/..\tests\test_pysipfenn.py#L10-L12"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.tests.test_pysipfenn.TestCore.testInit" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pysipfenn.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pysipfenn.tests" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pysipfenn.modelsSIPFENN.html" class="btn btn-neutral float-left" title="pysipfenn.modelsSIPFENN package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Adam M. Krajewski.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
