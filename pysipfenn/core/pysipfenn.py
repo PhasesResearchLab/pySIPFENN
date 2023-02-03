@@ -24,8 +24,16 @@ from typing import List
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
 # - add new ones here if extending the code
 
+__version__ = '0.10.1'
+__authors__ = [["Adam Krajewski", "ak@psu.edu"],
+               ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
+__name__ = 'pysipfenn'
 
 class Calculator:
+    """
+        pySIPFENN Calculator automatically initializes all functionalities. This includes identification and loading
+        of all available models defined statically in models.json file.
+    """
     def __init__(self):
 
         self.thread_pool_executor = futures.ThreadPoolExecutor(max_workers=4)
@@ -52,6 +60,11 @@ class Calculator:
         print(f'*********  PySIPFENN Successfully Initialized  **********')
 
     def updateModelAvailability(self):
+        """
+            Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
+            current ONNX model definitions. Legacy support for MxNet models is retained in other functions, but they
+            have to be manually added here.
+        """
         with resources.files('pysipfenn.modelsSIPFENN') as p:
             all_files = os.listdir(p)
         detectedNets = []
@@ -64,6 +77,9 @@ class Calculator:
         self.network_list_available = detectedNets
 
     def downloadModels_legacyMxNet(self, network='all'):
+        """
+            **Legacy Function** Downloads MxNet models.
+        """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
             if network == 'all':
@@ -180,8 +196,11 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
 
-    # Create available models dictionary with loaded model neural networks
+    #
     def loadModels(self):
+        '''
+            Fill a dictionary of available models with loaded model neural networks in self.loadedModels.
+        '''
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             print('Loading models:')
             for net in tqdm(self.network_list_available):
@@ -258,7 +277,25 @@ class Calculator:
                 compatibleList.append(net)
         return compatibleList
 
-    def runModels(self, descriptor: str, structList: list, mode='serial', max_workers=4):
+    def runModels(self, descriptor: str, structList: List[Structure], mode='serial', max_workers=4) -> list:
+        """
+
+        Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
+        computation modes. If parallel is selected, max_workers determines number of processes handling the
+        featurization of structures (90-99+% of computational intensity) and models are then run in series.
+
+            Args:
+                descriptor (): Name of the descriptor (i.e. feature vector type) to be used. This selection determines which
+                models can and will be automatically run.
+                structList (): A list of atomic structures.
+                mode (): Determines serial or parallel execution of descriptor calculation.
+                max_workers (): If parallel mode is selected, it determines the number of processes which will be
+                initiated by the Calculator to calculate structural descriptors.
+
+            Returns:
+                A list of predictions corresponding to the structList entries.
+
+        """
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         self.toRun = natsort.natsorted(self.toRun)
