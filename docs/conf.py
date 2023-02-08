@@ -11,21 +11,24 @@ from pysipfenn.core.pysipfenn import __version__, __file__
 project = 'pySIPFENN'
 copyright = '2023, Adam M. Krajewski'
 author = 'Adam M. Krajewski'
+version = __version__
 release = __version__
+language = 'en'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ['sphinx.ext.linkcode',
               'sphinx.ext.duration',
+              'sphinx.ext.coverage',
               'sphinx.ext.napoleon',
-              #'sphinx_autodoc_typehints',
+              'sphinx.ext.autodoc',
+              'sphinx_autodoc_typehints',
               'myst_parser',
               ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-exclude_dirnames = ["../pysipfenn/tests"]
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '../**/tests*']
 
 napoleon_use_param = True
 

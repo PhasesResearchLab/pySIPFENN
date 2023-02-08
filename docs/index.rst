@@ -10,7 +10,6 @@ Welcome to pySIPFENN's documentation!
    install
    source/pysipfenn
    Journal Article <https://doi.org/10.1016/j.commatsci.2022.111254>
-   modindex
    genindex
    :maxdepth: 2
    :caption: Contents
