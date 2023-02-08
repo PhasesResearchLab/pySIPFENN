@@ -9,7 +9,9 @@ class TestCore(unittest.TestCase):
 
     def testInit(self):
         self.assertEqual(self.c.predictions, [])
-        self.assertEqual(self.c.network_list_available, [])
+        self.assertEqual(self.c.toRun, [])
+        self.assertEqual(self.c.descriptorData, [])
+        self.assertEqual(self.c.inputFiles, [])
 
     def detectModels(self):
         self.c.updateModelAvailability()
