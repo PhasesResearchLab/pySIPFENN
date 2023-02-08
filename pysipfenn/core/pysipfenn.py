@@ -113,6 +113,12 @@ class Calculator:
                 print('Network name not recognized')
 
     def downloadModels(self, network='all'):
+        """Downloads all ONNX models.
+
+        Args:
+            network (str, optional): Name of the network to download. Defaults to 'all'.
+
+        """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
             if network == 'all':
@@ -142,8 +148,18 @@ class Calculator:
                 print('Network name not recognized')
         self.updateModelAvailability()
 
-    def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10):
+    def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10) -> list:
+        '''Calculates Ward2017 descriptors for a list of structures.
 
+        Args:
+            structList (List[Structure]): List of structures to calculate descriptors for.
+            mode (str, optional): Mode of calculation. Defaults to 'serial'.
+            max_workers (int, optional): Number of workers to use in parallel mode. Defaults to 10.
+
+        Returns:
+            list: List of descriptors.
+
+        '''
         if mode == 'serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
@@ -208,7 +224,18 @@ class Calculator:
                     net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
                 })
 
-    def makePredictions_legacyMxNet(self, mxnet_networks, dataInList):
+    def makePredictions_legacyMxNet(self, mxnet_networks: List[str], dataInList: List[List[float]]) -> list:
+        '''Makes predictions using legacy mxnet networks. This is a legacy function and will be removed in future
+        versions. Compatibility with legacy networks is not guaranteed. Use at your own risk.
+
+        Args:
+            mxnet_networks: List of networks to use.
+            dataInList: List of data to make predictions for. Each element of the list should be a list of descriptors.
+
+        Returns:
+            list: List of predictions. Each element of the list is a list of predictions for all ran network.
+        '''
+
         # Import MxNet
         import mxnet as mx
         from mxnet import nd
@@ -278,24 +305,19 @@ class Calculator:
         return compatibleList
 
     def runModels(self, descriptor: str, structList: List[Structure], mode='serial', max_workers=4) -> list:
-        """
-
-        Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
+        '''Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
         computation modes. If parallel is selected, max_workers determines number of processes handling the
         featurization of structures (90-99+% of computational intensity) and models are then run in series.
 
-            Args:
-                descriptor (): Name of the descriptor (i.e. feature vector type) to be used. This selection determines which
-                models can and will be automatically run.
-                structList (): A list of atomic structures.
-                mode (): Determines serial or parallel execution of descriptor calculation.
-                max_workers (): If parallel mode is selected, it determines the number of processes which will be
-                initiated by the Calculator to calculate structural descriptors.
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See self.descriptor_list_available. Available default descriptors are: 'Ward2017', 'KS2022', 'KS2022_dilute'.
+            structList: List of pymatgen Structure objects to run the models on.
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None, will use all available cores. If set to 0, will use 1 core.
 
-            Returns:
-                A list of predictions corresponding to the structList entries.
-
-        """
+        Returns:
+            list: List of predictions. Each element of the list is a list of predictions for all ran networks. The order of the predictions is the same as the order of the input structures. The order of the networks is the same as the order of the networks in self.network_list_available. If a network is not available, it will not be included in the list. If a network is not compatible with the selected descriptor, it will not be included in the list.
+        '''
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         self.toRun = natsort.natsorted(self.toRun)
