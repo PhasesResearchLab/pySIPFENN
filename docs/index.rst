@@ -7,16 +7,32 @@
 pySIPFENN
 =========
 
-.. image:: https://img.shields.io/badge/python-3.9-blue.svg
-    :target: https://www.python.org/downloads/release/python-390/
+.. image:: https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn
+   :alt: GitHub top language
 
-.. image:: https://img.shields.io/badge/python-3.10-blue.svg
+.. image:: https://img.shields.io/pypi/pyversions/pysipfenn
+    :alt: PyPI - Python Version
     :target: https://www.python.org/downloads/release/python-3100/
 
-.. image:: https://badge.fury.io/py/pysipfenn.svg
-    :target: https://badge.fury.io/py/pysipfenn
+.. image:: https://img.shields.io/pypi/l/pysipfenn
+   :alt: PyPI - License
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg
+.. image:: https://img.shields.io/pypi/v/pysipfenn
+   :alt: PyPI
+
+.. image:: https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit
+   :alt: GitHub last commit (by committer)
+
+.. image:: https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release
+   :alt: GitHub Release Date - Published_At
+
+.. image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.10.1?color=g
+   :alt: GitHub commits since tagged version
+
+.. image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue
+   :target: https://doi.org/10.1016/j.commatsci.2022.111254
+
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
    :target: https://doi.org/10.5281/zenodo.7373089
 
 
