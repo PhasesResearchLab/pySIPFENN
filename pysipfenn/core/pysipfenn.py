@@ -24,7 +24,7 @@ from typing import List, Union
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
 # - add new ones here if extending the code
 
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'

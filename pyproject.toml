@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysipfenn"
-version = "0.10.1"
+version = "0.10.2"
 authors = [
   { name="Adam Krajewski", email="ak@psu.edu" },
     { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
@@ -40,5 +40,5 @@ dependencies = [
 
 [project.urls]
 "Research Page" = "https://phaseslab.com/sipfenn"
-"Homepage" = "https://github.com/PhasesResearchLab/pySIPFENN"
+"Homepage" = "https://pysipfenn.readthedocs.io/en/stable/"
 "Bug Tracker" = "https://github.com/PhasesResearchLab/pySIPFENN/issues"
