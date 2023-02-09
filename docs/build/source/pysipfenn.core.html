@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pysipfenn.core package &mdash; pySIPFENN 0.10.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pysipfenn.descriptorDefinitions package" href="pysipfenn.descriptorDefinitions.html" />
+    <link rel="prev" title="pysipfenn package" href="pysipfenn.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pySIPFENN
+          </a>
+              <div class="version">
+                0.10.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install pySIPFENN</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pysipfenn.html">pysipfenn package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pysipfenn.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pysipfenn.core package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pysipfenn">pysipfenn.core.pysipfenn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-0">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pysipfenn.descriptorDefinitions.html">pysipfenn.descriptorDefinitions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pysipfenn.modelsSIPFENN.html">pysipfenn.modelsSIPFENN package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pysipfenn.html#module-pysipfenn">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/sipfenn_examples.html">pySIPFENN MGF-PSU Workshop (Feb 2023)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://doi.org/10.1016/j.commatsci.2022.111254">Journal Article</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pySIPFENN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="pysipfenn.html">pysipfenn package</a></li>
+      <li class="breadcrumb-item active">pysipfenn.core package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/PhasesResearchLab/pySIPFENN/blob/main/docs/source/pysipfenn.core.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pysipfenn-core-package">
+<h1>pysipfenn.core package<a class="headerlink" href="#pysipfenn-core-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-pysipfenn">
+<span id="pysipfenn-core-pysipfenn-module"></span><h2>pysipfenn.core.pysipfenn module<a class="headerlink" href="#module-pysipfenn" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pysipfenn.Calculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.</span></span><span class="sig-name descname"><span class="pre">Calculator</span></span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>pySIPFENN Calculator automatically initializes all functionalities. This includes identification and loading
+of all available models defined statically in models.json file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.calculate_KS2022">
+<span class="sig-name descname"><span class="pre">calculate_KS2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L174-L185"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.calculate_KS2022" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.calculate_KS2022_dilute">
+<span class="sig-name descname"><span class="pre">calculate_KS2022_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L187-L213"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.calculate_KS2022_dilute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.calculate_Ward2017">
+<span class="sig-name descname"><span class="pre">calculate_Ward2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L151-L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.calculate_Ward2017" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates Ward2017 descriptors for a list of structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structList</strong> (<em>List</em><em>[</em><em>Structure</em><em>]</em>) – List of structures to calculate descriptors for.</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Mode of calculation. Defaults to ‘serial’.</p></li>
+<li><p><strong>max_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of workers to use in parallel mode. Defaults to 10.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of descriptors.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.downloadModels">
+<span class="sig-name descname"><span class="pre">downloadModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L115-L149"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.downloadModels" title="Permalink to this definition"></a></dt>
+<dd><p>Downloads all ONNX models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>network</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the network to download. Defaults to ‘all’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.downloadModels_legacyMxNet">
+<span class="sig-name descname"><span class="pre">downloadModels_legacyMxNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L79-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.downloadModels_legacyMxNet" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Legacy Function</strong> Downloads MxNet models.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.findCompatibleModels">
+<span class="sig-name descname"><span class="pre">findCompatibleModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L303-L319"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.findCompatibleModels" title="Permalink to this definition"></a></dt>
+<dd><p>Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
+models.json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘Ward2017’, ‘KS2022’, ‘KS2022_dilute’.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of compatible models.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.get_resultDicts">
+<span class="sig-name descname"><span class="pre">get_resultDicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L436-L444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.get_resultDicts" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+names of the networks. The order of the dictionaries is the same as the order of the input structures passed
+through runModels() functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dictionaries with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.get_resultDictsWithNames">
+<span class="sig-name descname"><span class="pre">get_resultDictsWithNames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L446-L462"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.get_resultDictsWithNames" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+names of the networks and the names of the input structures. The order of the dictionaries is the same as the
+order of the input structures passed through runModels() functions. Note that this function requires self.inputFiles
+to be set, which is done automatically when using runFromDirectory() or runFromDirectory_dilute() but not when
+using runModels() or runModels_dilute(), as the input structures are passed directly to the function and names
+have to be provided separately by assigning them to self.inputFiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dictionaries with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.loadModels">
+<span class="sig-name descname"><span class="pre">loadModels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L216-L225"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.loadModels" title="Permalink to this definition"></a></dt>
+<dd><p>Fill a dictionary of available models with loaded model neural networks in self.loadedModels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.makePredictions">
+<span class="sig-name descname"><span class="pre">makePredictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toRun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataInList</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L280-L301"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.makePredictions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.makePredictions_legacyMxNet">
+<span class="sig-name descname"><span class="pre">makePredictions_legacyMxNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mxnet_networks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataInList</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L227-L278"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.makePredictions_legacyMxNet" title="Permalink to this definition"></a></dt>
+<dd><p>Makes predictions using legacy mxnet networks. This is a legacy function and will be removed in future
+versions. Compatibility with legacy networks is not guaranteed. Use at your own risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mxnet_networks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of networks to use.</p></li>
+<li><p><strong>dataInList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – List of data to make predictions for. Each element of the list should be a list of descriptors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran network.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.runFromDirectory">
+<span class="sig-name descname"><span class="pre">runFromDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L464-L504"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.runFromDirectory" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
+directory must contain only atomic structures in formats such as ‘poscar’, ‘cif’, ‘json’, ‘mcsqs’, etc., or a mix
+of these. The structures are automatically sorted using natsort library, so the order of the structures in the
+directory, as defined by the operating system, is not important. Natural sorting, for example, will sort the
+structures in the following order: ‘1-Fe’, ‘2-Al’, ‘10-xx’, ‘11-xx’, ‘20-xx’, ‘21-xx’, ‘11111-xx’, etc. This is
+useful when the structures are named using a numbering system. The order of the predictions is the same as the
+order of the input structures. The order of the networks in a prediction is the same as the order of the networks in
+self.network_list_available. If a network is not available, it will not be included in the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Directory containing the structures to run the models on. The directory must contain only atomic
+structures in formats such as ‘poscar’, ‘cif’, ‘json’, ‘mcsqs’, etc., or a mix of these. The structures are
+automatically sorted as described above.</p></li>
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
+for a list of available descriptors.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for small
+datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None,
+will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The order of
+the predictions is the same as the order of the input structures. The order of the networks is the same as
+the order of the networks in self.network_list_available. If a network is not available, it will not be
+included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.runFromDirectory_dilute">
+<span class="sig-name descname"><span class="pre">runFromDirectory_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L506-L516"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.runFromDirectory_dilute" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.runModels">
+<span class="sig-name descname"><span class="pre">runModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L321-L374"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.runModels" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
+computation modes. If parallel is selected, max_workers determines number of processes handling the
+featurization of structures (90-99+% of computational intensity) and models are then run in series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘Ward2017’, ‘KS2022’.</p></li>
+<li><p><strong>structList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – List of pymatgen Structure objects to run the models on.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for
+small datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+None, will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The
+order of the predictions is the same as the order of the input structures. The order of the networks is
+the same as the order of the networks in self.network_list_available. If a network is not available, it
+will not be included in the list. If a network is not compatible with the selected descriptor, it will
+not be included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.runModels_dilute">
+<span class="sig-name descname"><span class="pre">runModels_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L376-L434"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.runModels_dilute" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures using specified descriptor. A critical difference
+from runModels() is that this function supports the KS2022_dilute descriptor, which can only be used on dilute
+structures (both based on pure elements and on custom base structures, e.g. TCP endmember configurations) that
+contain a single alloying atom. Speed increases are substantial compared to the KS2022 descriptor, which is
+more general and can be used on any structure. Supports serial and parallel modes in the same way as runModels().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘KS2022_dilute’. The ‘KS2022’
+should also work, but is not recommended, as it negates the speed increase of the dilute descriptor.</p></li>
+<li><p><strong>structList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – List of pymatgen Structure objects to run the models on. Must be dilute structures as described
+above.</p></li>
+<li><p><strong>baseStruct</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – Base structure to use for the dilute descriptor. Can be a Structure object or a string. If a
+string, must be ‘pure’ indicating that the dilute structures given as input are pure elements alloyed
+with a single atom. If the base structure is not pure, it must be a Structure object which differs from
+the input Structures by one atom.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for
+small datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+None, will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The
+order of the predictions is the same as the order of the input structures. The order of the networks
+is the same as the order of the networks in self.network_list_available. If a network is not available,
+it will not be included in the list. If a network is not compatible with the selected descriptor, it
+will not be included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.updateModelAvailability">
+<span class="sig-name descname"><span class="pre">updateModelAvailability</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L62-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.updateModelAvailability" title="Permalink to this definition"></a></dt>
+<dd><p>Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
+current ONNX model definitions. Legacy support for MxNet models is retained in other functions, but they
+have to be manually added here.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.writeDescriptorsToCSV">
+<span class="sig-name descname"><span class="pre">writeDescriptorsToCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L532-L549"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.writeDescriptorsToCSV" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pysipfenn.Calculator.writeResultsToCSV">
+<span class="sig-name descname"><span class="pre">writeResultsToCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L518-L530"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.Calculator.writeResultsToCSV" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pysipfenn.ward2ks2022">
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.</span></span><span class="sig-name descname"><span class="pre">ward2ks2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ward2017</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L552-L563"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.ward2ks2022" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-0">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-0" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.</span></span><span class="sig-name descname"><span class="pre">Calculator</span></span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>pySIPFENN Calculator automatically initializes all functionalities. This includes identification and loading
+of all available models defined statically in models.json file.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">calculate_KS2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L174-L185"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">calculate_KS2022_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L187-L213"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">calculate_Ward2017</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L151-L172"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates Ward2017 descriptors for a list of structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structList</strong> (<em>List</em><em>[</em><em>Structure</em><em>]</em>) – List of structures to calculate descriptors for.</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – Mode of calculation. Defaults to ‘serial’.</p></li>
+<li><p><strong>max_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of workers to use in parallel mode. Defaults to 10.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of descriptors.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">downloadModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L115-L149"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd><p>Downloads all ONNX models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>network</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the network to download. Defaults to ‘all’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">downloadModels_legacyMxNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L79-L113"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd><p><strong>Legacy Function</strong> Downloads MxNet models.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">findCompatibleModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L303-L319"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd><p>Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
+models.json file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘Ward2017’, ‘KS2022’, ‘KS2022_dilute’.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of compatible models.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">get_resultDicts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L436-L444"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+names of the networks. The order of the dictionaries is the same as the order of the input structures passed
+through runModels() functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dictionaries with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">get_resultDictsWithNames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L446-L462"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+names of the networks and the names of the input structures. The order of the dictionaries is the same as the
+order of the input structures passed through runModels() functions. Note that this function requires self.inputFiles
+to be set, which is done automatically when using runFromDirectory() or runFromDirectory_dilute() but not when
+using runModels() or runModels_dilute(), as the input structures are passed directly to the function and names
+have to be provided separately by assigning them to self.inputFiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of dictionaries with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">loadModels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L216-L225"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Permalink to this definition"></a></dt>
+<dd><p>Fill a dictionary of available models with loaded model neural networks in self.loadedModels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">makePredictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toRun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataInList</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L280-L301"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">makePredictions_legacyMxNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mxnet_networks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataInList</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L227-L278"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Permalink to this definition"></a></dt>
+<dd><p>Makes predictions using legacy mxnet networks. This is a legacy function and will be removed in future
+versions. Compatibility with legacy networks is not guaranteed. Use at your own risk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mxnet_networks</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – List of networks to use.</p></li>
+<li><p><strong>dataInList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]]) – List of data to make predictions for. Each element of the list should be a list of descriptors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran network.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">runFromDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L464-L504"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
+directory must contain only atomic structures in formats such as ‘poscar’, ‘cif’, ‘json’, ‘mcsqs’, etc., or a mix
+of these. The structures are automatically sorted using natsort library, so the order of the structures in the
+directory, as defined by the operating system, is not important. Natural sorting, for example, will sort the
+structures in the following order: ‘1-Fe’, ‘2-Al’, ‘10-xx’, ‘11-xx’, ‘20-xx’, ‘21-xx’, ‘11111-xx’, etc. This is
+useful when the structures are named using a numbering system. The order of the predictions is the same as the
+order of the input structures. The order of the networks in a prediction is the same as the order of the networks in
+self.network_list_available. If a network is not available, it will not be included in the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Directory containing the structures to run the models on. The directory must contain only atomic
+structures in formats such as ‘poscar’, ‘cif’, ‘json’, ‘mcsqs’, etc., or a mix of these. The structures are
+automatically sorted as described above.</p></li>
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
+for a list of available descriptors.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for small
+datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None,
+will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The order of
+the predictions is the same as the order of the input structures. The order of the networks is the same as
+the order of the networks in self.network_list_available. If a network is not available, it will not be
+included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">runFromDirectory_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L506-L516"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">runModels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L321-L374"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
+computation modes. If parallel is selected, max_workers determines number of processes handling the
+featurization of structures (90-99+% of computational intensity) and models are then run in series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘Ward2017’, ‘KS2022’.</p></li>
+<li><p><strong>structList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – List of pymatgen Structure objects to run the models on.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for
+small datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+None, will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The
+order of the predictions is the same as the order of the input structures. The order of the networks is
+the same as the order of the networks in self.network_list_available. If a network is not available, it
+will not be included in the list. If a network is not compatible with the selected descriptor, it will
+not be included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">runModels_dilute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseStruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pure'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'serial'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L376-L434"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Permalink to this definition"></a></dt>
+<dd><p>Runs all loaded models on a list of Structures using specified descriptor. A critical difference
+from runModels() is that this function supports the KS2022_dilute descriptor, which can only be used on dilute
+structures (both based on pure elements and on custom base structures, e.g. TCP endmember configurations) that
+contain a single alloying atom. Speed increases are substantial compared to the KS2022 descriptor, which is
+more general and can be used on any structure. Supports serial and parallel modes in the same way as runModels().</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+to see available modules or add yours. Available default descriptors are: ‘KS2022_dilute’. The ‘KS2022’
+should also work, but is not recommended, as it negates the speed increase of the dilute descriptor.</p></li>
+<li><p><strong>structList</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – List of pymatgen Structure objects to run the models on. Must be dilute structures as described
+above.</p></li>
+<li><p><strong>baseStruct</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>]) – Base structure to use for the dilute descriptor. Can be a Structure object or a string. If a
+string, must be ‘pure’ indicating that the dilute structures given as input are pure elements alloyed
+with a single atom. If the base structure is not pure, it must be a Structure object which differs from
+the input Structures by one atom.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Computation mode. ‘serial’ or ‘parallel’. Default is ‘serial’. Parallel mode is not recommended for
+small datasets.</p></li>
+<li><p><strong>max_workers</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+None, will use all available cores. If set to 0, will use 1 core.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of predictions. Each element of the list is a list of predictions for all ran networks. The
+order of the predictions is the same as the order of the input structures. The order of the networks
+is the same as the order of the networks in self.network_list_available. If a network is not available,
+it will not be included in the list. If a network is not compatible with the selected descriptor, it
+will not be included in the list.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">updateModelAvailability</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L62-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Permalink to this definition"></a></dt>
+<dd><p>Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
+current ONNX model definitions. Legacy support for MxNet models is retained in other functions, but they
+have to be manually added here.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">writeDescriptorsToCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L532-L549"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">writeResultsToCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L518-L530"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.</span></span><span class="sig-name descname"><span class="pre">ward2ks2022</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ward2017</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.1/pysipfenn/core/pysipfenn.py#L552-L563"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id19" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pysipfenn.html" class="btn btn-neutral float-left" title="pysipfenn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pysipfenn.descriptorDefinitions.html" class="btn btn-neutral float-right" title="pysipfenn.descriptorDefinitions package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Adam M. Krajewski.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
