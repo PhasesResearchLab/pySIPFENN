@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pySIPFENN MGF-PSU Workshop (Feb 2023) &mdash; pySIPFENN 0.10.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Changelog" href="../changelog.html" />
+    <link rel="prev" title="pysipfenn.modelsSIPFENN package" href="../source/pysipfenn.modelsSIPFENN.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pySIPFENN
+          </a>
+              <div class="version">
+                0.10.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Install pySIPFENN</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/pysipfenn.html">pysipfenn package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pySIPFENN MGF-PSU Workshop (Feb 2023)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-pysipfenn">Install pySIPFENN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-pysipfenn">Starting pySIPFENN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simple-run-from-directory">Simple run from directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sigma-phase-5-sublattice-model">Sigma-Phase 5-sublattice model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-models-utilizing-different-descriptor-feature-vector">Run models utilizing different descriptor / feature vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-new-model">Add a new model!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://doi.org/10.1016/j.commatsci.2022.111254">Journal Article</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pySIPFENN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">pySIPFENN MGF-PSU Workshop (Feb 2023)</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/PhasesResearchLab/pySIPFENN/blob/main/docs/examples/sipfenn_examples.ipynb" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pysipfenn-mgf-psu-workshop-feb-2023">
+<h1>pySIPFENN MGF-PSU Workshop (Feb 2023)<a class="headerlink" href="#pysipfenn-mgf-psu-workshop-feb-2023" title="Permalink to this heading"></a></h1>
+<p>This Jupyter notebook is a brief walkthrough covering core functionalities of the <strong>pySIPFENN</strong> or <strong>py</strong>(<strong>S</strong>tructure-<strong>I</strong>nformed <strong>P</strong>rediction of <strong>F</strong>ormation <strong>E</strong>nergy using <strong>N</strong>eural <strong>N</strong>etworks) package; available through the PyPI repository. A fuller description of capabilities is given at PSU Phases Research Lab webpage under <em>phaseslab.com/sipfenn</em>.
+<img alt="img" src="../_images/neuralnetcolorized.png" /></p>
+<section id="install-pysipfenn">
+<h2>Install pySIPFENN<a class="headerlink" href="#install-pysipfenn" title="Permalink to this heading"></a></h2>
+<p>Installing pySIPFENN is simple and easy utilizing either <strong>PyPI</strong> package repository or cloning from <strong>GitHub</strong>. While not required, it is recommended to first set up a virtual environment using venv or Conda. This ensures that one of the required versions of Python (3.9+) is used and there are no dependency conflicts. To create one</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda create -n pysipfenn-workshop python=3.9 jupyter
+conda activate pysipfenn-workshop
+</pre></div>
+</div>
+<p>And then install pySIPFENN from PyPI with</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install pysipfenn
+</pre></div>
+</div>
+<p>Alternatively, you can also install pySIPFENN in editable mode if you cloned it from GitHub like</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/PhasesResearchLab/pySIPFENN.git
+</pre></div>
+</div>
+<p>Or by downloading a ZIP file. Then, move to the pySIPFENN folder and install in editable (-e) mode</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd pySIPFENN
+pip install -e .
+</pre></div>
+</div>
+</section>
+<section id="starting-pysipfenn">
+<h2>Starting pySIPFENN<a class="headerlink" href="#starting-pysipfenn" title="Permalink to this heading"></a></h2>
+<p>To utilize pySIPFENN for straightforward calculations, only the Calculator class is needed. It allows for both fetching and identification of NN models and later running of them. For pretty printing we also import pretty print Python built-in library.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysipfenn</span> <span class="kn">import</span> <span class="n">Calculator</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span> <span class="c1"># Just for pretty printing</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now initialize the Calculator. When run, this should display all models detected
+(e.g. ✔ SIPFENN_Krajewski2020 Standard Materials Model)
+and those not detected, but declared in the <em>modelsSIPFENN/models.json</em> file.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">Calculator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✔ SIPFENN_Krajewski2020 Standard Materials Model
+✔ SIPFENN_Krajewski2020 Novel Materials Model
+✔ SIPFENN_Krajewski2020 Light Model
+✔ SIPFENN_Krajewski2022 KS2022 Novel Materials Model
+Loading models:
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4/4 [00:17&lt;00:00,  4.30s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>*********  PySIPFENN Successfully Initialized  **********
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If this is the first run of pySIPFENN and no models are available, one can fetch four default (as of Feb 2023) models from Zenodo with a simple:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#c.downloadModels()</span>
+<span class="c1">#c.loadModels()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For the purpose of testing, a single model is sufficient and will be fetched faster. E.g. the lightweight model (‘SIPFENN_Krajewski2020_NN24’) can be acquired in about 1/30 of the time required to download all four.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#c.downloadModels(network=&#39;SIPFENN_Krajewski2020_NN24&#39;)</span>
+<span class="c1">#c.loadModels()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="simple-run-from-directory">
+<h2>Simple run from directory<a class="headerlink" href="#simple-run-from-directory" title="Permalink to this heading"></a></h2>
+<p>The simplest and most common usage of pySIPFENN is to deploy it on a directory/folder containing atomic structure files such as POSCAR or CIF. To of so, one simply specifies its location and which descriptor / feature vector should be used. The latter determines which ML models will be run, as they require a list of specific and ordered features as input. Furthermore, while the exact model can be specified by the user, by default all applicable models are run, as the run itself is 1-3 orders of magnitude faster than descriptor calculation.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>c.runFromDirectory(directory=&#39;myInputFiles&#39;, descriptor=&#39;KS2022&#39;)
+</pre></div>
+</div>
+<p>In this demonstration, a set of test files shipped with pySIPFENN under <strong>directory</strong></p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pysipfenn/tests/testCaseFiles/exampleInputFiles/
+</pre></div>
+</div>
+<p>is used. However, feel free to change the directory to something with your structure files. Please note that the file extension (e.g. <em>.POSCAR</em>) is required for correct input.</p>
+<p>Furthermore, you can specify whether pySIPFENN should run in series or parallel <strong>calculation mode</strong>. The parallel mode is generally faster, but uses more system resources and may be slower on low-power machines with not enough CPU cores. Serial mode is also preferred if there are less than 5 calculations/worker due to multiprocessing overheads.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">runFromDirectory</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="s1">&#39;../pysipfenn/tests/testCaseFiles/exampleInputFiles/&#39;</span><span class="p">,</span>
+                   <span class="n">descriptor</span><span class="o">=</span><span class="s1">&#39;KS2022&#39;</span><span class="p">,</span>
+                   <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;serial&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Importing structures...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 32/32 [00:00&lt;00:00, 571.42it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Models that will be run: [&#39;SIPFENN_Krajewski2022_NN30&#39;]
+Calculating descriptors...
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 32/32 [00:10&lt;00:00,  3.07it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
+Making predictions...
+Prediction rate: 183.2 pred/s
+Obtained 32 predictions from:  SIPFENN_Krajewski2022_NN30
+Done!
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, all results are obtained and stored within the <strong>c</strong> Calculator object inside a few exposed conveniently named variables
+<em>predictions</em> and <em>inputFiles</em>. Also, the descriptor data is retained in <em>descriptorData</em> if needed. Let’s look up the first 3 entries.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pprint</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">inputFiles</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">predictions</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;0-Cr8Fe18Ni4.POSCAR&#39;, &#39;1-Cr16Fe8Ni6.POSCAR&#39;, &#39;2-Fe8Ni22.POSCAR&#39;]
+[[0.17857088148593903], [0.22403044998645782], [0.07981749624013901]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>For user convenience, a few methods are provided for extracting the results. E.g., if pySIPFENN has been run from structure files, the <em>get_resultDictsWithNames()</em> method is available to conveniently pass results forward in the code.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">get_resultDictsWithNames</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;name&#39;: &#39;0-Cr8Fe18Ni4.POSCAR&#39;,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.17857088148593903},
+ {&#39;name&#39;: &#39;1-Cr16Fe8Ni6.POSCAR&#39;,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.22403044998645782},
+ {&#39;name&#39;: &#39;2-Fe8Ni22.POSCAR&#39;,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.07981749624013901}]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alternatively, if results are to be preserved in a spreadsheet, they can be exported into a CSV.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">writeResultsToCSV</span><span class="p">(</span><span class="s1">&#39;myFirstResults_pySIPFENN.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="sigma-phase-5-sublattice-model">
+<h2>Sigma-Phase 5-sublattice model<a class="headerlink" href="#sigma-phase-5-sublattice-model" title="Permalink to this heading"></a></h2>
+<p>In the previous example we went over a set of POSCAR files in a directory without performing any non-automated manipulation. This is what authors expect will be the most common use pattern. However, pySIPFENN can be effortlessly combined with other structure analysis and manipulation software to fulfill more advanced needs. Here, as an example, we will play with a fairly complex <strong>topologically close packed (TCP) phase called Sigma</strong> possesing 5 chemically unique sites, which will be automatically identified from one configuration, like the one in figure below. Then we will look at energetics of all possible occupancies by 3 elements.</p>
+<p><img alt="img" src="../_images/112-Cr12Fe10Ni8.png" /></p>
+<p>For structure manipulation we will utilize pymatgen Structure. The <a class="reference external" href="http://spglib.github.io/spglib/">Spglib library</a>, accessed through pymatgen, will perform the symmetry analysis. We begin with import of appropriate modules.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">pymatgen.analysis.structure_analyzer</span> <span class="kn">import</span> <span class="n">SpacegroupAnalyzer</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we take any end-member of the atomic structure in question. Conveniently, one of them is already in the test case files. Then we replace all species in it with dummy ones.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">baseStructure</span> <span class="o">=</span> <span class="n">Structure</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;../pysipfenn/tests/testCaseFiles/exampleInputFiles/0-Cr8Fe18Ni4.POSCAR&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">baseStructure</span><span class="o">.</span><span class="n">species</span><span class="p">):</span>
+    <span class="n">baseStructure</span><span class="o">.</span><span class="n">replace_species</span><span class="p">({</span><span class="n">el</span><span class="p">:</span> <span class="s1">&#39;dummy&#39;</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baseStructure</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Full Formula (Dummy30)
+Reduced Formula: Dummy
+abc   :   8.547048   8.547048   4.477714
+angles:  90.000000  90.000000  90.000000
+pbc   :       True       True       True
+Sites (30)
+  #  SP              a         b         c
+---  -------  --------  --------  --------
+  0  Dummy0+  0.737702  0.063709  0
+  1  Dummy0+  0.262298  0.936291  0
+  2  Dummy0+  0.436291  0.237702  0.5
+  3  Dummy0+  0.762298  0.563709  0.5
+  4  Dummy0+  0.563709  0.762298  0.5
+  5  Dummy0+  0.237702  0.436291  0.5
+  6  Dummy0+  0.063709  0.737702  0
+  7  Dummy0+  0.936291  0.262298  0
+  8  Dummy0+  0         0         0
+  9  Dummy0+  0.5       0.5       0.5
+ 10  Dummy0+  0.463029  0.129472  0
+ 11  Dummy0+  0.536971  0.870528  0
+ 12  Dummy0+  0.370528  0.963029  0.5
+ 13  Dummy0+  0.036971  0.629472  0.5
+ 14  Dummy0+  0.629472  0.036971  0.5
+ 15  Dummy0+  0.963029  0.370528  0.5
+ 16  Dummy0+  0.129472  0.463029  0
+ 17  Dummy0+  0.870528  0.536971  0
+ 18  Dummy0+  0.182718  0.182718  0.251726
+ 19  Dummy0+  0.817282  0.817282  0.748274
+ 20  Dummy0+  0.817282  0.817282  0.251726
+ 21  Dummy0+  0.317282  0.682718  0.751726
+ 22  Dummy0+  0.317282  0.682718  0.248274
+ 23  Dummy0+  0.182718  0.182718  0.748274
+ 24  Dummy0+  0.682718  0.317282  0.248274
+ 25  Dummy0+  0.682718  0.317282  0.751726
+ 26  Dummy0+  0.39991   0.39991   0
+ 27  Dummy0+  0.60009   0.60009   0
+ 28  Dummy0+  0.10009   0.89991   0.5
+ 29  Dummy0+  0.89991   0.10009   0.5
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we use Spglib to find and group unique chemical sites in the structure and lists of their equivalents. In the case of Sigma-phase, there are 5 such sites, also called <strong>sublattices</strong>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spgA</span> <span class="o">=</span> <span class="n">SpacegroupAnalyzer</span><span class="p">(</span><span class="n">baseStructure</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eqAtoms</span> <span class="o">=</span> <span class="n">spgA</span><span class="o">.</span><span class="n">get_symmetry_dataset</span><span class="p">()[</span><span class="s1">&#39;equivalent_atoms&#39;</span><span class="p">]</span>
+<span class="n">uniqueDict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">site</span><span class="p">,</span> <span class="n">unique</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">eqAtoms</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">unique</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">uniqueDict</span><span class="p">:</span>
+        <span class="n">uniqueDict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">unique</span><span class="p">:</span> <span class="p">[]})</span>
+    <span class="n">uniqueDict</span><span class="p">[</span><span class="n">unique</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="n">site</span><span class="p">]</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">uniqueDict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [0, 1, 2, 3, 4, 5, 6, 7],
+ 8: [8, 9],
+ 10: [10, 11, 12, 13, 14, 15, 16, 17],
+ 18: [18, 19, 20, 21, 22, 23, 24, 25],
+ 26: [26, 27, 28, 29]}
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, with unique sites identified, we need to find all possible occupancies in the chemical system in question. Here we look at the Cr-Fe-Ni ternary. We expect 3^5=243 possible permutations with repetition.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="n">allPermutations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">([</span><span class="s1">&#39;Fe&#39;</span><span class="p">,</span> <span class="s1">&#39;Cr&#39;</span><span class="p">,</span> <span class="s1">&#39;Ni&#39;</span><span class="p">],</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Obtained </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">allPermutations</span><span class="p">)</span><span class="si">}</span><span class="s1"> permutations of the sublattice occupancy</span><span class="se">\n</span><span class="s1">E.g.:  </span><span class="si">{</span><span class="n">allPermutations</span><span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Obtained 243 permutations of the sublattice occupancy
+E.g.:  (&#39;Fe&#39;, &#39;Cr&#39;, &#39;Fe&#39;, &#39;Cr&#39;, &#39;Ni&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">structList</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">permutation</span> <span class="ow">in</span> <span class="n">allPermutations</span><span class="p">:</span>
+    <span class="n">tempStructure</span> <span class="o">=</span> <span class="n">baseStructure</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">unique</span><span class="p">,</span> <span class="n">el</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">uniqueDict</span><span class="p">,</span> <span class="n">permutation</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="n">uniqueDict</span><span class="p">[</span><span class="n">unique</span><span class="p">]:</span>
+            <span class="n">tempStructure</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">site</span><span class="p">,</span> <span class="n">el</span><span class="p">)</span>
+    <span class="n">structList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tempStructure</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">structList</span><span class="p">[</span><span class="mi">32</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Full Formula (Cr10 Fe16 Ni4)
+Reduced Formula: Cr5(Fe4Ni)2
+abc   :   8.547048   8.547048   4.477714
+angles:  90.000000  90.000000  90.000000
+pbc   :       True       True       True
+Sites (30)
+  #  SP           a         b         c
+---  ----  --------  --------  --------
+  0  Fe    0.737702  0.063709  0
+  1  Fe    0.262298  0.936291  0
+  2  Fe    0.436291  0.237702  0.5
+  3  Fe    0.762298  0.563709  0.5
+  4  Fe    0.563709  0.762298  0.5
+  5  Fe    0.237702  0.436291  0.5
+  6  Fe    0.063709  0.737702  0
+  7  Fe    0.936291  0.262298  0
+  8  Cr    0         0         0
+  9  Cr    0.5       0.5       0.5
+ 10  Fe    0.463029  0.129472  0
+ 11  Fe    0.536971  0.870528  0
+ 12  Fe    0.370528  0.963029  0.5
+ 13  Fe    0.036971  0.629472  0.5
+ 14  Fe    0.629472  0.036971  0.5
+ 15  Fe    0.963029  0.370528  0.5
+ 16  Fe    0.129472  0.463029  0
+ 17  Fe    0.870528  0.536971  0
+ 18  Cr    0.182718  0.182718  0.251726
+ 19  Cr    0.817282  0.817282  0.748274
+ 20  Cr    0.817282  0.817282  0.251726
+ 21  Cr    0.317282  0.682718  0.751726
+ 22  Cr    0.317282  0.682718  0.248274
+ 23  Cr    0.182718  0.182718  0.748274
+ 24  Cr    0.682718  0.317282  0.248274
+ 25  Cr    0.682718  0.317282  0.751726
+ 26  Ni    0.39991   0.39991   0
+ 27  Ni    0.60009   0.60009   0
+ 28  Ni    0.10009   0.89991   0.5
+ 29  Ni    0.89991   0.10009   0.5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">Calculator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✔ SIPFENN_Krajewski2020 Standard Materials Model
+✔ SIPFENN_Krajewski2020 Novel Materials Model
+✔ SIPFENN_Krajewski2020 Light Model
+✔ SIPFENN_Krajewski2022 KS2022 Novel Materials Model
+Loading models:
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4/4 [00:14&lt;00:00,  3.50s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>*********  PySIPFENN Successfully Initialized  **********
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictions1</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">runModels</span><span class="p">(</span><span class="n">structList</span><span class="o">=</span><span class="n">structList</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="s1">&#39;KS2022&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">predictions1</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Models that will be run: [&#39;SIPFENN_Krajewski2022_NN30&#39;]
+Calculating descriptors...
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "16067693c7d746f5b95af578f0217029", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
+Making predictions...
+Prediction rate: 210.3 pred/s
+Obtained 243 predictions from:  SIPFENN_Krajewski2022_NN30
+[[0.17875494062900543], [0.164070263504982], [0.20459170639514923]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results1</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_resultDicts</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">results1</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;SIPFENN_Krajewski2022_NN30&#39;: 0.17875494062900543},
+ {&#39;SIPFENN_Krajewski2022_NN30&#39;: 0.164070263504982},
+ {&#39;SIPFENN_Krajewski2022_NN30&#39;: 0.20459170639514923}]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="run-models-utilizing-different-descriptor-feature-vector">
+<h2>Run models utilizing different descriptor / feature vector<a class="headerlink" href="#run-models-utilizing-different-descriptor-feature-vector" title="Permalink to this heading"></a></h2>
+<p>As alluded to before, pySIPFENN is built to enable rapid deployment of models based around single feature vector (or a subset of it) as descriptor calculation is by far the most costly component of structure-informed ML. However, the same feature vector cannot always be used and sometimes another one is needed. In this part of the tutorial, we combine previous predictions with a models based on a different descriptor (KS2017) used in the original SIPFENN paper.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictions2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">runModels</span><span class="p">(</span><span class="n">structList</span><span class="o">=</span><span class="n">structList</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="s1">&#39;Ward2017&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">predictions2</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Models that will be run: [&#39;SIPFENN_Krajewski2020_NN9&#39;, &#39;SIPFENN_Krajewski2020_NN20&#39;, &#39;SIPFENN_Krajewski2020_NN24&#39;]
+Calculating descriptors...
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "10e85a1d7d7f42d68774f707dbdd0d19", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
+Making predictions...
+Prediction rate: 223.7 pred/s
+Obtained 243 predictions from:  SIPFENN_Krajewski2020_NN9
+Prediction rate: 244.4 pred/s
+Obtained 243 predictions from:  SIPFENN_Krajewski2020_NN20
+Prediction rate: 1663.4 pred/s
+Obtained 243 predictions from:  SIPFENN_Krajewski2020_NN24
+[[0.07845493406057358, 0.07977385818958282, 0.036190714687108994],
+ [0.0612497553229332, -0.011681136675179005, 0.057756152004003525],
+ [0.05984886735677719, 0.06342127919197083, 0.07474079728126526]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results2</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_resultDicts</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">results2</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;SIPFENN_Krajewski2020_NN20&#39;: 0.07977385818958282,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.036190714687108994,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.07845493406057358},
+ {&#39;SIPFENN_Krajewski2020_NN20&#39;: -0.011681136675179005,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.057756152004003525,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.0612497553229332}]
+</pre></div>
+</div>
+</div>
+</div>
+<p>And finally combine two list of result dictionaries together.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resultsCombined</span> <span class="o">=</span> <span class="p">[</span><span class="n">res1</span> <span class="o">|</span> <span class="n">res2</span> <span class="k">for</span> <span class="n">res1</span><span class="p">,</span> <span class="n">res2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">results1</span><span class="p">,</span> <span class="n">results2</span><span class="p">)]</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">resultsCombined</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;SIPFENN_Krajewski2020_NN20&#39;: 0.07977385818958282,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.036190714687108994,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.07845493406057358,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.17875494062900543},
+ {&#39;SIPFENN_Krajewski2020_NN20&#39;: -0.011681136675179005,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.057756152004003525,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.0612497553229332,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.164070263504982}]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resultsCombinedLabeled</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;configuration&#39;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">permutation</span><span class="p">)}</span> <span class="o">|</span> <span class="n">result</span> <span class="k">for</span>
+                          <span class="n">result</span><span class="p">,</span> <span class="n">permutation</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">resultsCombined</span><span class="p">,</span> <span class="n">allPermutations</span><span class="p">)]</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">resultsCombinedLabeled</span><span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">33</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;SIPFENN_Krajewski2020_NN20&#39;: 0.10104335844516754,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.1215638816356659,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.10402818769216537,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.24544550478458405,
+  &#39;configuration&#39;: &#39;Fe-Cr-Fe-Cr-Cr&#39;},
+ {&#39;SIPFENN_Krajewski2020_NN20&#39;: 0.0738341212272644,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.05895533785223961,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.06879021972417831,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.19040240347385406,
+  &#39;configuration&#39;: &#39;Fe-Cr-Fe-Cr-Ni&#39;}]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="add-a-new-model">
+<h2>Add a new model!<a class="headerlink" href="#add-a-new-model" title="Permalink to this heading"></a></h2>
+<p>Adding a new model that accepts one of the descriptors / feature vectors implemented in pySIPFENN is very easy! No matter if it is a re-trained model to fit a specific set of species, or entirely new architecture. It doesn’t even need to be created in PyTorch, as pySIPFENN imports ONNX format which can be the export target of almost all ML frameworks.
+To add your model, you just need to put it in the <strong>modelsSIPFENN directory</strong> in the pySIPFENN location and add a brief definition to the <strong>models.json file</strong>, with field name matching model file name, descriptive name, and specify which descriptor has been used. E.g.,:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>  &quot;SIPFENN_myNewModel&quot;: {
+    &quot;name&quot;: &quot;SIPFENN_Krajewski2022 KS2022 Novel Materials Model - Retrained for Personal Needs&quot;,
+    &quot;descriptor&quot;: &quot;KS2022&quot;
+  }
+</pre></div>
+</div>
+<p>Then just re-initialize the Calculator and everything should be loaded automatically!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">Calculator</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>✔ SIPFENN_Krajewski2020 Standard Materials Model
+✔ SIPFENN_Krajewski2020 Novel Materials Model
+✔ SIPFENN_Krajewski2020 Light Model
+✔ SIPFENN_Krajewski2022 KS2022 Novel Materials Model
+✔ SIPFENN_Krajewski2022 KS2022 Novel Materials Model - Retrained for Personal Needs
+Loading models:
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 5/5 [00:16&lt;00:00,  3.20s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>*********  PySIPFENN Successfully Initialized  **********
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictions3</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">runModels</span><span class="p">(</span><span class="n">structList</span><span class="o">=</span><span class="n">structList</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">=</span><span class="s1">&#39;KS2022&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">results3</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_resultDicts</span><span class="p">()</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">results3</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Models that will be run: [&#39;SIPFENN_Krajewski2022_NN30&#39;, &#39;SIPFENN_myNewModel&#39;]
+Calculating descriptors...
+</pre></div>
+</div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4517d3fa6b394f52bd60b29319c2af23", "version_major": 2, "version_minor": 0}</script><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Done!
+Making predictions...
+Prediction rate: 243.5 pred/s
+Obtained 243 predictions from:  SIPFENN_Krajewski2022_NN30
+Prediction rate: 254.5 pred/s
+Obtained 243 predictions from:  SIPFENN_myNewModel
+[{&#39;SIPFENN_Krajewski2022_NN30&#39;: 0.17875494062900543,
+  &#39;SIPFENN_myNewModel&#39;: 0.17875494062900543},
+ {&#39;SIPFENN_Krajewski2022_NN30&#39;: 0.164070263504982,
+  &#39;SIPFENN_myNewModel&#39;: 0.164070263504982}]
+</pre></div>
+</div>
+</div>
+</div>
+<p>And append our new results to the previous ones!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">resultsFull</span> <span class="o">=</span> <span class="p">[</span><span class="n">res12</span> <span class="o">|</span> <span class="n">res3</span> <span class="k">for</span> <span class="n">res12</span><span class="p">,</span> <span class="n">res3</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">resultsCombinedLabeled</span><span class="p">,</span> <span class="n">results3</span><span class="p">)]</span>
+<span class="n">pprint</span><span class="p">(</span><span class="n">resultsFull</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;SIPFENN_Krajewski2020_NN20&#39;: 0.07977385818958282,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.036190714687108994,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.07845493406057358,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.17875494062900543,
+  &#39;SIPFENN_myNewModel&#39;: 0.17875494062900543,
+  &#39;configuration&#39;: &#39;Fe-Fe-Fe-Fe-Fe&#39;},
+ {&#39;SIPFENN_Krajewski2020_NN20&#39;: -0.011681136675179005,
+  &#39;SIPFENN_Krajewski2020_NN24&#39;: 0.057756152004003525,
+  &#39;SIPFENN_Krajewski2020_NN9&#39;: 0.0612497553229332,
+  &#39;SIPFENN_Krajewski2022_NN30&#39;: 0.164070263504982,
+  &#39;SIPFENN_myNewModel&#39;: 0.164070263504982,
+  &#39;configuration&#39;: &#39;Fe-Fe-Fe-Fe-Cr&#39;}]
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Great job! You have successfully completed the workshop!</strong>
+Thank you for your attention! If you are following it in synchronous fashion, we will now head to Q&amp;A session. If you are viewing it in your own time and have some questions, please feel free to reach out to <a class="reference external" href="mailto:ak&#37;&#52;&#48;psu&#46;edu">Adam M<span>&#46;</span> Krajewski (ak<span>&#64;</span>psu<span>&#46;</span>edu)</a> or <a class="reference external" href="mailto:zxl15&#37;&#52;&#48;psu&#46;edu">Zi-Kui Liu (zxl15<span>&#64;</span>psu<span>&#46;</span>edu)</a>!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../source/pysipfenn.modelsSIPFENN.html" class="btn btn-neutral float-left" title="pysipfenn.modelsSIPFENN package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Adam M. Krajewski.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
