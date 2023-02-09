@@ -7,6 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 from pysipfenn.core.pysipfenn import __version__, __file__
+import os
 
 project = 'pySIPFENN'
 copyright = '2023, Adam M. Krajewski'
@@ -33,8 +34,7 @@ nb_execution_mode = "off"
 nb_execution_cache_path = "../temp/jupyter_cache"
 
 # Changelog configuration
-half = 'ghp_3NoDxZ5bwXpN'
-sphinx_github_changelog_token = half+'XAVLZF1JyBpQZQLFxh03d2VG'
+sphinx_github_changelog_token = password = os.environ.get("sphinx_github_changelog_token")
 
 # -- Options for autodoc -----------------------------------------------------
 templates_path = ['_templates']
