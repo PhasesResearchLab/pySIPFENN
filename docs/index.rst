@@ -6,6 +6,13 @@
 =========
 pySIPFENN
 =========
+
+.. image:: https://img.shields.io/badge/python-3.9-blue.svg
+    :target: https://www.python.org/downloads/release/python-390/
+
+.. image:: https://img.shields.io/badge/python-3.10-blue.svg
+    :target: https://www.python.org/downloads/release/python-3100/
+
 .. image:: https://badge.fury.io/py/pysipfenn.svg
     :target: https://badge.fury.io/py/pysipfenn
 

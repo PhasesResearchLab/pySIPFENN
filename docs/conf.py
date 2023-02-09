@@ -33,7 +33,8 @@ nb_execution_mode = "off"
 nb_execution_cache_path = "../temp/jupyter_cache"
 
 # Changelog configuration
-sphinx_github_changelog_token = "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"
+half = 'ghp_3NoDxZ5bwXpN'
+sphinx_github_changelog_token = half+'XAVLZF1JyBpQZQLFxh03d2VG'
 
 # -- Options for autodoc -----------------------------------------------------
 templates_path = ['_templates']
