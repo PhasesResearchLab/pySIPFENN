@@ -24,12 +24,22 @@ extensions = ['sphinx.ext.linkcode',
               'sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx_autodoc_typehints',
-              'myst_parser',
+              'myst_nb',
+              'sphinx_github_changelog',
               ]
 
+# Jupyter Notebook configuration
+nb_execution_mode = "off"
+nb_execution_cache_path = "../temp/jupyter_cache"
+
+# Changelog configuration
+sphinx_github_changelog_token = ""
+
+# -- Options for autodoc -----------------------------------------------------
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '../**/tests*']
 
+# -- Options for napoleon ----------------------------------------------------
 napoleon_use_param = True
 
 
