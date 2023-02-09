@@ -18,7 +18,7 @@ import torch
 import onnx2torch
 import onnx
 
-from typing import List
+from typing import List, Union
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
@@ -224,7 +224,10 @@ class Calculator:
                     net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
                 })
 
-    def makePredictions_legacyMxNet(self, mxnet_networks: List[str], dataInList: List[List[float]]) -> list:
+    def makePredictions_legacyMxNet(self,
+                                    mxnet_networks: List[str],
+                                    dataInList: List[List[float]]
+                                    ) -> List[list]:
         '''Makes predictions using legacy mxnet networks. This is a legacy function and will be removed in future
         versions. Compatibility with legacy networks is not guaranteed. Use at your own risk.
 
@@ -233,7 +236,7 @@ class Calculator:
             dataInList: List of data to make predictions for. Each element of the list should be a list of descriptors.
 
         Returns:
-            list: List of predictions. Each element of the list is a list of predictions for all ran network.
+            List of predictions. Each element of the list is a list of predictions for all ran network.
         '''
 
         # Import MxNet
@@ -297,26 +300,48 @@ class Calculator:
         self.predictions = dataOuts
         return dataOuts
 
-    def findCompatibleModels(self, descriptor):
+    def findCompatibleModels(self, descriptor: str) -> List[str]:
+        '''Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
+        models.json file.
+
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022', 'KS2022_dilute'.
+
+        Returns:
+            List of compatible models.
+        '''
+
         compatibleList = []
         for net in self.models:
             if descriptor in self.models[net]['descriptor']:
                 compatibleList.append(net)
         return compatibleList
 
-    def runModels(self, descriptor: str, structList: List[Structure], mode='serial', max_workers=4) -> list:
+    def runModels(self,
+                  descriptor: str,
+                  structList: List[Structure],
+                  mode: str = 'serial',
+                  max_workers: int = 4) -> List[list]:
         '''Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
         computation modes. If parallel is selected, max_workers determines number of processes handling the
         featurization of structures (90-99+% of computational intensity) and models are then run in series.
 
         Args:
-            descriptor: Descriptor to use. Must be one of the available descriptors. See self.descriptor_list_available. Available default descriptors are: 'Ward2017', 'KS2022', 'KS2022_dilute'.
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022'.
             structList: List of pymatgen Structure objects to run the models on.
-            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for small datasets.
-            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None, will use all available cores. If set to 0, will use 1 core.
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for
+                small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+                None, will use all available cores. If set to 0, will use 1 core.
 
         Returns:
-            list: List of predictions. Each element of the list is a list of predictions for all ran networks. The order of the predictions is the same as the order of the input structures. The order of the networks is the same as the order of the networks in self.network_list_available. If a network is not available, it will not be included in the list. If a network is not compatible with the selected descriptor, it will not be included in the list.
+            List of predictions. Each element of the list is a list of predictions for all ran networks. The
+            order of the predictions is the same as the order of the input structures. The order of the networks is
+            the same as the order of the networks in self.network_list_available. If a network is not available, it
+            will not be included in the list. If a network is not compatible with the selected descriptor, it will
+            not be included in the list.
         '''
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
@@ -348,7 +373,40 @@ class Calculator:
 
         return self.predictions
 
-    def runModels_dilute(self, descriptor: str, structList: list, baseStruct='pure', mode='serial', max_workers=4):
+    def runModels_dilute(self,
+                         descriptor: str,
+                         structList: List[Structure],
+                         baseStruct: Union[str, Structure] = 'pure',
+                         mode: str = 'serial',
+                         max_workers: int = 4) -> List[list]:
+        '''Runs all loaded models on a list of Structures using specified descriptor. A critical difference
+        from runModels() is that this function supports the KS2022_dilute descriptor, which can only be used on dilute
+        structures (both based on pure elements and on custom base structures, e.g. TCP endmember configurations) that
+        contain a single alloying atom. Speed increases are substantial compared to the KS2022 descriptor, which is
+        more general and can be used on any structure. Supports serial and parallel modes in the same way as runModels().
+
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
+                to see available modules or add yours. Available default descriptors are: 'KS2022_dilute'. The 'KS2022'
+                should also work, but is not recommended, as it negates the speed increase of the dilute descriptor.
+            structList: List of pymatgen Structure objects to run the models on. Must be dilute structures as described
+                above.
+            baseStruct: Base structure to use for the dilute descriptor. Can be a Structure object or a string. If a
+                string, must be 'pure' indicating that the dilute structures given as input are pure elements alloyed
+                with a single atom. If the base structure is not pure, it must be a Structure object which differs from
+                the input Structures by one atom.
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for
+                small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+                None, will use all available cores. If set to 0, will use 1 core.
+
+        Returns:
+            List of predictions. Each element of the list is a list of predictions for all ran networks. The
+            order of the predictions is the same as the order of the input structures. The order of the networks
+            is the same as the order of the networks in self.network_list_available. If a network is not available,
+            it will not be included in the list. If a network is not compatible with the selected descriptor, it
+            will not be included in the list.
+        '''
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         if len(self.toRun) == 0:
@@ -375,23 +433,75 @@ class Calculator:
 
         return self.predictions
 
-    def get_resultDicts(self):
+    def get_resultDicts(self) -> List[dict]:
+        '''Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        names of the networks. The order of the dictionaries is the same as the order of the input structures passed
+        through runModels() functions.
+
+        Returns:
+            List of dictionaries with the predictions.
+        '''
         return [dict(zip(self.toRun, pred)) for pred in self.predictions]
 
-    def get_resultDictsWithNames(self):
+    def get_resultDictsWithNames(self) -> List[dict]:
+        '''Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        names of the networks and the names of the input structures. The order of the dictionaries is the same as the
+        order of the input structures passed through runModels() functions. Note that this function requires self.inputFiles
+        to be set, which is done automatically when using runFromDirectory() or runFromDirectory_dilute() but not when
+        using runModels() or runModels_dilute(), as the input structures are passed directly to the function and names
+        have to be provided separately by assigning them to self.inputFiles.
+
+        Returns:
+            List of dictionaries with the predictions.
+        '''
         assert self.inputFiles is not []
+        assert len(self.inputFiles) == len(self.predictions)
         return [
             dict(zip(['name']+self.toRun, [name]+pred))
             for name, pred in
             zip(self.inputFiles, self.predictions)]
 
-    def runFromDirectory(self, directory: str, descriptor: str, mode='serial', max_workers=4):
+    def runFromDirectory(self,
+                         directory: str,
+                         descriptor: str,
+                         mode: str = 'serial',
+                         max_workers: int = 4
+                         ) -> List[list]:
+        '''Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
+        directory must contain only atomic structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix
+        of these. The structures are automatically sorted using natsort library, so the order of the structures in the
+        directory, as defined by the operating system, is not important. Natural sorting, for example, will sort the
+        structures in the following order: '1-Fe', '2-Al', '10-xx', '11-xx', '20-xx', '21-xx', '11111-xx', etc. This is
+        useful when the structures are named using a numbering system. The order of the predictions is the same as the
+        order of the input structures. The order of the networks in a prediction is the same as the order of the networks in
+        self.network_list_available. If a network is not available, it will not be included in the list.
+
+        Args:
+            directory: Directory containing the structures to run the models on. The directory must contain only atomic
+                structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix of these. The structures are
+                automatically sorted as described above.
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
+                for a list of available descriptors.
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for small
+                datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None,
+                will use all available cores. If set to 0, will use 1 core.
+
+        Returns:
+            List of predictions. Each element of the list is a list of predictions for all ran networks. The order of
+            the predictions is the same as the order of the input structures. The order of the networks is the same as
+            the order of the networks in self.network_list_available. If a network is not available, it will not be
+            included in the list.
+        '''
+
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
         self.inputFiles = natsort.natsorted(self.inputFiles)
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
         print('Done!')
+        
+        return self.predictions
 
     def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct='pure', mode='serial', max_workers=4):
         print('Importing structures...')
@@ -439,7 +549,7 @@ class Calculator:
                     i += 1
 
 
-def ward2ks2022(ward2017: np.ndarray):
+def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
     assert isinstance(ward2017, np.ndarray)
     ward2017split = np.split(ward2017, [12, 15, 121, 126, 258, 264, 268, 269, 271])
     ks2022 = np.concatenate((
