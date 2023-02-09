@@ -6,3 +6,4 @@ include pysipfenn/modelsSIPFENN/models.json
 include pysipfenn/modelsSIPFENN/README.md
 
 prune example.workshop2023Feb
+prune docs
