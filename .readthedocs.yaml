@@ -15,10 +15,6 @@ sphinx:
 
 python:
   install:
+    - requirements: docs/docs_requirements.txt
     - method: pip
       path: .
-      extra_requirements:
-        - sphinx-github-changelog
-        - sphinx-autodoc-typehints
-        - sphinx-rtd-theme
-        - myst-nb
