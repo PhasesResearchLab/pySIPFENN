@@ -1,8 +1,5 @@
-pysipfenn.descriptorDefinitions package
-=======================================
-
-Submodules
-----------
+pysipfenn.descriptorDefinitions
+===============================
 
 pysipfenn.descriptorDefinitions.KS2022 module
 ---------------------------------------------
@@ -24,14 +21,6 @@ pysipfenn.descriptorDefinitions.Ward2017 module
 -----------------------------------------------
 
 .. automodule:: pysipfenn.descriptorDefinitions.Ward2017
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: pysipfenn.descriptorDefinitions
    :members:
    :undoc-members:
    :show-inheritance:

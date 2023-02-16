@@ -1,19 +1,8 @@
-pysipfenn.core package
-======================
+pySIPFENN Core
+==============
 
-Submodules
-----------
-
-pysipfenn.core.pysipfenn module
--------------------------------
-
-.. automodule:: pysipfenn
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
+pysipfenn.core.pysipfenn
+------------------------
 
 .. automodule:: pysipfenn
    :members:

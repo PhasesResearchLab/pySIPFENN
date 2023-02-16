@@ -1,5 +1,5 @@
-pysipfenn package
-=================
+pySIPFENN API
+=============
 
 Subpackages
 -----------
@@ -11,7 +11,7 @@ Subpackages
    pysipfenn.descriptorDefinitions
    pysipfenn.modelsSIPFENN
 
-Module contents
+Module Contents
 ---------------
 
 .. automodule:: pysipfenn
