@@ -34,11 +34,8 @@ class Calculator:
         pySIPFENN Calculator automatically initializes all functionalities. This includes identification and loading
         of all available models defined statically in models.json file.
     """
-    def __init__(self):
-
-        self.thread_pool_executor = futures.ThreadPoolExecutor(max_workers=4)
-        self.process_pool_executor = futures.ProcessPoolExecutor(max_workers=12)
-        self.descriptor_thread_executor = futures.ThreadPoolExecutor(max_workers=13)
+    def __init__(self,
+                 autoLoad: bool=True):
 
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
@@ -51,7 +48,8 @@ class Calculator:
         self.updateModelAvailability()
 
         self.loadedModels = {}
-        self.loadModels()
+        if autoLoad:
+            self.loadModels()
 
         self.toRun = []
         self.descriptorData = []
