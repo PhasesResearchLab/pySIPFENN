@@ -7,7 +7,6 @@ import csv
 import numpy as np
 from pymatgen.core import Structure
 import json
-from concurrent import futures
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 from time import perf_counter
@@ -18,7 +17,7 @@ import torch
 import onnx2torch
 import onnx
 
-from typing import List, Union
+from typing import List, Union, Dict
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
@@ -28,6 +27,7 @@ __version__ = '0.10.2'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'
+
 
 class Calculator:
     """
@@ -53,7 +53,7 @@ class Calculator:
                 corresponds to the order of atomic structures given to models as input.
     """
     def __init__(self,
-                 autoLoad: bool=True):
+                 autoLoad: bool = True):
 
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
@@ -92,7 +92,7 @@ class Calculator:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
 
-    def downloadModels_legacyMxNet(self, network:str ='all') -> None:
+    def downloadModels_legacyMxNet(self, network: str = 'all') -> None:
         """**Legacy Function** Downloads MxNet models.
 
         Args:
@@ -130,7 +130,7 @@ class Calculator:
             else:
                 print('Network name not recognized')
 
-    def downloadModels(self, network: str='all') -> None:
+    def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
         on disk, it is skipped. If a specific network is given, only that network is downloaded possibly overwriting
         the existing one. If the networks name is not recognized message is printed.
@@ -170,9 +170,9 @@ class Calculator:
 
     def calculate_Ward2017(self,
                            structList: List[Structure],
-                           mode: str='serial',
-                           max_workers: int=4) -> list:
-        '''Calculates Ward2017 descriptors for a list of structures. The calculation can be done in serial or parallel
+                           mode: str = 'serial',
+                           max_workers: int = 4) -> list:
+        """Calculates Ward2017 descriptors for a list of structures. The calculation can be done in serial or parallel
         mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
         attribute. The function returns the list of descriptors as well.
 
@@ -185,7 +185,7 @@ class Calculator:
         Returns:
             List of Ward2017 descriptor (feature vector) for each structure.
 
-        '''
+        """
         if mode == 'serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
@@ -199,9 +199,9 @@ class Calculator:
 
     def calculate_KS2022(self,
                          structList: List[Structure],
-                         mode: str='serial',
-                         max_workers: int=8) -> list:
-        '''Calculates KS2022 descriptors for a list of structures. The calculation can be done in serial or parallel
+                         mode: str = 'serial',
+                         max_workers: int = 8) -> list:
+        """Calculates KS2022 descriptors for a list of structures. The calculation can be done in serial or parallel
         mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
         attribute. The function returns the list of descriptors as well.
 
@@ -214,7 +214,7 @@ class Calculator:
         Returns:
             List of KS2022 descriptor (feature vector) for each structure.
 
-        '''
+        """
         if mode == 'serial':
             descList = [KS2022.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
@@ -228,10 +228,10 @@ class Calculator:
 
     def calculate_KS2022_dilute(self,
                                 structList: List[Structure],
-                                baseStruct: Union[str, Structure]='pure',
-                                mode: str='serial',
-                                max_workers: int=8) -> list:
-        '''Calculates KS2022 descriptors for a list of dilute structures (either based on pure elements and on custom
+                                baseStruct: Union[str, Structure] = 'pure',
+                                mode: str = 'serial',
+                                max_workers: int = 8) -> list:
+        """Calculates KS2022 descriptors for a list of dilute structures (either based on pure elements and on custom
         base structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
         substantial compared to the KS2022 descriptor, which is more general and can be used on any structure. The
         calculation can be done in serial or parallel mode. In parallel mode, the number of workers can be specified.
@@ -240,17 +240,17 @@ class Calculator:
         Args:
             structList: List of structures to calculate descriptors for. The structures must be
                 dilute structures (either based on pure elements and on custom base structures, e.g. TCP endmember
-                configurations) that contain a single alloying atom. The structures must be initialized with the pymatgen
-                Structure class.
+                configurations) that contain a single alloying atom. The structures must be initialized with the
+                pymatgen Structure class.
             baseStruct: Base structure to use for dilute structures. Defaults to
                 'pure'. Options are 'pure', where the base is automatically generated assuming the structure is pure
-                elmental solid, or a Structure object, where the base structure is provided by the user.
+                elemental solid, or a Structure object, where the base structure is provided by the user.
             mode: Mode of calculation. Defaults to 'serial'. Options are 'serial' and 'parallel'.
             max_workers: Number of workers to use in parallel mode. Defaults to 8.
 
         Returns:
             List of KS2022 descriptor (feature vector) for each structure.
-        '''
+        """
 
         if baseStruct == 'pure' or isinstance(baseStruct, Structure):
             if mode == 'serial':
@@ -280,10 +280,10 @@ class Calculator:
                 return descList
 
     #
-    def loadModels(self):
-        '''
+    def loadModels(self) -> None:
+        """
             Fill a dictionary of available models with loaded model neural networks in self.loadedModels.
-        '''
+        """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             print('Loading models:')
             for net in tqdm(self.network_list_available):
@@ -295,8 +295,8 @@ class Calculator:
                                     mxnet_networks: List[str],
                                     dataInList: List[List[float]]
                                     ) -> List[list]:
-        '''Makes predictions using legacy mxnet networks. This is a legacy function and will be removed in future
-        versions. Compatibility with legacy networks is not guaranteed. Use at your own risk.
+        """Loads legacy mxnet networks models and makes predictions using them. Requires mxnet to be installed. This
+        may be challenging on Windows systems but is easy on Linux systems.
 
         Args:
             mxnet_networks: List of networks to use.
@@ -304,7 +304,11 @@ class Calculator:
 
         Returns:
             List of predictions. Each element of the list is a list of predictions for all ran network.
-        '''
+
+        Note:
+            MxNet support is deprecated as of V0.10.0 and will be removed in future versions. Use at your own risk.
+            Compatibility with legacy networks is not guaranteed. Use at your own risk.
+        """
 
         # Import MxNet
         import mxnet as mx
@@ -344,7 +348,22 @@ class Calculator:
         self.predictions = dataOuts
         return dataOuts
 
-    def makePredictions(self, models, toRun, dataInList):
+    def makePredictions(self,
+                        models: Dict[str, torch.nn.Module],
+                        toRun: List[str],
+                        dataInList: List[Union[List[float], np.array]]) -> List[list]:
+        """Makes predictions using PyTorch networks listed in toRun and provided in models dictionary.
+
+        Args:
+            models: Dictionary of models to use. Keys are network names and values are PyTorch models.
+            toRun: List of networks to run. Must be a subset of models.keys().
+            dataInList: List of data to make predictions for. Each element of the list should be a descriptor accepted
+                by all networks in toRun. Can be a list of lists of floats or a list of numpy arrays.
+
+        Returns:
+            List of predictions. Each element of the list is a list of predictions for all ran network. The order of the
+            predictions is the same as the order of the networks in toRun.
+        """
         dataOuts = []
         print('Making predictions...')
         # Run for each network
@@ -368,16 +387,17 @@ class Calculator:
         return dataOuts
 
     def findCompatibleModels(self, descriptor: str) -> List[str]:
-        '''Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
+        """Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
         models.json file.
 
         Args:
             descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
-                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022', 'KS2022_dilute'.
+                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022',
+                'KS2022_dilute'.
 
         Returns:
             List of compatible models.
-        '''
+        """
 
         compatibleList = []
         for net in self.models:
@@ -390,7 +410,7 @@ class Calculator:
                   structList: List[Structure],
                   mode: str = 'serial',
                   max_workers: int = 4) -> List[list]:
-        '''Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
+        """Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
         computation modes. If parallel is selected, max_workers determines number of processes handling the
         featurization of structures (90-99+% of computational intensity) and models are then run in series.
 
@@ -409,7 +429,7 @@ class Calculator:
             the same as the order of the networks in self.network_list_available. If a network is not available, it
             will not be included in the list. If a network is not compatible with the selected descriptor, it will
             not be included in the list.
-        '''
+        """
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         self.toRun = natsort.natsorted(self.toRun)
@@ -446,11 +466,12 @@ class Calculator:
                          baseStruct: Union[str, Structure] = 'pure',
                          mode: str = 'serial',
                          max_workers: int = 4) -> List[list]:
-        '''Runs all loaded models on a list of Structures using specified descriptor. A critical difference
+        """Runs all loaded models on a list of Structures using specified descriptor. A critical difference
         from runModels() is that this function supports the KS2022_dilute descriptor, which can only be used on dilute
         structures (both based on pure elements and on custom base structures, e.g. TCP endmember configurations) that
         contain a single alloying atom. Speed increases are substantial compared to the KS2022 descriptor, which is
-        more general and can be used on any structure. Supports serial and parallel modes in the same way as runModels().
+        more general and can be used on any structure. Supports serial and parallel modes in the same way as
+        runModels().
 
         Args:
             descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
@@ -473,7 +494,7 @@ class Calculator:
             is the same as the order of the networks in self.network_list_available. If a network is not available,
             it will not be included in the list. If a network is not compatible with the selected descriptor, it
             will not be included in the list.
-        '''
+        """
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
         if len(self.toRun) == 0:
@@ -501,26 +522,26 @@ class Calculator:
         return self.predictions
 
     def get_resultDicts(self) -> List[dict]:
-        '''Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
         names of the networks. The order of the dictionaries is the same as the order of the input structures passed
         through runModels() functions.
 
         Returns:
             List of dictionaries with the predictions.
-        '''
+        """
         return [dict(zip(self.toRun, pred)) for pred in self.predictions]
 
     def get_resultDictsWithNames(self) -> List[dict]:
-        '''Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
         names of the networks and the names of the input structures. The order of the dictionaries is the same as the
-        order of the input structures passed through runModels() functions. Note that this function requires self.inputFiles
-        to be set, which is done automatically when using runFromDirectory() or runFromDirectory_dilute() but not when
-        using runModels() or runModels_dilute(), as the input structures are passed directly to the function and names
-        have to be provided separately by assigning them to self.inputFiles.
+        order of the input structures passed through runModels() functions. Note that this function requires
+        self.inputFiles to be set, which is done automatically when using runFromDirectory() or
+        runFromDirectory_dilute() but not when using runModels() or runModels_dilute(), as the input structures are
+        passed directly to the function and names have to be provided separately by assigning them to self.inputFiles.
 
         Returns:
             List of dictionaries with the predictions.
-        '''
+        """
         assert self.inputFiles is not []
         assert len(self.inputFiles) == len(self.predictions)
         return [
@@ -534,7 +555,7 @@ class Calculator:
                          mode: str = 'serial',
                          max_workers: int = 4
                          ) -> List[list]:
-        '''Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
+        """Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
         directory must contain only atomic structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix
         of these. The structures are automatically sorted using natsort library, so the order of the structures in the
         directory, as defined by the operating system, is not important. Natural sorting, for example, will sort the
@@ -559,7 +580,7 @@ class Calculator:
             the predictions is the same as the order of the input structures. The order of the networks is the same as
             the order of the networks in self.network_list_available. If a network is not available, it will not be
             included in the list.
-        '''
+        """
 
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
