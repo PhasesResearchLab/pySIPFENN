@@ -230,7 +230,7 @@ class Calculator:
 
     def calculate_KS2022_dilute(self,
                                 structList: List[Structure],
-                                baseStruct: Union[str, Structure] = 'pure',
+                                baseStruct: Union[str, List[Structure]] = 'pure',
                                 mode: str = 'serial',
                                 max_workers: int = 8) -> list:
         """Calculates KS2022 descriptors for a list of dilute structures (either based on pure elements and on custom
@@ -244,9 +244,10 @@ class Calculator:
                 dilute structures (either based on pure elements and on custom base structures, e.g. TCP endmember
                 configurations) that contain a single alloying atom. The structures must be initialized with the
                 pymatgen Structure class.
-            baseStruct: Base structure to use for dilute structures. Defaults to
-                'pure'. Options are 'pure', where the base is automatically generated assuming the structure is pure
-                elemental solid, or a Structure object, where the base structure is provided by the user.
+            baseStruct: Non-diluted references for the dilute structures. Defaults to 'pure', which assumes that the structures
+                are based on pure elements and generates references automatically. Alternatively, a list of structures
+                can be provided, which can be either pure elements or custom base structures (e.g. TCP endmember
+                configurations).
             mode: Mode of calculation. Defaults to 'serial'. Options are 'serial' and 'parallel'.
             max_workers: Number of workers to use in parallel mode. Defaults to 8.
 
@@ -465,7 +466,7 @@ class Calculator:
     def runModels_dilute(self,
                          descriptor: str,
                          structList: List[Structure],
-                         baseStruct: Union[str, Structure] = 'pure',
+                         baseStruct: Union[str, List[Structure]] = 'pure',
                          mode: str = 'serial',
                          max_workers: int = 4) -> List[list]:
         """Runs all loaded models on a list of Structures using specified descriptor. A critical difference
@@ -481,10 +482,10 @@ class Calculator:
                 should also work, but is not recommended, as it negates the speed increase of the dilute descriptor.
             structList: List of pymatgen Structure objects to run the models on. Must be dilute structures as described
                 above.
-            baseStruct: Base structure to use for the dilute descriptor. Can be a Structure object or a string. If a
-                string, must be 'pure' indicating that the dilute structures given as input are pure elements alloyed
-                with a single atom. If the base structure is not pure, it must be a Structure object which differs from
-                the input Structures by one atom.
+            baseStruct: Non-diluted references for the dilute structures. Defaults to 'pure', which assumes that the
+                structures are based on pure elements and generates references automatically. Alternatively, a list of
+                structures can be provided, which can be either pure elements or custom base structures (e.g. TCP
+                endmember configurations).
             mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for
                 small datasets.
             max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
@@ -594,7 +595,45 @@ class Calculator:
 
         return self.predictions
 
-    def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct='pure', mode='serial', max_workers=4):
+    def runFromDirectory_dilute(self,
+                                directory: str,
+                                descriptor: str,
+                                baseStruct: str = 'pure',
+                                mode: str = 'serial',
+                                max_workers: int = 8) -> None:
+        """Runs all loaded models on a list of dilute Structures it automatically imports from a specified directory.
+        The directory must contain only atomic structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc.,
+        or a mix of these. The structures are automatically sorted using natsort library, so the order of the
+        structures in the directory, as defined by the operating system, is not important. Natural sorting,
+        for example, will sort the structures in the following order: '1-Fe', '2-Al', '10-xx', '11-xx', '20-xx',
+        '21-xx', '11111-xx', etc. This is useful when the structures are named using a numbering system. The order of
+        the predictions is the same as the order of the input structures. The order of the networks in a prediction
+        is the same as the order of the networks in self.network_list_available. If a network is not available,
+        it will not be included in the list.
+
+        Args:
+            directory: Directory containing the structures to run the models on. The directory must contain only atomic
+                structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix of these. The structures
+                are automatically sorted as described above. The structures must be dilute structures, i.e. they must
+                contain only one alloying element.
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
+                for a list of available descriptors.
+            baseStruct: Non-diluted references for the dilute structures. Defaults to 'pure', which assumes that the
+                structures are based on pure elements and generates references automatically. Alternatively, a list of
+                structures can be provided, which can be either pure elements or custom base structures (e.g. TCP
+                endmember configurations).
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for
+                small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 8. Ignored in serial mode. If set to
+                None, will use all available cores. If set to 0, will use 1 core.
+
+        Returns:
+            List of predictions. Each element of the list is a list of predictions for all ran networks. The order of
+            the predictions is the same as the order of the input structures. The order of the networks is the same as
+            the order of the networks in self.network_list_available. If a network is not available, it will not be
+            included in the list.
+
+        """
         print('Importing structures...')
         self.inputFiles = os.listdir(directory)
         self.inputFiles = natsort.natsorted(self.inputFiles)
@@ -606,7 +645,18 @@ class Calculator:
                               max_workers=max_workers)
         print('Done!')
 
-    def writeResultsToCSV(self, file: str):
+    def writeResultsToCSV(self, file: str) -> None:
+        """Writes the results to a CSV file. The first column is the name of the structure. If the self.inputFiles
+        attribute is populated automatically by runFromDirectory() or set manually, the names of the structures will
+        be used. Otherwise, the names will be '1', '2', '3', etc. The remaining columns are the predictions for each
+        network. The order of the columns is the same as the order of the networks in self.network_list_available.
+
+        Args:
+            file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
+                file does not exist, it will be created. The file must have a '.csv' extension to be recognized
+                correctly.
+        """
+
         assert self.toRun is not []
         with open(file, 'w+', encoding="utf-8") as f:
             f.write('Name,' + ','.join(self.toRun) + '\n')
@@ -620,7 +670,21 @@ class Calculator:
                     f.write(f'{i},{",".join(str(v) for v in pred)}\n')
                     i += 1
 
-    def writeDescriptorsToCSV(self, descriptor: str, file: str):
+    def writeDescriptorsToCSV(self, descriptor: str, file: str) -> None:
+        """Writes the descriptor data to a CSV file. The first column is the name of the structure. If the
+        self.inputFiles attribute is populated automatically by runFromDirectory() or set manually, the names of the
+        structures will be used. Otherwise, the names will be '1', '2', '3', etc. The remaining columns are the
+        descriptor values. The order of the columns is the same as the order of the labels in the descriptor
+        definition file.
+
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
+                for a list of available descriptors, such as 'KS2022' and 'Ward2017'.
+            file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
+                file does not exist, it will be created. The file must have a '.csv' extension to be recognized
+                correctly.
+        """
+
         # Load descriptor labels
         with open(f'descriptorDefinitions/labels_{descriptor}.csv', 'r') as f:
             reader = csv.reader(f)
@@ -641,7 +705,17 @@ class Calculator:
 
 
 def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
+    """Converts a Ward 2017 descriptor to a KS2022 descriptor (which is its subset).
+
+    Args:
+        ward2017: Ward2017 descriptor. Must be a 1D NumPy array of length 271.
+
+    Returns:
+        KS2022 descriptor array.
+    """
+
     assert isinstance(ward2017, np.ndarray)
+    assert ward2017.shape == (271,)
     ward2017split = np.split(ward2017, [12, 15, 121, 126, 258, 264, 268, 269, 271])
     ks2022 = np.concatenate((
         ward2017split[0],
