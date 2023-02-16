@@ -31,8 +31,26 @@ __name__ = 'pysipfenn'
 
 class Calculator:
     """
-        pySIPFENN Calculator automatically initializes all functionalities. This includes identification and loading
-        of all available models defined statically in models.json file.
+        pySIPFENN Calculator automatically initializes all functionalities including identification and loading
+        of all available models defined statically in models.json file. It exposes methods for calculating predefined
+        structure-informed descriptors (feature vectors) and predicting properties using models that utilize them.
+
+        Args:
+            autoLoad (bool): Automatically load all available models. Default: True.
+
+        Attributes:
+            models (dict): Dictionary with all model information based on the models.json file in the modelsSIPFENN
+                directory. The keys are the network names and the values are dictionaries with the model information.
+            loadedModels (dict): Dictionary with all loaded models. The keys are the network names and the values
+                are the loaded pytorch models.
+            descriptorData (list): List of all descriptor data created during the last predictions run. The order
+                of the list corresponds to the order of atomic structures given to models as input. The order of the
+                list of descriptor data for each structure corresponds to the order of networks in the toRun list.
+            predictions (list): List of all predictions created during the last predictions run. The order of the
+                list corresponds to the order of atomic structures given to models as input. The order of the list
+                of predictions for each structure corresponds to the order of networks in the toRun list.
+            inputFiles (list): List of all input file names used during the last predictions run. The order of the list
+                corresponds to the order of atomic structures given to models as input.
     """
     def __init__(self,
                  autoLoad: bool=True):
