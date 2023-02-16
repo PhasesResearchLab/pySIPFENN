@@ -21,6 +21,7 @@ from typing import List, Union, Dict
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
+
 # - add new ones here if extending the code
 
 __version__ = '0.10.2'
@@ -52,6 +53,7 @@ class Calculator:
             inputFiles: List of all input file names used during the last predictions run. The order of the list
                 corresponds to the order of atomic structures given to models as input.
     """
+
     def __init__(self,
                  autoLoad: bool = True):
 
@@ -327,7 +329,7 @@ class Calculator:
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             for net in mxnet_networks:
                 loadedModels.update({net: gluon.nn.SymbolBlock.imports(
-                    f'{modelPath}/{net}.json',    # architecture file
+                    f'{modelPath}/{net}.json',  # architecture file
                     ['Input'],
                     f'{modelPath}/{net}.params',  # parameters file
                     ctx=self.ctx)})
@@ -378,7 +380,7 @@ class Calculator:
                 tempOut = model(dataIn)
             t1 = perf_counter()
             dataOuts.append(tempOut.cpu().detach().numpy())
-            print(f'Prediction rate: {round(len(tempOut)/(t1-t0), 1)} pred/s')
+            print(f'Prediction rate: {round(len(tempOut) / (t1 - t0), 1)} pred/s')
             print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
         # Transpose and round the predictions
@@ -545,7 +547,7 @@ class Calculator:
         assert self.inputFiles is not []
         assert len(self.inputFiles) == len(self.predictions)
         return [
-            dict(zip(['name']+self.toRun, [name]+pred))
+            dict(zip(['name'] + self.toRun, [name] + pred))
             for name, pred in
             zip(self.inputFiles, self.predictions)]
 
@@ -556,24 +558,25 @@ class Calculator:
                          max_workers: int = 4
                          ) -> List[list]:
         """Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
-        directory must contain only atomic structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix
-        of these. The structures are automatically sorted using natsort library, so the order of the structures in the
-        directory, as defined by the operating system, is not important. Natural sorting, for example, will sort the
-        structures in the following order: '1-Fe', '2-Al', '10-xx', '11-xx', '20-xx', '21-xx', '11111-xx', etc. This is
-        useful when the structures are named using a numbering system. The order of the predictions is the same as the
-        order of the input structures. The order of the networks in a prediction is the same as the order of the networks in
-        self.network_list_available. If a network is not available, it will not be included in the list.
+        directory must contain only atomic structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc.,
+        or a mix of these. The structures are automatically sorted using natsort library, so the order of the
+        structures in the directory, as defined by the operating system, is not important. Natural sorting,
+        for example, will sort the structures in the following order: '1-Fe', '2-Al', '10-xx', '11-xx', '20-xx',
+        '21-xx', '11111-xx', etc. This is useful when the structures are named using a numbering system. The order of
+        the predictions is the same as the order of the input structures. The order of the networks in a prediction
+        is the same as the order of the networks in self.network_list_available. If a network is not available,
+        it will not be included in the list.
 
         Args:
             directory: Directory containing the structures to run the models on. The directory must contain only atomic
-                structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix of these. The structures are
-                automatically sorted as described above.
+                structures in formats such as 'poscar', 'cif', 'json', 'mcsqs', etc., or a mix of these. The structures
+                are automatically sorted as described above.
             descriptor: Descriptor to use. Must be one of the available descriptors. See pysipgenn.descriptorDefinitions
                 for a list of available descriptors.
-            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for small
-                datasets.
-            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to None,
-                will use all available cores. If set to 0, will use 1 core.
+            mode: Computation mode. 'serial' or 'parallel'. Default is 'serial'. Parallel mode is not recommended for
+                small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is 4. Ignored in serial mode. If set to
+                None, will use all available cores. If set to 0, will use 1 core.
 
         Returns:
             List of predictions. Each element of the list is a list of predictions for all ran networks. The order of
@@ -588,7 +591,7 @@ class Calculator:
         structList = [Structure.from_file(f'{directory}/{eif}') for eif in tqdm(self.inputFiles)]
         self.runModels(descriptor=descriptor, structList=structList, mode=mode, max_workers=max_workers)
         print('Done!')
-        
+
         return self.predictions
 
     def runFromDirectory_dilute(self, directory: str, descriptor: str, baseStruct='pure', mode='serial', max_workers=4):
@@ -606,7 +609,7 @@ class Calculator:
     def writeResultsToCSV(self, file: str):
         assert self.toRun is not []
         with open(file, 'w+', encoding="utf-8") as f:
-            f.write('Name,'+','.join(self.toRun)+'\n')
+            f.write('Name,' + ','.join(self.toRun) + '\n')
             if len(self.inputFiles) == len(self.predictions):
                 for name, pred in zip(self.inputFiles, self.predictions):
                     assert len(pred) == len(self.toRun)
@@ -646,6 +649,6 @@ def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
         ward2017split[4],
         ward2017split[6],
         ward2017split[8]
-        ), axis=-1, dtype=np.float32)
+    ), axis=-1, dtype=np.float32)
 
     return ks2022
