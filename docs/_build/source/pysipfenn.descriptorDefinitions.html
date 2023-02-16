@@ -211,54 +211,102 @@
 <span id="pysipfenn-descriptordefinitions-ward2017-module"></span><h2>pysipfenn.descriptorDefinitions.Ward2017 module<a class="headerlink" href="#module-pysipfenn.descriptorDefinitions.Ward2017" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">LocalAttributeGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_env_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nn_generator=&lt;pymatgen.analysis.local_env.VoronoiNN</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L88-L99"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">LocalAttributeGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_env_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nn_generator=&lt;pymatgen.analysis.local_env.VoronoiNN</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L92-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+a function which computes the local environment attributes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator.generate_local_attributes">
-<span class="sig-name descname"><span class="pre">generate_local_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L97-L99"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator.generate_local_attributes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">generate_local_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L104-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.LocalAttributeGenerator.generate_local_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the local environment attributes for a given site in the structure.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.cite">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">cite</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L274-L275"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.cite" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">cite</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L298-L300"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.cite" title="Permalink to this definition"></a></dt>
+<dd><p>Citation/s for the descriptor.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.generate_WC_attributes">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_WC_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbor_dict_raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L119-L176"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_WC_attributes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_WC_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbor_dict_raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L132-L199"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_WC_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the WC attributes for a given structure. The WC attributes are the ordering parameters for each
+shell of the Voronoi tessellation. Slightly different than what is implemented by Ward-Wolverton. Only considers
+immediate backtracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strc</strong> – A pymatgen Structure object.</p></li>
+<li><p><strong>neighbor_dict_raw</strong> – A dictionary of the neighbors of each site in the structure.</p></li>
+<li><p><strong>levels</strong> – The number of shells to consider.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.generate_descriptor">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L199-L271"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_descriptor" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L222-L295"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_descriptor" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the descriptor for a given structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.generate_voronoi_attributes">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_voronoi_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_funct=&lt;function</span> <span class="pre">local_env_function&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L102-L115"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_voronoi_attributes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">generate_voronoi_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_funct=&lt;function</span> <span class="pre">local_env_function&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L110-L130"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.generate_voronoi_attributes" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the local environment attributes for a given structure using a VoronoiNN generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> – A pymatgen Structure object.</p></li>
+<li><p><strong>local_funct</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.local_env_function">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">local_env_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L32-L83"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.local_env_function" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">local_env_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_dict</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L29-L90"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.local_env_function" title="Permalink to this definition"></a></dt>
+<dd><p>A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
+between them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>local_env</strong> – </p></li>
+<li><p><strong>site</strong> – </p></li>
+<li><p><strong>element_dict</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.magpie_mode">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">magpie_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L180-L196"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.magpie_mode" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">magpie_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute_properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L202-L219"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.magpie_mode" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the attributes corresponding to the most common elements.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.profile">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L278-L379"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.profile" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L303-L405"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.profile" title="Permalink to this definition"></a></dt>
+<dd><p>Profiles the descriptor using one of the test structures.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.Ward2017.profileParallel">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">profileParallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L382-L481"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.profileParallel" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.Ward2017.</span></span><span class="sig-name descname"><span class="pre">profileParallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.2/pysipfenn/core/..\descriptorDefinitions\Ward2017.py#L408-L508"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.Ward2017.profileParallel" title="Permalink to this definition"></a></dt>
+<dd><p>Profile the parallel version of the descriptor generator.</p>
+</dd></dl>
 
 </section>
 </section>

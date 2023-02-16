@@ -1,8 +1,8 @@
 # Authors: Jonathan Siegel, Adam M. Krajewski
 #
-# Calculates the descriptor first introduced by Ward and Wolverton.
+# Calculates the descriptor / feature vector first introduced by Ward and Wolverton.
 #
-# Please Cite:
+# Inaddition to pySIPFENN please cite:
 # L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
 # “Including crystal structure attributes in machine learning models of formation energies
 # via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
@@ -26,10 +26,17 @@ attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,
                    [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
 
+def local_env_function(local_env, site, element_dict) -> list:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
+    between them.
 
-# A prototype function which computes a weighted average over neighbors,
-# weighted by the area of the voronoi cell between them.
-def local_env_function(local_env, site, element_dict):
+    Args:
+        local_env:
+        site:
+        element_dict:
+
+    """
+
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
         local_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -82,10 +89,10 @@ def local_env_function(local_env, site, element_dict):
         ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
         elemental_properties_attributes[1], neighbor_list]
 
-
-# A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
-# a function which computes the local environment attributes.
 class LocalAttributeGenerator:
+    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    a function which computes the local environment attributes.
+    """
 
     def __init__(self, struct, local_env_func, element_dict,
                  nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
@@ -94,12 +101,20 @@ class LocalAttributeGenerator:
         self.function = local_env_func
         self.element_dict = element_dict
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
+        """Generates the local environment attributes for a given site in the structure."""
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n], self.element_dict)
 
 
-def generate_voronoi_attributes(struct, local_funct=local_env_function):
+def generate_voronoi_attributes(struct: Structure, local_funct=local_env_function):
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator.
+
+    Args:
+        struct: A pymatgen Structure object.
+        local_funct:
+
+    """
     # Collect stoichiometry of structure for use in WC parameter calculation.
     element_dict = {}
     for composition in struct.species_and_occu:
@@ -114,9 +129,17 @@ def generate_voronoi_attributes(struct, local_funct=local_env_function):
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list]), {
         i: value[2] for (i, value) in enumerate(attribute_list)}
 
+def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels):
+    """Generates the WC attributes for a given structure. The WC attributes are the ordering parameters for each
+    shell of the Voronoi tessellation. Slightly different than what is implemented by Ward-Wolverton. Only considers
+    immediate backtracking.
 
-# Slightly different than what is implemented by Ward-Wolverton. Only considers immediate backtracking.
-def generate_WC_attributes(strc, neighbor_dict_raw, levels):
+    Args:
+        strc: A pymatgen Structure object.
+        neighbor_dict_raw: A dictionary of the neighbors of each site in the structure.
+        levels: The number of shells to consider.
+
+    """
     if len(strc.composition) == 1:
         return [0] * levels
 
@@ -176,8 +199,8 @@ def generate_WC_attributes(strc, neighbor_dict_raw, levels):
     return output
 
 
-# Calculates the attributes corresponding to the most common elements.
 def magpie_mode(attribute_properties, axis=0):
+    """Calculates the attributes corresponding to the most common elements."""
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
@@ -196,7 +219,8 @@ def magpie_mode(attribute_properties, axis=0):
     return output / len(top_elements)
 
 
-def generate_descriptor(struct):
+def generate_descriptor(struct: Structure) -> np.ndarray:
+    """Generates the descriptor for a given structure."""
     diff_properties, attribute_properties, neighbor_dict = generate_voronoi_attributes(struct)
     properties = np.concatenate((np.stack((np.mean(diff_properties, axis=0),
             np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
@@ -271,11 +295,13 @@ def generate_descriptor(struct):
     return properties
 
 
-def cite():
+def cite() -> str:
+    """Citation/s for the descriptor."""
     return citation
 
 
 def profile(test='JVASP-10001'):
+    """Profiles the descriptor using one of the test structures."""
     if test == 'JVASP-10001':
         print('Profiling/testing task. Will calculate a descriptor for Li2 Zr1 Te1 O6 (JVASP-10001)')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": ' \
@@ -380,6 +406,7 @@ def profile(test='JVASP-10001'):
 
 
 def profileParallel(test='JVASP-10001'):
+    """Profile the parallel version of the descriptor generator."""
     from tqdm.contrib.concurrent import process_map
     if test == 'JVASP-10001':
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": ' \
