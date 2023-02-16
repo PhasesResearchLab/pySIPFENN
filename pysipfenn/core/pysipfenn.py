@@ -36,20 +36,20 @@ class Calculator:
         structure-informed descriptors (feature vectors) and predicting properties using models that utilize them.
 
         Args:
-            autoLoad (bool): Automatically load all available models. Default: True.
+            autoLoad: Automatically load all available models. Default: True.
 
         Attributes:
-            models (dict): Dictionary with all model information based on the models.json file in the modelsSIPFENN
+            models: Dictionary with all model information based on the models.json file in the modelsSIPFENN
                 directory. The keys are the network names and the values are dictionaries with the model information.
-            loadedModels (dict): Dictionary with all loaded models. The keys are the network names and the values
+            loadedModels: Dictionary with all loaded models. The keys are the network names and the values
                 are the loaded pytorch models.
-            descriptorData (list): List of all descriptor data created during the last predictions run. The order
+            descriptorData: List of all descriptor data created during the last predictions run. The order
                 of the list corresponds to the order of atomic structures given to models as input. The order of the
                 list of descriptor data for each structure corresponds to the order of networks in the toRun list.
-            predictions (list): List of all predictions created during the last predictions run. The order of the
+            predictions: List of all predictions created during the last predictions run. The order of the
                 list corresponds to the order of atomic structures given to models as input. The order of the list
                 of predictions for each structure corresponds to the order of networks in the toRun list.
-            inputFiles (list): List of all input file names used during the last predictions run. The order of the list
+            inputFiles: List of all input file names used during the last predictions run. The order of the list
                 corresponds to the order of atomic structures given to models as input.
     """
     def __init__(self,
@@ -75,7 +75,7 @@ class Calculator:
         self.inputFiles = []
         print(f'*********  PySIPFENN Successfully Initialized  **********')
 
-    def updateModelAvailability(self):
+    def updateModelAvailability(self) -> None:
         """
             Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
             current ONNX model definitions. Legacy support for MxNet models is retained in other functions, but they
@@ -92,9 +92,11 @@ class Calculator:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
 
-    def downloadModels_legacyMxNet(self, network='all'):
-        """
-            **Legacy Function** Downloads MxNet models.
+    def downloadModels_legacyMxNet(self, network:str ='all') -> None:
+        """**Legacy Function** Downloads MxNet models.
+
+        Args:
+            network: Name of the network to download. Defaults to 'all'.
         """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
             # Fetch all
@@ -128,11 +130,13 @@ class Calculator:
             else:
                 print('Network name not recognized')
 
-    def downloadModels(self, network='all'):
-        """Downloads all ONNX models.
+    def downloadModels(self, network: str='all') -> None:
+        """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
+        on disk, it is skipped. If a specific network is given, only that network is downloaded possibly overwriting
+        the existing one. If the networks name is not recognized message is printed.
 
         Args:
-            network (str, optional): Name of the network to download. Defaults to 'all'.
+            network: Name of the network to download. Defaults to 'all'.
 
         """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
@@ -164,16 +168,22 @@ class Calculator:
                 print('Network name not recognized')
         self.updateModelAvailability()
 
-    def calculate_Ward2017(self, structList: List[Structure], mode='serial', max_workers=10) -> list:
-        '''Calculates Ward2017 descriptors for a list of structures.
+    def calculate_Ward2017(self,
+                           structList: List[Structure],
+                           mode: str='serial',
+                           max_workers: int=4) -> list:
+        '''Calculates Ward2017 descriptors for a list of structures. The calculation can be done in serial or parallel
+        mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
+        attribute. The function returns the list of descriptors as well.
 
         Args:
-            structList (List[Structure]): List of structures to calculate descriptors for.
-            mode (str, optional): Mode of calculation. Defaults to 'serial'.
-            max_workers (int, optional): Number of workers to use in parallel mode. Defaults to 10.
+            structList: List of structures to calculate descriptors for. The structures must be
+                initialized with the pymatgen Structure class.
+            mode: Mode of calculation. Defaults to 'serial'. Options are 'serial' and 'parallel'.
+            max_workers: Number of workers to use in parallel mode. Defaults to 4.
 
         Returns:
-            list: List of descriptors.
+            List of Ward2017 descriptor (feature vector) for each structure.
 
         '''
         if mode == 'serial':
@@ -187,8 +197,24 @@ class Calculator:
             self.descriptorData = descList
             return descList
 
-    def calculate_KS2022(self, structList: List[Structure], mode='serial', max_workers=10):
+    def calculate_KS2022(self,
+                         structList: List[Structure],
+                         mode: str='serial',
+                         max_workers: int=8) -> list:
+        '''Calculates KS2022 descriptors for a list of structures. The calculation can be done in serial or parallel
+        mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
+        attribute. The function returns the list of descriptors as well.
 
+        Args:
+            structList: List of structures to calculate descriptors for. The structures must be
+                initialized with the pymatgen Structure class.
+            mode: Mode of calculation. Defaults to 'serial'. Options are 'serial' and 'parallel'.
+            max_workers: Number of workers to use in parallel mode. Defaults to 8.
+
+        Returns:
+            List of KS2022 descriptor (feature vector) for each structure.
+
+        '''
         if mode == 'serial':
             descList = [KS2022.generate_descriptor(s) for s in tqdm(structList)]
             print('Done!')
@@ -200,7 +226,32 @@ class Calculator:
             self.descriptorData = descList
             return descList
 
-    def calculate_KS2022_dilute(self, structList: List[Structure], baseStruct='pure', mode='serial', max_workers=10):
+    def calculate_KS2022_dilute(self,
+                                structList: List[Structure],
+                                baseStruct: Union[str, Structure]='pure',
+                                mode: str='serial',
+                                max_workers: int=8) -> list:
+        '''Calculates KS2022 descriptors for a list of dilute structures (either based on pure elements and on custom
+        base structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
+        substantial compared to the KS2022 descriptor, which is more general and can be used on any structure. The
+        calculation can be done in serial or parallel mode. In parallel mode, the number of workers can be specified.
+        The results are stored in the descriptorData attribute. The function returns the list of descriptors as well.
+
+        Args:
+            structList: List of structures to calculate descriptors for. The structures must be
+                dilute structures (either based on pure elements and on custom base structures, e.g. TCP endmember
+                configurations) that contain a single alloying atom. The structures must be initialized with the pymatgen
+                Structure class.
+            baseStruct: Base structure to use for dilute structures. Defaults to
+                'pure'. Options are 'pure', where the base is automatically generated assuming the structure is pure
+                elmental solid, or a Structure object, where the base structure is provided by the user.
+            mode: Mode of calculation. Defaults to 'serial'. Options are 'serial' and 'parallel'.
+            max_workers: Number of workers to use in parallel mode. Defaults to 8.
+
+        Returns:
+            List of KS2022 descriptor (feature vector) for each structure.
+        '''
+
         if baseStruct == 'pure' or isinstance(baseStruct, Structure):
             if mode == 'serial':
                 descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
