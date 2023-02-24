@@ -118,6 +118,17 @@ def get_equivalentSitesMultiplicities(struct: Structure):
 
 
 def generate_descriptor(struct: Structure):
+    """
+        Generates a descriptor based upon the Wolverton group paper which introduced Magpie given an input structure. This descriptor
+        can subsequently be used as the input to the neural network architecture described in 
+        https://www.sciencedirect.com/science/article/pii/S0927025622000593.
+        
+        Args:
+          Structure: A description of the input structure of the type defined in pyMatgen.
+            
+        Returns:
+          A numpy array containing the descriptor.
+    """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
         (np.stack(
@@ -182,6 +193,13 @@ def generate_descriptor(struct: Structure):
     return properties
 
 def cite():
+    """
+        Returns a citation to the paper which introduced Magpie.
+        Args:
+            
+        Returns:
+          A citation to the Wolverton group paper which initially introduced Magpie.
+    """
     return citation
 
 def profile(test='JVASP-10001'):
