@@ -15,25 +15,27 @@ pySIPFENN
     :target: https://www.python.org/downloads/release/python-3100/
 
 .. image:: https://img.shields.io/pypi/l/pysipfenn
-   :alt: PyPI - License
+    :target: https://pypi.org/project/pysipfenn/
+    :alt: PyPI - License
 
 .. image:: https://img.shields.io/pypi/v/pysipfenn
-   :alt: PyPI
+    :target: https://pypi.org/project/pysipfenn/
+    :alt: PyPI
 
 .. image:: https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit
-   :alt: GitHub last commit (by committer)
+    :alt: GitHub last commit (by committer)
 
 .. image:: https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release
-   :alt: GitHub Release Date - Published_At
+    :alt: GitHub Release Date - Published_At
 
 .. image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.10.1?color=g
-   :alt: GitHub commits since tagged version
+    :alt: GitHub commits since tagged version
 
 .. image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue
-   :target: https://doi.org/10.1016/j.commatsci.2022.111254
+    :target: https://doi.org/10.1016/j.commatsci.2022.111254
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
-   :target: https://doi.org/10.5281/zenodo.7373089
+    :target: https://doi.org/10.5281/zenodo.7373089
 
 
 **py** (**S** tructure - **I** nformed **P** rediction of
