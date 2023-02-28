@@ -294,6 +294,36 @@ class Calculator:
                     net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
                 })
 
+    def loadModelCustom(self, networkName:str, modelName:str, descriptor:str, modelDirectory:str = '.') -> None:
+        """
+            Load a custom ONNX model from a custom directory specified by the user. The primary use case for this
+            function is to load models that are not included in the package and cannot be placed in the package
+            directory because of write permissions (e.g. on restrictive HPC systems) or storage allocations.
+
+            Args:
+                modelDirectory: Directory where the model is located. Defaults to the current directory.
+                networkName: Name of the network. This is the name used to refer to the ONNX network. It has to be
+                    unique, not contain any spaces, and correspond to the name of the ONNX file (excluding the .onnx
+                    extension).
+                modelName: Name of the model. This is the name that will be displayed in the model selection menu. It
+                    can be any string desired.
+                descriptor: Descriptor/feature vector used by the model. pySIPFENN currently supports the following
+                    descriptors: KS2022, KS2022_dilute, and Ward2017.
+        """
+
+        self.loadedModels.update({
+            networkName: onnx2torch.convert(onnx.load(f'{modelDirectory}/{networkName}.onnx')).float()
+        })
+        self.models.update({
+            networkName: {
+                'name': modelName,
+                'descriptor': descriptor
+            }})
+        self.network_list.append(networkName)
+        self.network_list_names.append(modelName)
+        self.network_list_available.append(networkName)
+        print(f'Loaded model {modelName} ({networkName}) from {modelDirectory}')
+
     def makePredictions_legacyMxNet(self,
                                     mxnet_networks: List[str],
                                     dataInList: List[List[float]]
