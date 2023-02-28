@@ -28,7 +28,7 @@ pySIPFENN
 .. image:: https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release
     :alt: GitHub Release Date - Published_At
 
-.. image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.10.1?color=g
+.. image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.10.3?color=g
     :alt: GitHub commits since tagged version
 
 .. image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue
