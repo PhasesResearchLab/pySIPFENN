@@ -1,11 +1,6 @@
 # Authors: Jonathan Siegel, Adam M. Krajewski
 #
-# Calculates the descriptor first introduced by Ward and Wolverton.
-#
-# Please Cite:
-# L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
-# “Including crystal structure attributes in machine learning models of formation energies
-# via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
+
 
 import math
 import time
@@ -17,8 +12,12 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 import json
 from tqdm import tqdm
 from collections import Counter
+from typing import List
 
-citation = 'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.'
+citations = ['Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+             'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+             'Materials Science, Volume 208, 2022, 111254'
+             ]
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -27,10 +26,18 @@ attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,
                    [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
-
-# A prototype function which computes a weighted average over neighbors,
-# weighted by the area of the voronoi cell between them.
 def local_env_function(local_env, site):
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
+        between them.
+
+        Args:
+            local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
+            site: The site number for which the local environment is being computed.
+            element_dict: A dictionary of the elements in the structure.
+
+        Returns:
+            A list of the local environment attributes.
+    """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
         local_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -70,10 +77,10 @@ def local_env_function(local_env, site):
         ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
             elemental_properties_attributes[1]]
 
-
-# A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
-# a function which computes the local environment attributes.
 class LocalAttributeGenerator:
+    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    a function which computes the local environment attributes.
+    """
     def __init__(self, struct, local_env_func, nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
         self.generator = nn_generator
         self.struct = struct
@@ -85,6 +92,12 @@ class LocalAttributeGenerator:
 
 
 def generate_voronoi_attributes(struct, local_funct=local_env_function):
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator.
+
+        Args:
+            struct: A pymatgen Structure object.
+            local_funct: A function which computes the local environment attributes for a given site.
+    """
     local_generator = LocalAttributeGenerator(struct, local_funct)
     attribute_list = list()
     equivalentSitesMultiplicities = get_equivalentSitesMultiplicities(struct)
@@ -93,8 +106,8 @@ def generate_voronoi_attributes(struct, local_funct=local_env_function):
         attribute_list += localAttributes*equivalentSitesMultiplicities[siteN]
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
-# Calculates the attributes corresponding to the most common elements.
 def magpie_mode(attribute_properties, axis=0):
+    """Calculates the attributes corresponding to the most common elements."""
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
@@ -117,17 +130,14 @@ def get_equivalentSitesMultiplicities(struct: Structure):
     return dict(Counter(list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
 
 
-def generate_descriptor(struct: Structure):
-    """
-        Generates a descriptor based upon the Wolverton group paper which introduced Magpie given an input structure. This descriptor
-        can subsequently be used as the input to the neural network architecture described in 
-        https://www.sciencedirect.com/science/article/pii/S0927025622000593.
-        
-        Args:
-          Structure: A description of the input structure of the type defined in pyMatgen.
-            
-        Returns:
-          A numpy array containing the descriptor.
+def generate_descriptor(struct: Structure) -> np.ndarray:
+    """Main functionality. Generates the KS2022 descriptor for a given structure.
+
+    Args:
+        struct: A pymatgen Structure object.
+
+    Returns:
+        A 271-lenght numpy array of the descriptor.
     """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
@@ -192,17 +202,12 @@ def generate_descriptor(struct: Structure):
     properties = properties.astype(np.float32)
     return properties
 
-def cite():
-    """
-        Returns a citation to the paper which introduced Magpie.
-        Args:
-            
-        Returns:
-          A citation to the Wolverton group paper which initially introduced Magpie.
-    """
-    return citation
+def cite() -> List[str]:
+    """Citation/s for the descriptor."""
+    return citations
 
 def profile(test='JVASP-10001'):
+    """Profiles the descriptor in series using one of the test structures."""
     if test == 'JVASP-10001':
         print('Profiling/testing task. Will calculate a descriptor for Li2 Zr1 Te1 O6 (JVASP-10001)')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": [[4.599305652662459, 0.0098015076998823, 3.1052612865443736], [1.6553257726204653, 4.291108475854712, 3.1052602938979565], [0.0142541214919749, 0.0098025099996131, 5.549419141866351]], "a": 5.549446478152326, "b": 5.549446536179343, "c": 5.549446105810423, "alpha": 55.82714459985832, "beta": 55.82714014289371, "gamma": 55.82713972779092, "volume": 109.15484625642743}, "sites": [{"species": [{"element": "Li", "occu": 1.0}], "abc": [0.2738784872669924, 0.2738784872670407, 0.2738784872673032], "xyz": [1.7169128904007063, 1.1806114167777613, 3.220794775377278], "label": "Li", "properties": {}}, {"species": [{"element": "Li", "occu": 1.0}], "abc": [0.7852272010728069, 0.7852272010728856, 0.785227201073315], "xyz": [4.922499451739965, 3.3848887059434927, 9.234225338163633], "label": "Li", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.8669964454661124, 0.604089882092114, 0.241821769873143], "xyz": [4.990994160164061, 2.603083545876856, 5.910077181137658], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.717840894529788, 0.1213675889628683, 0.393537009186973], "xyz": [3.508082106234713, 0.531695063215412, 4.789863306469278], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.1213675889638402, 0.3935370091873943, 0.7178408945283384], "xyz": [1.2198707830817896, 1.6969362235910317, 5.58251292516964], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.3935370091861915, 0.7178408945293856, 0.1213675889634014], "xyz": [2.999987512595622, 3.085380109860344, 4.124637687962297], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.2418217698721573, 0.8669964454671221, 0.6040898820921513], "xyz": [2.555984564633329, 3.728667610729149, 6.795517372377343], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.6040898820933115, 0.2418217698723637, 0.8669964454664059], "xyz": [3.191046090145173, 1.0521031793025595, 7.4381031350436535], "label": "O", "properties": {}}, {"species": [{"element": "Te", "occu": 1.0}], "abc": [0.4965905610507353, 0.4965905610507355, 0.4965905610507361], "xyz": [3.113069390835793, 2.1406591357024984, 5.8398755612146624], "label": "Te", "properties": {}}, {"species": [{"element": "Zr", "occu": 1.0}], "abc": [0.0006501604980668, 0.0006501604980928, 0.0006501604982344], "xyz": [0.00407578174946036, 0.002802654981945192, 0.007645848918263076], "label": "Zr", "properties": {}}]}'
@@ -221,6 +226,7 @@ def profile(test='JVASP-10001'):
     print(d)
 
 def profileParallel(test='JVASP-10001'):
+    """Profiles the descriptor in parallel using one of the test structures."""
     from tqdm.contrib.concurrent import process_map
     if test=='JVASP-10001':
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": [[4.599305652662459, 0.0098015076998823, 3.1052612865443736], [1.6553257726204653, 4.291108475854712, 3.1052602938979565], [0.0142541214919749, 0.0098025099996131, 5.549419141866351]], "a": 5.549446478152326, "b": 5.549446536179343, "c": 5.549446105810423, "alpha": 55.82714459985832, "beta": 55.82714014289371, "gamma": 55.82713972779092, "volume": 109.15484625642743}, "sites": [{"species": [{"element": "Li", "occu": 1.0}], "abc": [0.2738784872669924, 0.2738784872670407, 0.2738784872673032], "xyz": [1.7169128904007063, 1.1806114167777613, 3.220794775377278], "label": "Li", "properties": {}}, {"species": [{"element": "Li", "occu": 1.0}], "abc": [0.7852272010728069, 0.7852272010728856, 0.785227201073315], "xyz": [4.922499451739965, 3.3848887059434927, 9.234225338163633], "label": "Li", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.8669964454661124, 0.604089882092114, 0.241821769873143], "xyz": [4.990994160164061, 2.603083545876856, 5.910077181137658], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.717840894529788, 0.1213675889628683, 0.393537009186973], "xyz": [3.508082106234713, 0.531695063215412, 4.789863306469278], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.1213675889638402, 0.3935370091873943, 0.7178408945283384], "xyz": [1.2198707830817896, 1.6969362235910317, 5.58251292516964], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.3935370091861915, 0.7178408945293856, 0.1213675889634014], "xyz": [2.999987512595622, 3.085380109860344, 4.124637687962297], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.2418217698721573, 0.8669964454671221, 0.6040898820921513], "xyz": [2.555984564633329, 3.728667610729149, 6.795517372377343], "label": "O", "properties": {}}, {"species": [{"element": "O", "occu": 1.0}], "abc": [0.6040898820933115, 0.2418217698723637, 0.8669964454664059], "xyz": [3.191046090145173, 1.0521031793025595, 7.4381031350436535], "label": "O", "properties": {}}, {"species": [{"element": "Te", "occu": 1.0}], "abc": [0.4965905610507353, 0.4965905610507355, 0.4965905610507361], "xyz": [3.113069390835793, 2.1406591357024984, 5.8398755612146624], "label": "Te", "properties": {}}, {"species": [{"element": "Zr", "occu": 1.0}], "abc": [0.0006501604980668, 0.0006501604980928, 0.0006501604982344], "xyz": [0.00407578174946036, 0.002802654981945192, 0.007645848918263076], "label": "Zr", "properties": {}}]}'
@@ -238,7 +244,7 @@ def profileParallel(test='JVASP-10001'):
 
 if __name__ == "__main__":
     profile(test='JVASP-10001')
-    #profile(test='diluteNiAlloy')
-    #profileDilute(test='diluteNiAlloy')
-    #profileParallel(test='JVASP-10001')
-    #profileParallel(test='diluteNiAlloy')
+    profile(test='diluteNiAlloy')
+    profileDilute(test='diluteNiAlloy')
+    profileParallel(test='JVASP-10001')
+    profileParallel(test='diluteNiAlloy')

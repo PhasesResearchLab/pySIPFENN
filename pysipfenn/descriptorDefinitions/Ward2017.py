@@ -2,7 +2,7 @@
 #
 # Calculates the descriptor / feature vector first introduced by Ward and Wolverton.
 #
-# Inaddition to pySIPFENN please cite:
+# In addition to pySIPFENN please cite:
 # L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
 # “Including crystal structure attributes in machine learning models of formation energies
 # via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
@@ -14,10 +14,15 @@ import os
 from pymatgen.core import Structure, Element
 from pymatgen.analysis.local_env import VoronoiNN
 from tqdm import tqdm
+from typing import List
 
-citation = 'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal ' \
-           'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical ' \
-           'Review B, vol. 96, no. 2, 7 2017.'
+citations = ['Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+             'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+             'Materials Science, Volume 208, 2022, 111254',
+             'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal '
+             'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical '
+             'Review B, vol. 96, no. 2, 7 2017.',
+             ]
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -31,10 +36,11 @@ def local_env_function(local_env, site, element_dict) -> list:
     between them.
 
     Args:
-        local_env:
-        site:
-        element_dict:
+        local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
+        site: The site number for which the local environment is being computed.
 
+    Returns:
+        A list of the local environment attributes.
     """
 
     local_attributes = np.zeros(attribute_matrix.shape[1])
@@ -89,6 +95,7 @@ def local_env_function(local_env, site, element_dict) -> list:
         ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
         elemental_properties_attributes[1], neighbor_list]
 
+
 class LocalAttributeGenerator:
     """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
     a function which computes the local environment attributes.
@@ -112,7 +119,7 @@ def generate_voronoi_attributes(struct: Structure, local_funct=local_env_functio
 
     Args:
         struct: A pymatgen Structure object.
-        local_funct:
+        local_funct: A function which computes the local environment attributes for a given site.
 
     """
     # Collect stoichiometry of structure for use in WC parameter calculation.
@@ -129,7 +136,8 @@ def generate_voronoi_attributes(struct: Structure, local_funct=local_env_functio
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list]), {
         i: value[2] for (i, value) in enumerate(attribute_list)}
 
-def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels):
+
+def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels) -> List[float]:
     """Generates the WC attributes for a given structure. The WC attributes are the ordering parameters for each
     shell of the Voronoi tessellation. Slightly different than what is implemented by Ward-Wolverton. Only considers
     immediate backtracking.
@@ -220,20 +228,29 @@ def magpie_mode(attribute_properties, axis=0):
 
 
 def generate_descriptor(struct: Structure) -> np.ndarray:
-    """Generates the descriptor for a given structure."""
+    """Main functionality. Generates the Ward2017 descriptor for a given structure.
+
+    Args:
+        struct: A pymatgen Structure object.
+
+    Returns:
+        A 271-lenght numpy array of the descriptor.
+    """
     diff_properties, attribute_properties, neighbor_dict = generate_voronoi_attributes(struct)
     properties = np.concatenate((np.stack((np.mean(diff_properties, axis=0),
-            np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
-            np.min(diff_properties, axis=0),
-            np.max(diff_properties, axis=0),
-            np.max(diff_properties, axis=0) -
-            np.min(diff_properties, axis=0)), axis=-1).reshape((-1)), np.stack((np.mean(attribute_properties, axis=0),
-            np.max(attribute_properties, axis=0) -
-            np.min(attribute_properties, axis=0),
-            np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
-            np.max(attribute_properties, axis=0),
-            np.min(attribute_properties, axis=0),
-            magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+                                           np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
+                                           np.min(diff_properties, axis=0),
+                                           np.max(diff_properties, axis=0),
+                                           np.max(diff_properties, axis=0) -
+                                           np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
+                                 np.stack((np.mean(attribute_properties, axis=0),
+                                           np.max(attribute_properties, axis=0) -
+                                           np.min(attribute_properties, axis=0),
+                                           np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)),
+                                                   axis=0),
+                                           np.max(attribute_properties, axis=0),
+                                           np.min(attribute_properties, axis=0),
+                                           magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
     # Normalize Bond Length properties.
     properties[6] /= properties[5]
     properties[7] /= properties[5]
@@ -295,9 +312,9 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
     return properties
 
 
-def cite() -> str:
+def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citation
+    return citations
 
 
 def profile(test='JVASP-10001'):
@@ -509,7 +526,7 @@ def profileParallel(test='JVASP-10001'):
 
 
 if __name__ == "__main__":
-    # profile(test='JVASP-10001')
+    profile(test='JVASP-10001')
     profile(test='diluteNiAlloy')
-    # profileParallel(test='JVASP-10001')
-    # profileParallel(test='diluteNiAlloy')
+    profileParallel(test='JVASP-10001')
+    profileParallel(test='diluteNiAlloy')
