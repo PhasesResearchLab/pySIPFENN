@@ -115,7 +115,8 @@ class LocalAttributeGenerator:
 
 
 def generate_voronoi_attributes(struct: Structure, local_funct=local_env_function):
-    """Generates the local environment attributes for a given structure using a VoronoiNN generator.
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator. 
+       The local environment attributes consist of averages over the neighbors of each site in the structure.
 
     Args:
         struct: A pymatgen Structure object.
