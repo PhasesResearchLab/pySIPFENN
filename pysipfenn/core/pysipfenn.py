@@ -700,7 +700,7 @@ class Calculator:
                     f.write(f'{i},{",".join(str(v) for v in pred)}\n')
                     i += 1
 
-    def writeDescriptorsToCSV(self, descriptor: str, file: str) -> None:
+    def writeDescriptorsToCSV(self, descriptor: str, file: str = 'descriptorData.csv') -> None:
         """Writes the descriptor data to a CSV file. The first column is the name of the structure. If the
         self.inputFiles attribute is populated automatically by runFromDirectory() or set manually, the names of the
         structures will be used. Otherwise, the names will be '1', '2', '3', etc. The remaining columns are the
@@ -716,9 +716,10 @@ class Calculator:
         """
 
         # Load descriptor labels
-        with open(f'descriptorDefinitions/labels_{descriptor}.csv', 'r') as f:
-            reader = csv.reader(f)
-            labels = [v[0] for v in list(reader)]
+        with resources.files('pysipfenn').joinpath(f'descriptorDefinitions/labels_{descriptor}.csv') as labelsCSV:
+            with open(labelsCSV, 'r') as f:
+                reader = csv.reader(f)
+                labels = [v[0] for v in list(reader)]
 
         # Write descriptor data
         with open(file, 'w+', encoding="utf-8") as f:
