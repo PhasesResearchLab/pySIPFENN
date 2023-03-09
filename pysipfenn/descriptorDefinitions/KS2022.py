@@ -206,6 +206,29 @@ def cite() -> List[str]:
     """Citation/s for the descriptor."""
     return citations
 
+def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
+    """Returns the structure-dependent part of the KS2022descriptor.
+
+    Args:
+        descriptor: A 256-length numpy array of the KS2022 descriptor.
+
+    Returns:
+        A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
+        descriptor is used as a fingerprint to compare polymorphs of the same compound.
+
+    """
+    assert isinstance(descriptor, np.ndarray)
+    assert descriptor.shape == (256,)
+    descriptorSplit = np.split(descriptor, [68, 73, 93, 98, 113])
+    ks2022_structural = np.concatenate((
+        descriptorSplit[0],
+        descriptorSplit[2],
+        descriptorSplit[4]
+    ), axis=-1, dtype=np.float32)
+    assert ks2022_structural == (103,)
+
+    return ks2022_structural
+
 def profile(test='JVASP-10001'):
     """Profiles the descriptor in series using one of the test structures."""
     if test == 'JVASP-10001':
