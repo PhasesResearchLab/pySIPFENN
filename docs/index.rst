@@ -51,6 +51,7 @@ is given in
 
 .. toctree::
    install
+   faq
    source/pysipfenn
    examples/sipfenn_examples
    Journal Article <https://doi.org/10.1016/j.commatsci.2022.111254>

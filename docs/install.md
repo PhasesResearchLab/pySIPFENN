@@ -1,13 +1,14 @@
 # Install pySIPFENN
 
-Installing pySIPFENN is simple and easy utilizing either **PyPI** package repository or cloning from **GitHub**. 
+Installing pySIPFENN is simple and easy utilizing either **PyPI** package repository or cloning from 
+[**GitHub**](https://git.pysipfenn.org).
 While not required, it is recommended to first set up a virtual environment using venv or Conda. This ensures that 
 one of the required versions of Python (3.9+) is used and there are no dependency conflicts. If you have Conda 
-installed on your system (see instructions at https://docs.conda.io/en/latest/miniconda.html), you can create a 
+installed on your system (see [Miniconda install instructions](https://docs.conda.io/en/latest/miniconda.html)), you can create a 
 new environment with:
 
-    conda create -n pysipfenn-workshop python=3.9 jupyter
-    conda activate pysipfenn-workshop
+    conda create -n pysipfenn python=3.9 jupyter numpy
+    conda activate pysipfenn
 
 And then simply install pySIPFENN from PyPI with
 
