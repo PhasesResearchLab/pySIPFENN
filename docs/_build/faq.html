@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ &mdash; pySIPFENN 0.10.3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pySIPFENN API" href="source/pysipfenn.html" />
+    <link rel="prev" title="Install pySIPFENN" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pySIPFENN
+          </a>
+              <div class="version">
+                0.10.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install pySIPFENN</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#first-things-to-check">First things to check</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#system-and-architecture">System and Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#python-version">Python Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#up-to-date-conda-pip">Up-to-date Conda / pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model-download">Model Download</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/pysipfenn.html">pySIPFENN API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/sipfenn_examples.html">pySIPFENN MGF-PSU Workshop (Feb 2023)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://doi.org/10.1016/j.commatsci.2022.111254">Journal Article</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pySIPFENN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">FAQ</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/PhasesResearchLab/pySIPFENN/blob/main/docs/faq.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this heading"></a></h1>
+<p>This page is not meant to be an extensive documentation of how to address all questions
+that may arrise when using pySIPFENN as a result of things outside our control, such as
+interpreter configuration, permissions, operating system issues. These can often be
+resolved by searching the internet for the error message you are receiving.</p>
+<section id="first-things-to-check">
+<h2>First things to check<a class="headerlink" href="#first-things-to-check" title="Permalink to this heading"></a></h2>
+<p>In case you are having issues, it is good to first check the following few things that
+helped other users.</p>
+<section id="system-and-architecture">
+<h3>System and Architecture<a class="headerlink" href="#system-and-architecture" title="Permalink to this heading"></a></h3>
+<p>pySIPFENN should generally run on any operating system and computer architecture. We
+have tested it on 6 common combinations, which are listed below:</p>
+<ul class="simple">
+<li><p>Windows 10/11 64-bit on x86_64 (i.e. Intel/AMD)</p></li>
+<li><p>Windows 11 on ARM64 (e.g. Surface Pro X, Parallels VM on M1/M2 Macs)</p></li>
+<li><p>Linux on x86_64 (i.e. Intel/AMD)</p></li>
+<li><p>Linux on ARM64 (e.g. Raspberry Pi 4, Jetson Nano, etc.)</p></li>
+<li><p>MacOS on x86_64 (most Macs from before 2021)</p></li>
+<li><p>MacOS on ARM64 (Macs with M1/M2 chip)</p></li>
+</ul>
+<p>Thus, it is unlikely that your operating system (PC vs Mac) or architecture (Intel
+vs M1/M2 Mac) is the issue. However, if you are using a different platform than above, please
+let us know, and we will try to help you.</p>
+</section>
+<section id="python-version">
+<h3>Python Version<a class="headerlink" href="#python-version" title="Permalink to this heading"></a></h3>
+<p>Make sure you are using the correct version of Python. pySIPFENN requires Python 3.9 or
+higher. We recommend 3.10 for longer support. The 3.11 increases computation speed but
+was not tested as thoroughly and may have some issues with dependencies.</p>
+<p>If you are using a different version, you can either install a new version of
+Python or use a virtual environment to install pySIPFENN in. We recommend using
+Conda to create a virtual environment. See the <a class="reference internal" href="install.html"><span class="doc std std-doc">installation instructions</span></a>
+making sure to specify the version of Python.</p>
+</section>
+<section id="up-to-date-conda-pip">
+<h3>Up-to-date Conda / pip<a class="headerlink" href="#up-to-date-conda-pip" title="Permalink to this heading"></a></h3>
+<p>Some users had problems with (1) loading the models or (2) making predictions using them
+and we traced the issue to an outdated version of Conda installed on their work station
+by their IT department. Updating Conda, pip, and reinstalling pySIPFENN fixed the issue.
+You can try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda update -n base conda -c anaconda
+conda update pip
+pip install --upgrade --force-reinstall pysipfenn
+</pre></div>
+</div>
+<p>If you downloaded the models before, they should be retained as long as you do not
+change the Conda environment. If you do, you will have to download them again.</p>
+</section>
+<section id="model-download">
+<h3>Model Download<a class="headerlink" href="#model-download" title="Permalink to this heading"></a></h3>
+<p>One of the most common concerns users have contacted us about is the inability to download
+the model files in reasonable time. This is usually correlated in time with a workshop,
+after which many users try to download them from Zenodo concurrently and exhaust the
+bandwidth. In such a case, we recommend trying again in a day or two.</p>
+<p>If your download is slow or fails during normal time periods, please let us know, and we
+will try to help you by providing the files directly.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Install pySIPFENN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="source/pysipfenn.html" class="btn btn-neutral float-right" title="pySIPFENN API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Adam M. Krajewski.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
