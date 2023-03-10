@@ -81,22 +81,20 @@ class Calculator:
 
     def __str__(self):
         printOut = f'PySIPFENN Calculator Object. Version: {__version__}\n'
-        printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-"*80}\n'
+        printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-" * 80}\n'
         printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
-        if len(self.inputFiles)>0:
+        if len(self.inputFiles) > 0:
             printOut += f'Last files selected as input: {len(self.inputFiles)}\n'
-            if len(self.inputFiles)>4:
-                printOut += f'{self.inputFiles[:2]} ... [{len(self.inputFiles)-4}] ... {self.inputFiles[-2:]}\n'
-        if len(self.descriptorData)>0:
+            if len(self.inputFiles) > 4:
+                printOut += f'{self.inputFiles[:2]} ... [{len(self.inputFiles) - 4}] ... {self.inputFiles[-2:]}\n'
+        if len(self.descriptorData) > 0:
             printOut += f'Last feature calculation run on: {len(self.descriptorData)} structures\n'
-        if len(self.toRun)>0:
+        if len(self.toRun) > 0:
             printOut += f'Last Prediction Run Using: {self.toRun}\n'
-        if len(self.predictions)>0:
+        if len(self.predictions) > 0:
             printOut += f'Last prediction run on: {len(self.predictions)} structures\n'
             printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
         return printOut
-
-
 
     def updateModelAvailability(self) -> None:
         """
@@ -174,7 +172,6 @@ class Calculator:
                                                      f'{modelPath}/{net}.onnx',
                                                      threads=16)
                             downloadObject.start()
-                            #wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
                             print('\nONNX Network Successfully Fetched.')
                         else:
                             print(f'{net} not detected on disk and ONNX URL has not been provided.')
@@ -192,7 +189,6 @@ class Calculator:
                                          f'{modelPath}/{network}.onnx',
                                          threads=16)
                 downloadObject.start()
-                #wget.download(self.models[network]['URL_ONNX'], f'{modelPath}/{network}.onnx')
                 print('\nONNX Network Successfully Fetched.')
             # Not recognized
             else:
@@ -311,19 +307,40 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
 
-    #
-    def loadModels(self) -> None:
+    def loadModels(self, network: str = 'all') -> None:
         """
-            Fill a dictionary of available models with loaded model neural networks in self.loadedModels.
+            Load model/models into memory of the Calculator class. The models are loaded from the modelsSIPFENN directory inside
+            the package. It's location can be seen by calling print() on the Calculator. The models are stored in the
+            loadedModels attribute as a dictionary with the network string as key and the PyTorch model as value.
+
+            Note:
+                This function only works with models that are stored in the modelsSIPFENN directory inside the package,
+                are in ONNX format, and have corresponding entries in models.json. For all others, you will need to use
+                loadModelCustom().
+
+            Args:
+                network: Default is 'all', which loads all models detected as available. Alternatively, a specific model
+                    can be loaded by its corresponding key in models.json. E.g. 'SIPFENN_Krajewski2020_NN9' or
+                    'SIPFENN_Krajewski2022_NN30'. The key is the same as the network argument in downloadModels().
         """
         with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-            print('Loading models:')
-            for net in tqdm(self.network_list_available):
+            if network == 'all':
+                print('Loading models:')
+                for net in tqdm(self.network_list_available):
+                    self.loadedModels.update({
+                        net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
+                    })
+            elif network in self.network_list_available:
+                print('Loading model: ', network)
                 self.loadedModels.update({
-                    net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
+                    network: onnx2torch.convert(onnx.load(f'{modelPath}/{network}.onnx')).float()
                 })
+            else:
+                raise ValueError(
+                    'Network not available. Please check the network name for typos or run downloadModels() '
+                    'to download the models. Currently available models are: ', self.network_list_available)
 
-    def loadModelCustom(self, networkName:str, modelName:str, descriptor:str, modelDirectory:str = '.') -> None:
+    def loadModelCustom(self, networkName: str, modelName: str, descriptor: str, modelDirectory: str = '.') -> None:
         """
             Load a custom ONNX model from a custom directory specified by the user. The primary use case for this
             function is to load models that are not included in the package and cannot be placed in the package
