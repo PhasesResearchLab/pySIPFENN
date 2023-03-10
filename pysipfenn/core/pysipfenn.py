@@ -3,6 +3,7 @@ import os
 
 import natsort
 import wget
+from pySmartDL import SmartDL
 import csv
 import numpy as np
 from pymatgen.core import Structure
@@ -149,7 +150,11 @@ class Calculator:
                     if net not in self.network_list_available:
                         if 'URL_ONNX' in self.models[net]:
                             print(f'Fetching: {net}')
-                            wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
+                            downloadObject = SmartDL(self.models[net]['URL_ONNX'],
+                                                     f'{modelPath}/{net}.onnx',
+                                                     threads=16)
+                            downloadObject.start()
+                            #wget.download(self.models[net]['URL_ONNX'], f'{modelPath}/{net}.onnx')
                             print('\nONNX Network Successfully Fetched.')
                         else:
                             print(f'{net} not detected on disk and ONNX URL has not been provided.')
@@ -163,7 +168,11 @@ class Calculator:
             # Fetch single
             elif network in self.network_list:
                 print(f'Fetching: {network}')
-                wget.download(self.models[network]['URL_ONNX'], f'{modelPath}/{network}.onnx')
+                downloadObject = SmartDL(self.models[network]['URL_ONNX'],
+                                         f'{modelPath}/{network}.onnx',
+                                         threads=16)
+                downloadObject.start()
+                #wget.download(self.models[network]['URL_ONNX'], f'{modelPath}/{network}.onnx')
                 print('\nONNX Network Successfully Fetched.')
             # Not recognized
             else:
