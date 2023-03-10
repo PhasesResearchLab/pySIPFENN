@@ -70,6 +70,7 @@ class Calculator:
 
         self.loadedModels = {}
         if autoLoad:
+            print(f'Loading all available models (autoLoad=True)')
             self.loadModels()
 
         self.toRun = []
@@ -77,6 +78,25 @@ class Calculator:
         self.predictions = []
         self.inputFiles = []
         print(f'*********  PySIPFENN Successfully Initialized  **********')
+
+    def __str__(self):
+        printOut = f'PySIPFENN Calculator Object. Version: {__version__}\n'
+        printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-"*80}\n'
+        printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
+        if len(self.inputFiles)>0:
+            printOut += f'Last files selected as input: {len(self.inputFiles)}\n'
+            if len(self.inputFiles)>4:
+                printOut += f'{self.inputFiles[:2]} ... [{len(self.inputFiles)-4}] ... {self.inputFiles[-2:]}\n'
+        if len(self.descriptorData)>0:
+            printOut += f'Last feature calculation run on: {len(self.descriptorData)} structures\n'
+        if len(self.toRun)>0:
+            printOut += f'Last Prediction Run Using: {self.toRun}\n'
+        if len(self.predictions)>0:
+            printOut += f'Last prediction run on: {len(self.predictions)} structures\n'
+            printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
+        return printOut
+
+
 
     def updateModelAvailability(self) -> None:
         """
