@@ -188,24 +188,31 @@ between them.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.KS2022.onlyStructural">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">onlyStructural</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L209-L221"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.onlyStructural" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">onlyStructural</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L209-L230"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.onlyStructural" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the structure-dependent part of the KS2022descriptor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>descriptor</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – A 256-length numpy array of the KS2022 descriptor.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
+descriptor is used as a fingerprint to compare polymorphs of the same compound.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.KS2022.profile">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L223-L240"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.profile" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L232-L249"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.profile" title="Permalink to this definition"></a></dt>
 <dd><p>Profiles the descriptor in series using one of the test structures.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pysipfenn.descriptorDefinitions.KS2022.profileParallel">
-<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">profileParallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L242-L257"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.profileParallel" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pysipfenn.descriptorDefinitions.KS2022.</span></span><span class="sig-name descname"><span class="pre">profileParallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'JVASP-10001'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/PhasesResearchLab/pySIPFENN/blob/v0.10.3/pysipfenn/core/../descriptorDefinitions/KS2022.py#L251-L266"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pysipfenn.descriptorDefinitions.KS2022.profileParallel" title="Permalink to this definition"></a></dt>
 <dd><p>Profiles the descriptor in parallel using one of the test structures.</p>
 </dd></dl>
 

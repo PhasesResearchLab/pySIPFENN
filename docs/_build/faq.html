@@ -58,6 +58,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#model-download">Model Download</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#more-complex-issues">More Complex Issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#out-of-memory-error-models-cannot-load">Out-Of-Memory Error / Models Cannot Load</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="source/pysipfenn.html">pySIPFENN API</a></li>
@@ -149,6 +153,59 @@ after which many users try to download them from Zenodo concurrently and exhaust
 bandwidth. In such a case, we recommend trying again in a day or two.</p>
 <p>If your download is slow or fails during normal time periods, please let us know, and we
 will try to help you by providing the files directly.</p>
+</section>
+</section>
+<section id="more-complex-issues">
+<h2>More Complex Issues<a class="headerlink" href="#more-complex-issues" title="Permalink to this heading"></a></h2>
+<section id="out-of-memory-error-models-cannot-load">
+<h3>Out-Of-Memory Error / Models Cannot Load<a class="headerlink" href="#out-of-memory-error-models-cannot-load" title="Permalink to this heading"></a></h3>
+<p><strong>RAM requirements to run:</strong></p>
+<p>While pySIPFENN shouldn’t have much trouble running on most modern desktop and protable
+computers, it may have issues on older machines or on machines with limited RAM such as
+VMs on cloud instances. In general, to run the models, you will need:</p>
+<ul class="simple">
+<li><p>512MB of RAM for Light Model (NN24)</p></li>
+<li><p>2.5GB of RAM for KS2022 Novel Materials Model (NN30)</p></li>
+<li><p><strong>6GB of RAM to run all default models</strong> (NN9, NN20, NN24, NN30) and follow the workshop tutorial</p></li>
+</ul>
+<p><strong>RAM requirements to load:</strong></p>
+<p>Now, one needs to consider how much memory is needed to get the models loaded into the
+memory. This is a bit complicated, but in general, your system will need to use around twice the memory
+given above.</p>
+<p>At the same time, if you are using any modern version of Windows or MacOS, you shouldn’t have any issues with this
+limits if your system has at least 8GB of RAM (assuming no memory-intensive applications
+running in the background) because they will utilize <em>pagefile</em> (Windows) or <em>swap</em> (MacOS) to automatically
+store the temporary data (as much as needed) that does not fit into RAM.</p>
+<p><strong>Memory on Linux</strong></p>
+<p>However, if you are using Linux, the <em>swap</em> is not dynamic and if it’s smaller than the
+amount of memory you need, you will get an error or the process will just be ‘killed’ by the system. You can check
+its size with</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>free -h
+</pre></div>
+</div>
+<p>And if the sum of RAM and swap is less than 12GB, you likely won’t be able to use all of
+pySIPFENN models. Fortunately, it’s an easy fix for your administrator, or if you have sudo
+access, yourself. To <strong>temporarily increase swap</strong> you just need to allocate some space on
+your drive (e.g. 8GB)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sudo fallocate -l 8G /swapfile
+</pre></div>
+</div>
+<p>limit access permissions for security reasons</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sudo chmod 600 /swapfile
+</pre></div>
+</div>
+<p>tell Linux that it is a swap file</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sudo mkswap /swapfile
+</pre></div>
+</div>
+<p>and enable it</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sudo swapon /swapfile
+</pre></div>
+</div>
+<p>Now, you should have no memory issues with running all pySIPFENN networks as of the time
+of writing (NN9, NN20, NN24, NN30). Please note that, as mentioned, this swap change is
+temporary and will disappear when ou reboot. To make it permanent, you can follow one of
+many guides available online.</p>
 </section>
 </section>
 </section>
