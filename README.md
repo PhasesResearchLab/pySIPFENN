@@ -16,7 +16,7 @@
 
 - **(v0.11.0)** Some common questions are now addressed in the [documentation FAQ section](https://pysipfenn.readthedocs.io/en/stable/faq.html).
 - **(v0.11.0)** The model downloads from Zenodo are now multithreaded and are 15 times faster.
-- **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-orgazined with the
+- **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the
 [Materials Genome Foundation](https://materialsgenomefoundation.org), such a success! Over 100 of you simultaneously followed
 all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. At this point, we would also like to 
 acknowledge the generous support from [IBM](https://www.ibm.com) who funded the workshop. Please stay tuned for next workshops
@@ -49,25 +49,26 @@ Research Lab webpage under https://phaseslab.com/sipfenn.
 
 ### Applications
 
-pySIPFENN in a very flexible tool that can, in principle be used, for prediction of 
-any property of interest that depends on an atomic configuration, with very little 
-modifications. The models shipped by default are trained to predict formation energy
-because that is what our research group is interested in; however, if one wanted to 
-predict Poisson's ratio and trained a model based on the same features, adding it
-would take minutes. Simply add the model in open ONNX format and link it using 
-_models.json_ file, as described in documentation.
+pySIPFENN is a very flexible tool that can, in principle, be used for
+the prediction of any property of interest that depends on an atomic
+configuration with very few modifications. The models shipped by
+default are trained to predict formation energy because that is what our
+research group is interested in; however, if one wanted to predict
+Poisson’s ratio and trained a model based on the same features, adding
+it would take minutes. Simply add the model in open ONNX format and link
+it using the *models.json* file, as described in the documentation.
 
 ### Real-World Examples
 
-In oru line of work, pySIPFENN and formation energies it predicts are usually used 
+In our line of work, pySIPFENN and the formation energies it predicts are usually used 
 as a computational engine that generates proto-data for creation of thermodynamic
 databases (TDBs) using ESPEI (https://espei.org). The TDBs are then used through
 pycalphad (https://pycalphad.org) to predict phase diagrams and other thermodynamic
 properties. 
 
 Another of its uses in our research is guiding the Density Functional Theory (DFT)
-calculations as a low-cost screening tool. Their efficient conjunction then drives
-experiments leading to discovery of new materials as presented in these two papers:
+calculations as a low-cost screening tool. Their efficient conjunction then drives the
+experiments leading to discovery of new materials, as presented in these two papers:
 
 - Sanghyeok Im, Shun-Li Shang, Nathan D. Smith, Adam M. Krajewski, Timothy 
 Lichtenstein, Hui Sun, Brandon J. Bocklund, Zi-Kui Liu, Hojong Kim, Thermodynamic 
