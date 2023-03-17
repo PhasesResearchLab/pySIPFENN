@@ -5,12 +5,22 @@
 ![PyPI - License](https://img.shields.io/pypi/l/pysipfenn)
 ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release)
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.10.3?color=g)
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g)
 [![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
 [![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg)](https://doi.org/10.5281/zenodo.7373089)
+
+### News
+
+- **(v0.11.0)** Some common questions are now addressed in the [documentation FAQ section](https://pysipfenn.readthedocs.io/en/stable/faq.html).
+- **(v0.11.0)** The model downloads from Zenodo are now multithreaded and are 15 times faster.
+- **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-orgazined with the
+[Materials Genome Foundation](https://materialsgenomefoundation.org), such a success! Over 100 of you simultaneously followed
+all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. At this point, we would also like to 
+acknowledge the generous support from [IBM](https://www.ibm.com) who funded the workshop. Please stay tuned for next workshops
+planned online and in-person at conferences. They will be announced both here and at the [Materials Genome Foundation](https://materialsgenomefoundation.org) website.
 
 ### Summary
 

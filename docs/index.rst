@@ -46,8 +46,26 @@ is given in
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks, Computational Materials Science, Volume 208, 2022, 111254 `(https://doi.org/10.1016/j.commatsci.2022.111254) <https://doi.org/10.1016/j.commatsci.2022.111254>`_
 
+**News:**
+
+-  **(v0.11.0)** Some common questions are now addressed in the
+   `documentation FAQ
+   section <https://pysipfenn.readthedocs.io/en/stable/faq.html>`__.
+-  **(v0.11.0)** The model downloads from Zenodo are now multithreaded
+   and are 15 times faster.
+-  **(March 2023 Workshop)** We would like to thank all of our amazing
+   attendees for making our workshop, co-orgazined with the `Materials
+   Genome Foundation <https://materialsgenomefoundation.org>`__, such a
+   success! Over 100 of you simultaneously followed all exercises and,
+   at the peak, we loaded over 1,200GB of models into the HPC’s RAM. At
+   this point, we would also like to acknowledge the generous support
+   from `IBM <https://www.ibm.com>`__ who funded the workshop. Please
+   stay tuned for next workshops planned online and in-person at
+   conferences. They will be announced both here and at the `Materials
+   Genome Foundation <https://materialsgenomefoundation.org>`__ website.
+
 .. note::
-   This project is under active development.
+   This project is under active development. We recommend using released (stable) versions.
 
 .. toctree::
    install
