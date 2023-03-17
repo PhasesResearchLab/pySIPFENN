@@ -1,2 +1,4 @@
 example.workshop2023Feb/** linguist-vendored
 docs/** linguist-vendored
+
+*.ipynb linguist-language=Python
