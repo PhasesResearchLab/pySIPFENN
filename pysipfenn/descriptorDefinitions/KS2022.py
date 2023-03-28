@@ -225,7 +225,7 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
         descriptorSplit[2],
         descriptorSplit[4]
     ), axis=-1, dtype=np.float32)
-    assert ks2022_structural == (103,)
+    assert ks2022_structural.shape == (103,)
 
     return ks2022_structural
 
