@@ -25,7 +25,7 @@ from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
 
 # - add new ones here if extending the code
 
-__version__ = '0.11.0'
+__version__ = '0.11.0post1'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'
