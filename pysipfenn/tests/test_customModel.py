@@ -6,7 +6,7 @@ import pysipfenn
 import pytest
 import os
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 class TestCustomModel(unittest.TestCase):
     '''Test loading a custom model by copying the Krajewski2020_NN24 model to the current directory
     and loading it from there instead of the default location.
