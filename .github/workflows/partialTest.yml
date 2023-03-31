@@ -22,4 +22,4 @@ jobs:
           python -m pip install -e .
       - name: Test with pytest
         run: |
-          pytest --cov=pyqalloy --cov-report=xml
+          pytest --cov=pysipfenn --cov-report=xml
