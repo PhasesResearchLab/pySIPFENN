@@ -1,6 +1,6 @@
 name: Full Test
 
-on: [push]
+on: [push, pull_request, release]
 
 jobs:
   testPython309:
@@ -27,9 +27,11 @@ jobs:
         run: pytest --cov=pysipfenn --cov-report=xml
         env:
           MODELS_FETCHED: true
+          
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
   
   testPython310:
-    needs: testPython309
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
