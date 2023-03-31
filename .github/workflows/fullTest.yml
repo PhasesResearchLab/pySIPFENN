@@ -20,6 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install flask pytest pytest-cov
           python -m pip install -e .
+          
       - name: Download Models
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
            
@@ -32,6 +33,7 @@ jobs:
         uses: codecov/codecov-action@v3
   
   testPython310:
+    needs: testPython309
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
