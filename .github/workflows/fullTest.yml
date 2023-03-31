@@ -3,37 +3,10 @@ name: Full Test
 on: [push]
 
 jobs:
-  fetchModels:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          cache: 'pip'
-          cache-dependency-path: 'pyproject.toml'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install flask pytest pytest-cov
-          python -m pip install -e .
-      - name: Download Models
-        run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
-        
-      - name: Archive models as artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: models
-          path: pysipfenn/modelsSIPFENN
-          
-      - name: Test with pytest
-        run: pytest --cov=pysipfenn --cov-report=xml
+  
           
   runTests:
-    needs: fetchModels
+    # needs: fetchModels
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
