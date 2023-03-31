@@ -6,7 +6,7 @@ from importlib import resources
 
 import pysipfenn
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
 testFile = '0-Cr8Fe18Ni4.POSCAR'
 toTest = ['SIPFENN_Krajewski2020_NN9', 'SIPFENN_Krajewski2020_NN20', 'SIPFENN_Krajewski2020_NN24']

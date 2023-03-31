@@ -1,6 +1,11 @@
 import unittest
+import pytest
+import os
+
 import pysipfenn
 from importlib import resources
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
 class TestCore(unittest.TestCase):
     def setUp(self):
@@ -17,6 +22,7 @@ class TestCore(unittest.TestCase):
         self.c.updateModelAvailability()
         self.assertIsInstance(self.c.network_list_available, list)
 
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_Ward2017(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
@@ -27,6 +33,7 @@ class TestCore(unittest.TestCase):
         else:
             print('Did not detect any Ward2017 models to run')
 
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_KS2022(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
