@@ -1,8 +1,12 @@
 import unittest
+import pytest
+import os
 from pymatgen.core import Structure
 from importlib import resources
 
 import pysipfenn
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 testFile = '0-Cr8Fe18Ni4.POSCAR'
 toTest = ['SIPFENN_Krajewski2020_NN9', 'SIPFENN_Krajewski2020_NN20', 'SIPFENN_Krajewski2020_NN24']
@@ -13,6 +17,7 @@ with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFile
     testStructure = Structure.from_file(f'{exampleInputsDir}/{testFile}')
 
 class TestKrajewski2020ModelsFromONNX(unittest.TestCase):
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def test_resutls(self):
         c = pysipfenn.Calculator()
         c.calculate_Ward2017(structList=[testStructure])

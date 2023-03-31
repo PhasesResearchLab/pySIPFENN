@@ -1,9 +1,14 @@
 import unittest
+import pytest
+import os
 from importlib import resources
 
 import pysipfenn
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
 class TestAllCompatibleONNX_Ward2017(unittest.TestCase):
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def test_runtime(self):
         c = pysipfenn.Calculator()
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:

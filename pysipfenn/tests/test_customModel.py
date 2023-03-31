@@ -3,13 +3,16 @@ from pymatgen.core import Structure
 from importlib import resources
 import shutil
 import pysipfenn
+import pytest
 import os
 
-
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 class TestCustomModel(unittest.TestCase):
     '''Test loading a custom model by copying the Krajewski2020_NN24 model to the current directory
     and loading it from there instead of the default location.
     '''
+
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def setUp(self) -> None:
         with open(resources.files('pysipfenn').joinpath('modelsSIPFENN/SIPFENN_Krajewski2020_NN24.onnx'),
                   'rb') as modelForTest:
@@ -21,6 +24,7 @@ class TestCustomModel(unittest.TestCase):
         print(self.c.network_list_available)
         print('Setup complete')
 
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testCalculation(self):
         self.c.loadModelCustom(networkName='MyFunNet',
                                modelName='MyFunNetName',
@@ -35,6 +39,7 @@ class TestCustomModel(unittest.TestCase):
             self.assertIn('MyFunNet', p.keys())
             self.assertAlmostEqual(p['MyFunNet'], p['SIPFENN_Krajewski2020_NN24'], places=9)
 
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def tearDown(self) -> None:
         self.c = None
         print('\nTearing down')
