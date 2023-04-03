@@ -1,6 +1,6 @@
 name: Partial Test
 
-on: [push]
+on: [push, pull_request, release]
 
 jobs:
   coreTest:
