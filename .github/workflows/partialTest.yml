@@ -3,15 +3,19 @@ name: Partial Test
 on: [push]
 
 jobs:
-  coverage-python310:
-    runs-on: ubuntu-latest
+  coreTest:
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Python 3.10
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: 'pyproject.toml'
 
