@@ -7,36 +7,69 @@
 pySIPFENN
 =========
 
-.. image:: https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn
-   :alt: GitHub top language
+|GitHub top language| |PyPI - Python Version| |PyPI Version| |PyPI Downloads| |GitHub license|
 
-.. image:: https://img.shields.io/pypi/pyversions/pysipfenn
+|Commit Build Status| |Build Status|  |Coverage Status|
+
+|GitHub last commit| |GitHub last release| |GitHub commits since tagged version| |GitHub issues|
+
+|Paper DOI| |Zenodo DOI|
+
+.. |GitHub top language| image:: https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn
+    :alt: GitHub top language
+    :target: https://github.com/PhasesResearchLab/pySIPFENN
+
+.. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/pysipfenn
     :alt: PyPI - Python Version
     :target: https://www.python.org/downloads/release/python-3100/
 
-.. image:: https://img.shields.io/pypi/l/pysipfenn
-    :target: https://pypi.org/project/pysipfenn/
-    :alt: PyPI - License
-
-.. image:: https://img.shields.io/pypi/v/pysipfenn
+.. |PyPI Version| image:: https://img.shields.io/pypi/v/pysipfenn
     :target: https://pypi.org/project/pysipfenn/
     :alt: PyPI
 
-.. image:: https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit
+.. |PyPI Downloads| image:: https://img.shields.io/pypi/dm/pysipfenn
+    :target: https://pypi.org/project/pysipfenn/
+    :alt: PyPI
+
+.. |Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml/badge.svg
+    :alt: Build Status
+    :target: https://github.com/PhasesResearchLab/pySIPFENN
+
+.. |Commit Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml/badge.svg
+    :alt: Commit Build Status
+    :target: https://github.com/PhasesResearchLab/pySIPFENN
+
+.. |Coverage Status| image:: https://codecov.io/gh/PhasesResearchLab/pySIPFENN/branch/main/graph/badge.svg?token=S2J0KR0WKQ
+    :alt: Coverage Status
+    :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
+
+.. |GitHub license| image:: https://img.shields.io/github/license/PhasesResearchLab/pySIPFENN
+    :alt: GitHub license
+    :target: https://github.com/PhasesResearchLab/pySIPFENN
+
+.. |GitHub last commit| image:: https://img.shields.io/github/last-commit/PhasesResearchLab/pySIPFENN?label=Last%20Commit
     :alt: GitHub last commit (by committer)
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/commits/main
 
-.. image:: https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release
+.. |GitHub last release| image:: https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release
     :alt: GitHub Release Date - Published_At
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
 
-.. image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g
+.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g
     :alt: GitHub commits since tagged version
+    :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
 
-.. image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue
+.. |GitHub issues| image:: https://img.shields.io/github/issues/PhasesResearchLab/pySIPFENN
+    :alt: GitHub issues
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/issues
+
+.. |Paper DOI| image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue
     :target: https://doi.org/10.1016/j.commatsci.2022.111254
+    :alt: Paper DOI
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
+.. |Zenodo DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
     :target: https://doi.org/10.5281/zenodo.7373089
-
+    :alt: Zenodo DOI
 
 **py** (**S** tructure - **I** nformed **P** rediction of
 **F** ormation **E** nergy using **N** eural **N** etworks)
