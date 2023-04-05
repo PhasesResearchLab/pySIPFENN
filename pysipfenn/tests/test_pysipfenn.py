@@ -105,14 +105,25 @@ class TestCore(unittest.TestCase):
             self.assertEqual(len(descList), len(testStructures))
 
     def test_RunModels_Errors(self):
-        '''Test that the runModels() method raises errors correctly when it is called with no models to run or with a
-        descriptor handling that has not been implemented'''
-        with self.assertRaises(AssertionError):
-            self.c.network_list_available = []
-            self.c.runModels(descriptor='KS2022', structList=[])
+        '''Test that the runModels() and runModels_dilute() methods raise errors correctly when it is called with no
+        models to run or with a descriptor handling that has not been implemented'''
+        with self.subTest(mgs='No models to run'):
+            with self.assertRaises(AssertionError):
+                self.c.network_list_available = []
+                self.c.runModels(descriptor='KS2022', structList=[])
 
-        with self.assertRaises(AssertionError):
-            self.c.runModels(descriptor='jx9348ghfmx8345wgyf', structList=[])
+        with self.subTest(mgs='No models to run dilute'):
+            with self.assertRaises(AssertionError):
+                self.c.network_list_available = []
+                self.c.runModels_dilute(descriptor='KS2022_dilute', structList=[])
+
+        with self.subTest(mgs='Descriptor not implemented'):
+            with self.assertRaises(AssertionError):
+                self.c.runModels(descriptor='jx9348ghfmx8345wgyf', structList=[])
+
+        with self.subTest(mgs='Dilute descriptor not implemented'):
+            with self.assertRaises(AssertionError):
+                self.c.runModels_dilute(descriptor='jx9348ghfmx8345wgyf', structList=[])
 
     def test_WriteToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is

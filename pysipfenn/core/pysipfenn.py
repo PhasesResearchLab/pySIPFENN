@@ -484,7 +484,7 @@ class Calculator:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not '
                   'defined/available, or if the selected descriptor does not correspond to any available network. '
                   'Check spelling and invoke the downloadModels() function if you are using base models.')
-            raise TypeError
+            raise AssertionError
         else:
             print(f'Running {self.toRun} models')
 
