@@ -67,5 +67,42 @@ class TestCore(unittest.TestCase):
         else:
             print('Did not detect any KS2022 models to run')
 
+    def test_descriptorCalculate_Ward2017_serial(self):
+        '''Test succesful execution of the descriptorCalculate() method with Ward2017 in series. A separate test for
+        calculation accuracy is done in test_Ward2017.py'''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = os.listdir(exampleInputsDir)[:6]
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            descList = self.c.calculate_Ward2017(structList=testStructures, mode='serial')
+            self.assertEqual(len(descList), len(testStructures))
+
+    def test_descriptorCalculate_Ward2017_parallel(self):
+        '''Test succesful execution of the descriptorCalculate() method with Ward2017 in parallel. A separate test for
+        calculation accuracy is done in test_Ward2017.py'''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = os.listdir(exampleInputsDir)[:6]
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            descList = self.c.calculate_Ward2017(structList=testStructures, mode='parallel', max_workers=2)
+            self.assertEqual(len(descList), len(testStructures))
+
+    def test_descriptorCalculate_KS2022_serial(self):
+        '''Test succesful execution of the descriptorCalculate() method with KS2022 in series. A separate test for
+        calculation accuracy is done in test_KS2022.py'''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = os.listdir(exampleInputsDir)
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            descList = self.c.calculate_KS2022(structList=testStructures, mode='serial')
+            self.assertEqual(len(descList), len(testStructures))
+
+    def test_descriptorCalculate_KS2022_parallel(self):
+        '''Test succesful execution of the descriptorCalculate() method with KS2022 in parallel. A separate test for
+        calculation accuracy is done in test_KS2022.py'''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = os.listdir(exampleInputsDir)
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            descList = self.c.calculate_KS2022(structList=testStructures, mode='parallel', max_workers=4)
+            self.assertEqual(len(descList), len(testStructures))
+
+
 if __name__ == '__main__':
     unittest.main()
