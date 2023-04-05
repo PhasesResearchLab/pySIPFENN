@@ -9,6 +9,7 @@ from pymatgen.core import Structure
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
+
 class TestCore(unittest.TestCase):
     def setUp(self):
         '''Initialise the Calculator object for testing. It will be used in all tests and is not modified in any way
@@ -49,7 +50,7 @@ class TestCore(unittest.TestCase):
     def testFromPOSCAR_Ward2017(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
-        if toRun!=[]:
+        if toRun != []:
             with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
@@ -60,7 +61,7 @@ class TestCore(unittest.TestCase):
     def testFromPOSCAR_KS2022(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
-        if toRun!=[]:
+        if toRun != []:
             with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'KS2022')
@@ -112,6 +113,39 @@ class TestCore(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             self.c.runModels(descriptor='jx9348ghfmx8345wgyf', structList=[])
+
+    def test_WriteToCSV(self):
+        '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
+        consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
+        structures based on the c.inputFileNames list'''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = os.listdir(exampleInputsDir)[:4]
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            self.c.calculate_KS2022(structList=testStructures, mode='serial')
+
+        self.c.writeDescriptorsToCSV(descriptor='KS2022',
+                                     file='TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv')
+
+        with open('TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv', 'r', newline='') as f1:
+            with resources.files('pysipfenn'
+                                 ).joinpath(
+                'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv'
+                ).open('r', newline='') as f2:
+                for line1, line2 in zip(f1, f2):
+                    self.assertEqual(line1, line2)
+
+        self.c.inputFiles = ['myStructure1.POSCAR', 'myStructure2.POSCAR', 'myStructure3.POSCAR', 'myStructure4.POSCAR']
+
+        self.c.writeDescriptorsToCSV(descriptor='KS2022',
+                                     file='TestFile_DescriptorData_4_KS2022_labeled_named.csv')
+
+        with open('TestFile_DescriptorData_4_KS2022_labeled_named.csv', 'r', newline='') as f1:
+            with resources.files('pysipfenn').joinpath(
+                    'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_named.csv').open('r',
+                                                                                                   newline=''
+                                                                                                   ) as f2:
+                for line1, line2 in zip(f1, f2):
+                    self.assertEqual(line1, line2)
 
 
 if __name__ == '__main__':
