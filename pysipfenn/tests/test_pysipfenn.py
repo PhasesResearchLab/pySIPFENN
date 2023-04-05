@@ -5,22 +5,45 @@ import os
 import pysipfenn
 from importlib import resources
 
+from pymatgen.core import Structure
+
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
 class TestCore(unittest.TestCase):
     def setUp(self):
+        '''Initialise the Calculator object for testing. It will be used in all tests and is not modified in any way
+        by them.'''
         self.c = pysipfenn.Calculator()
         self.assertIsNotNone(self.c)
 
     def testInit(self):
+        '''Test that the Calculator object is initialised correctly.'''
         self.assertEqual(self.c.predictions, [])
         self.assertEqual(self.c.toRun, [])
         self.assertEqual(self.c.descriptorData, [])
         self.assertEqual(self.c.inputFiles, [])
 
     def detectModels(self):
+        '''Test that the updateModelAvailability() method works without errors and returns a list of available models.
+        '''
         self.c.updateModelAvailability()
         self.assertIsInstance(self.c.network_list_available, list)
+
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    def testDownloadAndLoadModels(self):
+        '''Tests that the downloadModels() method works without errors in a case whwere the models are not already
+        downloaded and loads them correctly using the loadModels() method. Then also load a model explicitly using
+        loadModel() and check that it is in the loadedModels list. Also check that arror is raised correctly if
+        a non-available model is requested to be loaded.'''
+
+        self.c.downloadModels(network='all')
+        self.c.loadModels(network='SIPFENN_Krajewski2020_NN24')
+
+        self.assertEqual(set(self.c.network_list_available), set(self.c.loadedModels.keys()))
+        self.assertIn('SIPFENN_Krajewski2020_NN24', self.c.loadedModels)
+
+        with self.assertRaises(ValueError):
+            self.c.loadModels(network='jx9348ghfmx8345wgyf')
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_Ward2017(self):
