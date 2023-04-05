@@ -4,6 +4,7 @@ import os
 
 import pysipfenn
 from importlib import resources
+from natsort import natsorted
 
 from pymatgen.core import Structure
 
@@ -174,7 +175,7 @@ class TestCore(unittest.TestCase):
         consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
         structures based on the c.inputFileNames list'''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
-            exampleInputFiles = os.listdir(exampleInputsDir)[:4]
+            exampleInputFiles = natsorted(os.listdir(exampleInputsDir))[:4]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             self.c.calculate_KS2022(structList=testStructures, mode='serial')
 
