@@ -103,6 +103,16 @@ class TestCore(unittest.TestCase):
             descList = self.c.calculate_KS2022(structList=testStructures, mode='parallel', max_workers=4)
             self.assertEqual(len(descList), len(testStructures))
 
+    def test_RunModels_Errors(self):
+        '''Test that the runModels() method raises errors correctly when it is called with no models to run or with a
+        descriptor handling that has not been implemented'''
+        with self.assertRaises(AssertionError):
+            self.c.network_list_available = []
+            self.c.runModels(descriptor='KS2022', structList=[])
+
+        with self.assertRaises(AssertionError):
+            self.c.runModels(descriptor='jx9348ghfmx8345wgyf', structList=[])
+
 
 if __name__ == '__main__':
     unittest.main()
