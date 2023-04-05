@@ -1,4 +1,4 @@
-name: Partial Test
+name: Core Functions
 
 on: [push, pull_request, release]
 
