@@ -99,8 +99,7 @@ class Calculator:
     def updateModelAvailability(self) -> None:
         """
             Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
-            current ONNX model definitions. Legacy support for MxNet models is retained in other functions, but they
-            have to be manually added here.
+            current ONNX model definitions.
         """
         with resources.files('pysipfenn.modelsSIPFENN') as p:
             all_files = os.listdir(p)
@@ -112,44 +111,6 @@ class Calculator:
             else:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
-
-    def downloadModels_legacyMxNet(self, network: str = 'all') -> None:
-        """**Legacy Function** Downloads MxNet models.
-
-        Args:
-            network: Name of the network to download. Defaults to 'all'.
-        """
-        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-            # Fetch all
-            if network == 'all':
-                print('Fetching all networks!')
-                for net in self.network_list:
-                    if net not in self.network_list_available:
-                        print(f'Fetching: {net}')
-                        wget.download(self.models[net]['URLjson'], f'{modelPath}/{net}.json')
-                        print('\nArchitecture Successfully Fetched.')
-                        print('Downloading the Network Parameters. This process can take a few minutes.')
-                        wget.download(self.models[net]['URLparams'], f'{modelPath}/{net}.params')
-                        print('\nNetwork Parameters Fetched.')
-                    else:
-                        print(f'{net} detected on disk. Ready to use.')
-
-                if self.network_list == self.network_list_available:
-                    print('All networks available!')
-                else:
-                    print('Problem occurred.')
-
-            # Fetch single
-            elif network in self.network_list:
-                print(f'Fetching: {network}')
-                wget.download(self.models[network]['URLjson'], f'{modelPath}/{network}.json')
-                print('\nArchitecture Successfully Fetched.')
-                print('Downloading the Network Parameters. This process can take a few minutes.')
-                wget.download(self.models[network]['URLparams'], f'{modelPath}/{network}.params')
-                print('\nNetwork Parameters Fetched.')
-            # Not recognized
-            else:
-                print('Network name not recognized')
 
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
@@ -369,63 +330,6 @@ class Calculator:
         self.network_list_names.append(modelName)
         self.network_list_available.append(networkName)
         print(f'Loaded model {modelName} ({networkName}) from {modelDirectory}')
-
-    def makePredictions_legacyMxNet(self,
-                                    mxnet_networks: List[str],
-                                    dataInList: List[List[float]]
-                                    ) -> List[list]:
-        """Loads legacy mxnet networks models and makes predictions using them. Requires mxnet to be installed. This
-        may be challenging on Windows systems but is easy on Linux systems.
-
-        Args:
-            mxnet_networks: List of networks to use.
-            dataInList: List of data to make predictions for. Each element of the list should be a list of descriptors.
-
-        Returns:
-            List of predictions. Each element of the list is a list of predictions for all ran network.
-
-        Note:
-            MxNet support is deprecated as of V0.10.0 and will be removed in future versions. Use at your own risk.
-            Compatibility with legacy networks is not guaranteed. Use at your own risk.
-        """
-
-        # Import MxNet
-        import mxnet as mx
-        from mxnet import nd
-        from mxnet import gluon
-        # Create a context for mxnet
-        self.ctx = mx.gpu() if mx.context.num_gpus() > 0 else mx.cpu()
-        # Verify if the nets are available
-        with resources.files('pysipfenn.modelsSIPFENN') as p:
-            all_files = os.listdir(p)
-        for net in mxnet_networks:
-            assert all_files.__contains__(net + '.json')
-            assert all_files.__contains__(net + '.params')
-        # Load the models
-        loadedModels = {}
-        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-            for net in mxnet_networks:
-                loadedModels.update({net: gluon.nn.SymbolBlock.imports(
-                    f'{modelPath}/{net}.json',  # architecture file
-                    ['Input'],
-                    f'{modelPath}/{net}.params',  # parameters file
-                    ctx=self.ctx)})
-        dataOuts = []
-        print('Making predictions...')
-        # Run for each network
-        for net in loadedModels:
-            dataIn = nd.array(dataInList)
-            dataInCTX = dataIn.as_in_context(self.ctx)
-            model = loadedModels[net]
-            tempOut = model(dataInCTX)
-            dataOuts.append(list(tempOut.asnumpy()))
-            print(f'Obtained predictions from:  {net}')
-
-        # Transpose the predictions
-        dataOuts = np.array(dataOuts).T.tolist()[0]
-
-        self.predictions = dataOuts
-        return dataOuts
 
     def makePredictions(self,
                         models: Dict[str, torch.nn.Module],
