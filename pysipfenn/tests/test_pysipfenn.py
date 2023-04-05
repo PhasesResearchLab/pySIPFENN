@@ -50,7 +50,7 @@ class TestCore(unittest.TestCase):
     def testFromPOSCAR_Ward2017(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
-        if toRun != []:
+        if toRun:
             with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
@@ -61,10 +61,43 @@ class TestCore(unittest.TestCase):
     def testFromPOSCAR_KS2022(self):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
-        if toRun != []:
+        if toRun:
             with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'KS2022')
+        else:
+            print('Did not detect any KS2022 models to run')
+
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    def testFromStructure_KS2022_dilute(self):
+        self.c.updateModelAvailability()
+        toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
+        if toRun:
+            matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {' \
+                     '"matrix": [[2.318956, 0.000185, -0.819712], [-1.159251, 2.008215, -0.819524], [2.5e-05, ' \
+                     '0.000273, 2.459206]], "pbc": [true, true, true], "a": 2.4595700289085083, ' \
+                     '"b": 2.4593515311565364, "c": 2.4592060152801354, "alpha": 109.45958252256221, ' \
+                     '"beta": 109.46706290007663, "gamma": 109.46912204302215, "volume": 11.453776235839058}, ' \
+                     '"sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, '\
+                     '0.0], "label": "Fe", "properties": {"magmom": 2.211}}], "@version": null}'
+            struct = Structure.from_str(matStr, fmt='json')
+            struct.make_supercell([2, 2, 2])
+            baseStruct = struct.copy()
+            struct.replace(0, 'Al')
+
+            preds1 = self.c.runModels_dilute(descriptor='KS2022',
+                                             structList=[struct],
+                                             baseStruct='pure',
+                                             mode='serial')
+
+            preds2 = self.c.runModels_dilute(descriptor='KS2022',
+                                             structList=[struct],
+                                             baseStruct=[baseStruct],
+                                             mode='serial')
+
+            for val1, val2 in zip(preds1[0], preds2[0]):
+                self.assertEqual(val1, val2)
+
         else:
             print('Did not detect any KS2022 models to run')
 
@@ -138,10 +171,9 @@ class TestCore(unittest.TestCase):
                                      file='TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv')
 
         with open('TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv', 'r', newline='') as f1:
-            with resources.files('pysipfenn'
-                                 ).joinpath(
-                'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv'
-                ).open('r', newline='') as f2:
+            with resources.files('pysipfenn').joinpath(
+                    'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv').open('r',
+                                                                                                        newline='') as f2:
                 for line1, line2 in zip(f1, f2):
                     self.assertEqual(line1, line2)
 
