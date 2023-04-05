@@ -68,6 +68,17 @@ class TestCore(unittest.TestCase):
         else:
             print('Did not detect any KS2022 models to run')
 
+        with self.subTest(msg='Test Calculator printout after predictions'):
+            printOut = str(self.c)
+            self.assertIn('PySIPFENN Calculator Object', printOut)
+            self.assertIn('Models are located in', printOut)
+            self.assertIn('Loaded Networks', printOut)
+            self.assertIn('Last files selected as input', printOut)
+            self.assertIn('Last Prediction Run Using', printOut)
+            self.assertIn('Last prediction run on', printOut)
+
+
+
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromStructure_KS2022_dilute(self):
         self.c.updateModelAvailability()
@@ -78,7 +89,7 @@ class TestCore(unittest.TestCase):
                      '0.000273, 2.459206]], "pbc": [true, true, true], "a": 2.4595700289085083, ' \
                      '"b": 2.4593515311565364, "c": 2.4592060152801354, "alpha": 109.45958252256221, ' \
                      '"beta": 109.46706290007663, "gamma": 109.46912204302215, "volume": 11.453776235839058}, ' \
-                     '"sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, '\
+                     '"sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, ' \
                      '0.0], "label": "Fe", "properties": {"magmom": 2.211}}], "@version": null}'
             struct = Structure.from_str(matStr, fmt='json')
             struct.make_supercell([2, 2, 2])
@@ -158,7 +169,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 self.c.runModels_dilute(descriptor='jx9348ghfmx8345wgyf', structList=[])
 
-    def test_WriteToCSV(self):
+    def test_WriteDescriptorDataToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
         consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
         structures based on the c.inputFileNames list'''
@@ -189,6 +200,14 @@ class TestCore(unittest.TestCase):
                                                                                                    ) as f2:
                 for line1, line2 in zip(f1, f2):
                     self.assertEqual(line1, line2)
+
+    def test_CalculatorPrint(self):
+        '''Test that the Calculator.__str__() method returns the correcttly formatted string after being initialized
+        but before predictions'''
+        printOut = str(self.c)
+        self.assertIn('PySIPFENN Calculator Object', printOut)
+        self.assertIn('Models are located in', printOut)
+        self.assertIn('Loaded Networks', printOut)
 
 
 if __name__ == '__main__':
