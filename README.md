@@ -2,12 +2,19 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pysipfenn)
 ![PyPI](https://img.shields.io/pypi/v/pysipfenn)
-![PyPI - License](https://img.shields.io/pypi/l/pysipfenn)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pysipfenn)
+
+[![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
+[![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
+![GitHub license](https://img.shields.io/github/license/PhasesResearchLab/pySIPFENN)
+
+[![Partial Test](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml)
+[![Full Test](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml)
+[![codecov](https://codecov.io/gh/PhasesResearchLab/pySIPFENN/branch/main/graph/badge.svg?token=S2J0KR0WKQ)](https://codecov.io/gh/PhasesResearchLab/pySIPFENN)
+
 ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release)
 ![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g)
-[![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
-[![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg)](https://doi.org/10.5281/zenodo.7373089)
