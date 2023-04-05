@@ -315,7 +315,7 @@ class Calculator:
                 modelName: Name of the model. This is the name that will be displayed in the model selection menu. It
                     can be any string desired.
                 descriptor: Descriptor/feature vector used by the model. pySIPFENN currently supports the following
-                    descriptors: KS2022, KS2022_dilute, and Ward2017.
+                    descriptors: KS2022, and Ward2017.
         """
 
         self.loadedModels.update({
@@ -375,8 +375,7 @@ class Calculator:
 
         Args:
             descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
-                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022',
-                'KS2022_dilute'.
+                to see available modules or add yours. Available default descriptors are: 'Ward2017', 'KS2022'.
 
         Returns:
             List of compatible models.
@@ -450,16 +449,18 @@ class Calculator:
                          mode: str = 'serial',
                          max_workers: int = 4) -> List[list]:
         """Runs all loaded models on a list of Structures using specified descriptor. A critical difference
-        from runModels() is that this function supports the KS2022_dilute descriptor, which can only be used on dilute
-        structures (both based on pure elements and on custom base structures, e.g. TCP endmember configurations) that
-        contain a single alloying atom. Speed increases are substantial compared to the KS2022 descriptor, which is
-        more general and can be used on any structure. Supports serial and parallel modes in the same way as
-        runModels().
+        from runModels() is that this function will call dilute-specific featurizer, e.g. KS2022_dilute when KS2022 is
+        provided as input, which can only be used on dilute structures (both based on pure elements and on custom base
+        structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
+        substantial compared to the KS2022 descriptor, which is more general and can be used on any structure.
+        Supports serial and parallel modes in the same way as runModels().
 
         Args:
-            descriptor: Descriptor to use. Must be one of the available descriptors. See pysipfenn.descriptorDefinitions
-                to see available modules or add yours. Available default descriptors are: 'KS2022_dilute'. The 'KS2022'
-                should also work, but is not recommended, as it negates the speed increase of the dilute descriptor.
+            descriptor: Descriptor to use for predictions. Must be one of the descriptors which support the dilute
+                structures (i.e. *_dilute). See pysipfenn.descriptorDefinitions to see available modules or add yours
+                here. Available default dilute descriptors are now: 'KS2022'. The 'KS2022' can also be called from
+                runModels() function, but is not recommended for dilute alloys, as it negates the speed increase of the
+                dilute structure featurizer.
             structList: List of pymatgen Structure objects to run the models on. Must be dilute structures as described
                 above.
             baseStruct: Non-diluted references for the dilute structures. Defaults to 'pure', which assumes that the
@@ -489,7 +490,7 @@ class Calculator:
             print(f'Running {self.toRun} models')
 
         print('Calculating descriptors...')
-        if descriptor == 'KS2022_dilute':
+        if descriptor == 'KS2022':
             self.descriptorData = self.calculate_KS2022_dilute(structList=structList,
                                                                baseStruct=baseStruct,
                                                                mode=mode,
