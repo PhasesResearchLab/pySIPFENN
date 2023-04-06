@@ -14,7 +14,7 @@
 
 ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release)
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g)
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.12.0?color=g)
 ![GitHub issues](https://img.shields.io/github/issues/PhasesResearchLab/pysipfenn)
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
@@ -22,6 +22,9 @@
 
 ### News
 
+- **(v.12.0)** Official Python 3.11 support. 
+- **(v.12.0)** Automated matrix-testing on Linux / Mac / Windows with Python 3.9 / 3.10 / 3.11 through GitHub Actions CLI
+and test coverage report through Codecov. Tests are also generally improved and more extensive.
 - **(v0.11.0)** Some common questions are now addressed in the [documentation FAQ section](https://pysipfenn.readthedocs.io/en/stable/faq.html).
 - **(v0.11.0)** The model downloads from Zenodo are now multithreaded and are 15 times faster.
 - **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the

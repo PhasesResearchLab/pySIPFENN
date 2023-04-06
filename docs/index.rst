@@ -55,7 +55,7 @@ pySIPFENN
     :alt: GitHub Release Date - Published_At
     :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
 
-.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.11.0?color=g
+.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.12.0?color=g
     :alt: GitHub commits since tagged version
     :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
 
