@@ -19,7 +19,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools
-          python -m pip install flask pytest pytest-cov
+          python -m pip install wheel flask pytest pytest-cov
           python -m pip install -e .
           
       - name: Download Models
@@ -49,7 +49,8 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install flask pytest pytest-cov
+          python -m pip install --upgrade setuptools
+          python -m pip install wheel flask pytest pytest-cov
           python -m pip install -e .
       - name: Download Models
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
@@ -75,7 +76,8 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install flask pytest pytest-cov
+          python -m pip install --upgrade setuptools
+          python -m pip install wheel flask pytest pytest-cov
           python -m pip install -e .
       - name: Download Models
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
