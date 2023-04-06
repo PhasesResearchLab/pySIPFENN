@@ -26,10 +26,12 @@ jobs:
           python -m pip install wheel flask
           python -m pip install -e .
 
-      - name: Benchmark KS2022 with command line python call
+      - name: Benchmark KS2022
         run: python -c "from pysipfenn.descriptorDefinitions import KS2022; KS2022.profile(test='JVASP-10001', nRuns=100); KS2022.profile(test='diluteNiAlloy', nRuns=100)"
-      - name: Benchmark KS2022 with command line python call
+
+      - name: Benchmark Ward2017
         run: python -c "from pysipfenn.descriptorDefinitions import Ward2017; Ward2017.profile(test='JVASP-10001', nRuns=100); Ward2017.profile(test='diluteNiAlloy', nRuns=100)"
-      - name: Benchmark KS2022 dilute featurizer with command line python call
-        run: python -c "from pysipfenn.descriptorDefinitions import KS2022_dilute; KS2022_dilute.profile(test='diluteNiAlloy', nRuns=100)"
+
+      - name: Benchmark KS2022 dilute featurizer
+        run: python -c "from pysipfenn.descriptorDefinitions import KS2022_dilute; KS2022_dilute.profile(test='diluteNiAlloy', nRuns=250)"
 
