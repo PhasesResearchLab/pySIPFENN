@@ -36,5 +36,18 @@ class TestWard2017(unittest.TestCase):
                     with self.subTest(msg=f'Testing {l} calculated for {name}'):
                         self.assertAlmostEqual(p_fo, p_trd, places=6)
 
+
+class TestWard2017Profiling(unittest.TestCase):
+    '''Test the Ward2017 descriptor generation by profiling the execution time of the descriptor generation function
+    for two example structures in serial and parallel (8 workers) mode.'''
+    def test_serial(self):
+        Ward2017.profile(test='JVASP-10001', nRuns=4)
+        Ward2017.profile(test='diluteNiAlloy', nRuns=4)
+
+    def test_parallel(self):
+        Ward2017.profileParallel(test='JVASP-10001', nRuns=24)
+        Ward2017.profileParallel(test='diluteNiAlloy', nRuns=24)
+
+
 if __name__ == '__main__':
     unittest.main()

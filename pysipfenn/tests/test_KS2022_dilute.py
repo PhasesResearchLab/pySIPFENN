@@ -78,7 +78,13 @@ class TestKS2022(unittest.TestCase):
                     with self.subTest(msg=f'{name:<16} diff in {l}'):
                         self.assertAlmostEqual(p_fo, p_trd, places=6)
 
-
+class TestKS2022_diluteProfiling(unittest.TestCase):
+    '''Test the dilute version of KS2022 descriptor generation by profiling the execution time of the descriptor generation function
+        for one example structures in serial and parallel (8 workers) mode.'''
+    def test_serial(self):
+        KS2022_dilute.profile(test='diluteNiAlloy', nRuns=10)
+    def test_parallel(self):
+        KS2022_dilute.profileParallel(test='diluteNiAlloy', nRuns=64)
 
 
 if __name__ == '__main__':
