@@ -2,7 +2,6 @@
 import os
 
 import natsort
-import wget
 from pySmartDL import SmartDL
 import csv
 import numpy as np
