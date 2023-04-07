@@ -143,3 +143,18 @@ Now, you should have no memory issues with running all pySIPFENN networks as of 
 of writing (NN9, NN20, NN24, NN30). Please note that, as mentioned, this swap change is
 temporary and will disappear when ou reboot. To make it permanent, you can follow one of
 many guides available online.
+
+### Errors related to initializing OpenMP library
+
+This error was reported to us by pySIPFENN user running Windows 11 64bit, but it wasn't seen by our team at any point 
+on any of our 12 test systems and doesn't seem to be related to pySIPFENN directly, but to some conflict between 
+scikit-learn and numpy, possibly because of problems with base conda installation. If you see it, we would recommend you 
+re-install conda and recreate environments to avoid unexpected behavior of pySIPFENN and other Python tools you are using.
+However, if you are in a hurry and want to try this _not recommended_ fix, you can try to run the following commands before
+importing pySIPFENN:
+
+    import os
+    os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+Which fixed the issue for the user who reported it. If you also run into this issue, we would appreciate if you could
+let us know and we will investigate it further.
