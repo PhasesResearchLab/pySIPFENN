@@ -10,10 +10,39 @@ resolved by searching the internet for the error message you are receiving.
 In case you are having issues, it is good to first check the following few things that
 helped other users.
 
+### How to see if it works?
+
+The easiest way to see if pySIPFENN is installed correctly is to run the following command:
+
+    python -c "import pysipfenn; print(pysipfenn.__version__)"
+
+Then, to see if its core functionalities are working, you can run a small profiling script that will featurize
+(calculate KS2022 feature vector of) a typical atomic structure we use to profile its speed:
+
+    python -c "from pysipfenn.descriptorDefinitions import KS2022; KS2022.profile()"
+
+You can also profile in parallel to see if your system is configured correctly for parallelization:
+
+    python -c "from pysipfenn.descriptorDefinitions import KS2022; KS2022.profileParallel()"
+
+If you got to this point, it means that pySIPFENN is almost certainly working correctly, because most complex operations
+that could go wrong didn't. If something did go wrong, look through this FAQ and the [installation instructions](install.md)
+to see if you can find a solution. If you still can't, please [open an issue](https://github.com/PhasesResearchLab/pySIPFENN/issues) 
+or email [ak@psu.edu](mailto:ak@psu.edu) and we will be happy to help you.
+
+Now, you can try to run the tutorial notebook to see if you are able to run SIPFENN models
+and make predictions by opening the `example.workshop2023Feb/sipfenn_examples_clean.ipynb` notebook in Jupyter Notebook
+or Jupyter Lab and following the instructions. To see how this notebook should look like after successful execution,
+you can look at the `example.workshop2023Feb/sipfenn_examples.ipynb` or [this page in the pySIPFENN documentation](
+https://pysipfenn.readthedocs.io/en/stable/examples/sipfenn_examples.html#pysipfenn-mgf-psu-workshop-feb-2023). 
+
+
 ### System and Architecture 
 
-pySIPFENN should generally run on any operating system and computer architecture. We
-    have tested it on 6 common combinations, which are listed below:
+pySIPFENN should generally run well on any operating system and computer architecture. In addition to automated CI
+testing through GitHub Actions across platforms and Python version every time code is modified (see 
+[pySIPFENN Repository Actions](https://github.com/PhasesResearchLab/pySIPFENN/actions)), we and our collaborators test it on 6 common 
+combinations, which are listed below:
    - Windows 10/11 64-bit on x86_64 (i.e. Intel/AMD)
    - Windows 11 on ARM64 (e.g. Surface Pro X, Parallels VM on M1/M2 Macs)
    - Linux on x86_64 (i.e. Intel/AMD)
@@ -26,9 +55,9 @@ vs M1/M2 Mac) is the issue. However, if you are using a different platform than 
 let us know, and we will try to help you.
 
 ### Python Version
-Make sure you are using the correct version of Python. pySIPFENN requires Python 3.9 or
-higher. We recommend 3.10 for longer support. The 3.11 increases computation speed but
-was not tested as thoroughly and may have some issues with dependencies. 
+Make sure you are using the correct version of Python. pySIPFENN _requires_ Python 3.9 or
+higher. We recommend 3.10 for longer support. The 3.11 is officially supported starting from
+pySIPFENN v0.12.0 (April 2023).
 
 If you are using a different version, you can either install a new version of
 Python or use a virtual environment to install pySIPFENN in. We recommend using
@@ -39,11 +68,12 @@ making sure to specify the version of Python.
 
 Some users had problems with (1) loading the models or (2) making predictions using them
 and we traced the issue to an outdated version of Conda installed on their work station
-by their IT department. Updating Conda, pip, and reinstalling pySIPFENN fixed the issue.
+by their IT department. Updating Conda, pip, setuptools, and reinstalling pySIPFENN fixed the issue.
 You can try:
 
     conda update -n base conda -c anaconda
     conda update pip
+    pip install --upgrade setuptools
     pip install --upgrade --force-reinstall pysipfenn
 
 If you downloaded the models before, they should be retained as long as you do not
