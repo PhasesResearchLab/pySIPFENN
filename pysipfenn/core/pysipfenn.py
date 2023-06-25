@@ -354,7 +354,7 @@ class Calculator:
             t0 = perf_counter()
             model = models[net]
             model.eval()
-            if hasattr(model, 'Dropout_0'):
+            if 'OnnxDropoutDynamic()' in {str(module) for module in list(m._modules.values())}:
                 tempOut = model(dataIn, None)
             else:
                 tempOut = model(dataIn)
