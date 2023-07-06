@@ -81,7 +81,13 @@ is given in
 
 News
 ----
-
+-  **(v.12.2)** The license has been changed to LGPLv3 to allow for integration with proprietary software developed
+   by CALPHAD community, while supporting the development of new pySIPFENN features for all users. Many thanks to our colleagues from
+   `GTT-Technologies <https://gtt-technologies.de>`__ and
+   other participants of `50th CALPHAD 2023 conference in Boston <https://calphad.org/calphad-2023>`__ for fruitful discussions.
+-  **(v.12.0)** Official Python 3.11 support.
+-  **(v.12.0)** Automated matrix-testing on Linux / Mac / Windows with Python 3.9 / 3.10 / 3.11 through GitHub Actions CLI
+   and test coverage report through Codecov. Tests are also generally improved and more extensive.
 -  **(v0.11.0)** Some common questions are now addressed in the
    `documentation FAQ
    section <https://pysipfenn.readthedocs.io/en/stable/faq.html>`__.
