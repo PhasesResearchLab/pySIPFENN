@@ -6,7 +6,7 @@
 
 [![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
 [![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
-![GitHub license](https://img.shields.io/github/license/PhasesResearchLab/pySIPFENN)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 [![Partial Test](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml)
 [![Full Test](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml)
