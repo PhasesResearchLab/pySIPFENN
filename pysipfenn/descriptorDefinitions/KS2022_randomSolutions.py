@@ -290,8 +290,12 @@ def generate_descriptor(struct: Structure, comp: Composition, plotParameters: bo
 
     # print(f'Target: {comp.fractional_composition}')
     # print(f'Final:  {currentComposition.fractional_composition}')
-
-    return properties
+    if properties is not None:
+        assert properties.shape == (256,)
+        assert isinstance(properties, np.ndarray)
+        return properties
+    else:
+        raise RuntimeError('KS2022_randomSolution descriptor failed to converge.')
 
 
 def cite() -> List[str]:
