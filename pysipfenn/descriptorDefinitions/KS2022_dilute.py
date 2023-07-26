@@ -1,11 +1,4 @@
 # Authors: Jonathan Siegel, Adam M. Krajewski
-#
-# Calculates the descriptor first introduced by Ward and Wolverton.
-#
-# Please Cite:
-# L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
-# “Including crystal structure attributes in machine learning models of formation energies
-# via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
 
 import math
 import time
@@ -18,7 +11,10 @@ import json
 from tqdm import tqdm
 from collections import Counter
 
-citation = 'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.'
+citations = ['Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+             'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+             'Materials Science, Volume 208, 2022, 111254'
+             ]
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
