@@ -275,6 +275,10 @@ def generate_descriptor(struct: Structure, comp: Composition, plotParameters: bo
 
     if plotParameters:
         import plotly.express as px
+        import pandas as pd
+        import warnings
+        warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
+
         diffArray = np.array(diffHistory)
 
         # Plot the parameters as lines. Add hover text to show the parameter name based on the labels_KS2022.csv file.
