@@ -147,14 +147,43 @@ def magpie_mode(attribute_properties, axis=0):
     return output / len(top_elements)
 
 
-def generate_descriptor(struct: Structure, comp: Composition, plotParameters: bool = False) -> np.ndarray:
-    """Main functionality. Generates the KS2022 descriptor for a given structure.
-
+def generate_descriptor(struct: Structure,
+                        comp: Composition,
+                        minimumSitesPerExpansion: int = 50,
+                        featureConvergenceCriterion: float = 0.01,
+                        compositionConvergenceCriterion: float = 0.01,
+                        minimumElementOccurances: int = 10,
+                        plotParameters: bool = False) -> np.ndarray:
+    """Main functionality. Generates the KS2022 descriptor for a given composition randomly distributed on a given
+    structure until the convergence criteria are met. The descriptor is KS2022 which is compatible with all KS2022
+    models and approaches values that would be reached by infinite supercell size.
+    
     Args:
-        struct: A pymatgen Structure object.
+        struct: A pymatgen Structure object that will be used as the basis for the structure to be generated. It can
+            be occupied by any species without affecting the result since all will be replaced by the composition.
+        comp: A pymatgen Composition object that will be randomly distributed on the structure within accuracy
+            determined by the compositionConvergenceCriterion.
+        minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling dimension-by-dimension) before it will
+            be used as expansion step in each iteration adding local chemical environment information to the global pool.
+            Optimal value will depend on the number of species and their relative fractions in the composition.
+            Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result 
+            in slower computation. The default value is 50.
+        featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration (statistics based on the
+            global ensemble of local chemical environments) and the previous iteration (before last expansion) 
+            expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of 
+            SIPFENN publication (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the 
+            maximum value.
+        compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the current
+            composition (all expansions) and the the target composition (comp). The default value is 0.01, corresponding
+            to deviation depending on the number of elements in the composition.
+        minimumElementOccurances: The minimum number of times all elements must occur in the composition before it is
+            considered converged. This is to prevent the algorithm from converging before very dilute elements have
+            had a chance to occur. The default value is 10.
+        plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
 
     Returns:
-        A 271-lenght numpy array of the descriptor.
+        A numpy array containing the KS2022 descriptor. Please note the stochastic nature of the algorithm and that
+        the result may vary slightly between runs and parameters.
     """
 
     # Obtain the elemental frequencies
@@ -164,7 +193,7 @@ def generate_descriptor(struct: Structure, comp: Composition, plotParameters: bo
     # at a time until there are at least 50 sites.
     adjustedStruct = struct.copy()
     i = 0
-    while len(adjustedStruct.sites) < 50:
+    while len(adjustedStruct.sites) < minimumSitesPerExpansion:
         scaling = [1, 1, 1]
         scaling[i] = 2
         adjustedStruct.make_supercell(scaling)
@@ -178,9 +207,12 @@ def generate_descriptor(struct: Structure, comp: Composition, plotParameters: bo
     maxDiff = 1
     compositionDistance = 0
     minOccupationCount = 0
+    properties = None
 
     print(f'#Atoms | Composition Distance | Worst Convergence Criterion | Min Occupation Count')
-    while maxDiff > 0.01 or compositionDistance > 0.01 or minOccupationCount < 10:
+    while maxDiff > featureConvergenceCriterion \
+            or compositionDistance > compositionConvergenceCriterion \
+            or minOccupationCount < minimumElementOccurances:
         # Choose random structure occupation
         randomOccupation = random.choices(list(elementalFrequencies.keys()),
                                           weights=elementalFrequencies.values(),
