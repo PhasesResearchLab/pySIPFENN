@@ -172,13 +172,7 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
     # Renormalize the packing efficiency.
     properties[12] *= len(attribute_properties) / struct.volume
     # Calculate and insert stoichiometry attributes.
-    element_dict = {}
-    for composition in struct.species_and_occu:
-        for key, value in composition.get_el_amt_dict().items():
-            if key in element_dict:
-                element_dict[key] += value / len(struct.species_and_occu)
-            else:
-                element_dict[key] = value / len(struct.species_and_occu)
+    element_dict = struct.composition.fractional_composition.as_dict()
     position = 118
     for p in [10, 7, 5, 3, 2]:
         properties = np.insert(properties, position,
