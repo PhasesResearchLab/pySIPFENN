@@ -363,7 +363,11 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
     return ks2022_structural
 
 
-def profile(test: str = 'FCC', comp: Composition = Composition('Cr12.8 Fe12.8 Co12.8 Ni12.8 Cu12.8 Al35.9')):
+def profile(test: str = 'FCC',
+            comp: Composition = Composition('Cr12.8 Fe12.8 Co12.8 Ni12.8 Cu12.8 Al35.9'),
+            nIterations: int = 1,
+            plotParameters: bool = False,
+            returnDescriptor: bool = False):
     """Profiles the descriptor in series using one of the test structures."""
     if test == 'FCC':
         print(
@@ -378,19 +382,39 @@ def profile(test: str = 'FCC', comp: Composition = Composition('Cr12.8 Fe12.8 Co
     else:
         print('Unrecognized test name.')
         return None
-    s = Structure.from_dict(json.loads(matStr))
-    d = generate_descriptor(s, comp, plotParameters=True)
+
+    if nIterations == 1:
+        s = Structure.from_dict(json.loads(matStr))
+        d = generate_descriptor(s, comp, plotParameters=plotParameters)
+    elif nIterations > 1:
+        print(f'Running {nIterations} iterations in parallel...')
+        s = Structure.from_dict(json.loads(matStr))
+        from tqdm.contrib.concurrent import process_map
+        d = process_map(generate_descriptor,
+                        [s for i in range(nIterations)],
+                        [comp for i in range(nIterations)],
+                        chunksize=1,
+                        max_workers=8)
+    else:
+        d = None
 
     if d is None:
         print('No descriptors generated.')
         return None
     else:
-        with open('KS2022_randomSolution_TestResult.csv', 'w+') as f:
-            f.writelines([f'{v}\n' for v in d])
+        name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
+        if nIterations == 1:
+            with open(name, 'w+') as f:
+                f.writelines([f'{v}\n' for v in d])
+            if returnDescriptor:
+                return d
+        else:
+            with open(name, 'w+') as f:
+                f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
     print('Done!')
 
-
 if __name__ == "__main__":
-    profile(test='FCC')
-    profile(test='BCC')
-    profile(test='HCP')
+    profile(test='FCC', plotParameters=True)
+    profile(test='BCC', plotParameters=True)
+    profile(test='HCP', plotParameters=True)
+    profile(test='BCC', nIterations=6)
