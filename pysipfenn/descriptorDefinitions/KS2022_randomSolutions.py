@@ -153,7 +153,9 @@ def generate_descriptor(struct: Structure,
                         featureConvergenceCriterion: float = 0.01,
                         compositionConvergenceCriterion: float = 0.01,
                         minimumElementOccurances: int = 10,
-                        plotParameters: bool = False) -> np.ndarray:
+                        plotParameters: bool = False,
+                        printProgress: bool = True,
+                        ) -> np.ndarray:
     """Main functionality. Generates the KS2022 descriptor for a given composition randomly distributed on a given
     structure until the convergence criteria are met. The descriptor is KS2022 which is compatible with all KS2022
     models and approaches values that would be reached by infinite supercell size.
@@ -180,6 +182,7 @@ def generate_descriptor(struct: Structure,
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
         plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
+        printProgress: If True, the progress will be printed to the console. The default value is True.
 
     Returns:
         A numpy array containing the KS2022 descriptor. Please note the stochastic nature of the algorithm and that
@@ -209,7 +212,9 @@ def generate_descriptor(struct: Structure,
     minOccupationCount = 0
     properties = None
 
-    print(f'#Atoms | Composition Distance | Worst Convergence Criterion | Min Occupation Count')
+    if printProgress:
+        print(f'#Atoms | Comp. Distance AVG | Convergence Crit. MAX | Occupation Count MIN')
+
     while maxDiff > featureConvergenceCriterion \
             or compositionDistance > compositionConvergenceCriterion \
             or minOccupationCount < minimumElementOccurances:
@@ -302,8 +307,17 @@ def generate_descriptor(struct: Structure,
             diff /= maxFeaturesInOQMD
             diffHistory.append(diff)
             maxDiff = np.max(np.abs(diff))
-            print(
-                f'{attribute_properties.shape[0]:<6} | {round(compositionDistance, 6):<20} | {round(maxDiff, 12)} | {minOccupationCount:<2}')
+            if printProgress:
+                print(f'{attribute_properties.shape[0]:^6} | '
+                      f'{compositionDistance: 18.6f} | '
+                      f'{maxDiff: 21.6f} | '
+                      f'{minOccupationCount:^4}')
+        else:
+            if printProgress:
+                print(f'{attribute_properties.shape[0]:^6} | '
+                      f'{compositionDistance: 18.6f} | '
+                      f'{"(init)":^21} | '
+                      f'{minOccupationCount:^4}')
 
     if plotParameters:
         import plotly.express as px
