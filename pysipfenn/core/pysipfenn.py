@@ -20,11 +20,11 @@ import onnx
 from typing import List, Union, Dict
 
 # Descriptor Generators
-from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
+from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute, KS2022_randomSolutions
 
 # - add new ones here if extending the code
 
-__version__ = '0.11.0post1'
+__version__ = '0.12.2'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'
