@@ -166,28 +166,32 @@ def generate_descriptor(struct: Structure,
             be occupied by any species without affecting the result since all will be replaced by the composition.
         comp: A pymatgen Composition object that will be randomly distributed on the structure within accuracy
             determined by the compositionConvergenceCriterion.
-        minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling dimension-by-dimension) before it will
+        minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling
+            dimension-by-dimension) before it will
             be used as expansion step in each iteration adding local chemical environment information to the global pool.
             Optimal value will depend on the number of species and their relative fractions in the composition.
-            Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result 
+            Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result
             in slower computation. The default value is 50.
-        featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration (statistics based on the
-            global ensemble of local chemical environments) and the previous iteration (before last expansion) 
-            expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of 
-            SIPFENN publication (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the 
+        featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration
+            (statistics based on the
+            global ensemble of local chemical environments) and the previous iteration (before last expansion)
+            expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of
+            SIPFENN publication (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the
             maximum value.
-        compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the current
-            composition (all expansions) and the the target composition (comp). The default value is 0.01, corresponding
-            to deviation depending on the number of elements in the composition.
+        compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the
+            current composition (all expansions) and the the target composition (comp). The default value is 0.01,
+            corresponding to deviation depending on the number of elements in the composition.
         minimumElementOccurances: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
         plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
         printProgress: If True, the progress will be printed to the console. The default value is True.
+        returnMeta: If True, a dictionary containing the convergence history will be returned in addition to the
+            descriptor. The default value is False.
 
-    Returns:
-        A numpy array containing the KS2022 descriptor. Please note the stochastic nature of the algorithm and that
-        the result may vary slightly between runs and parameters.
+    Returns: By default, a numpy array containing the KS2022 descriptor. Please note the stochastic nature of the
+    algorithm and that the result may vary slightly between runs and parameters. If returnMeta is True,
+    a tuple containing the descriptor and a dictionary containing the convergence history will be returned.
     """
 
     # Obtain the elemental frequencies
