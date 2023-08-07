@@ -7,7 +7,7 @@ from pymatgen.core import Structure, Element, Composition
 from pymatgen.analysis.local_env import VoronoiNN
 import json
 from collections import Counter
-from typing import List
+from typing import List, Union, Tuple
 import random
 from importlib import resources
 import pandas as pd
@@ -155,7 +155,8 @@ def generate_descriptor(struct: Structure,
                         minimumElementOccurances: int = 10,
                         plotParameters: bool = False,
                         printProgress: bool = True,
-                        ) -> np.ndarray:
+                        returnMeta: bool = False,
+                        ) -> Union[np.ndarray, Tuple[np.ndarray, dict]]:
     """Main functionality. Generates the KS2022 descriptor for a given composition randomly distributed on a given
     structure until the convergence criteria are met. The descriptor is KS2022 which is compatible with all KS2022
     models and approaches values that would be reached by infinite supercell size.
@@ -319,6 +320,13 @@ def generate_descriptor(struct: Structure,
                       f'{"(init)":^21} | '
                       f'{minOccupationCount:^4}')
 
+    if returnMeta:
+        metaData = {'diffHistory': diffHistory,
+                    'propHistory': propHistory,
+                    'finalAtomsN': attribute_properties.shape[0],
+                    'finalCompositionDistance': compositionDistance
+                    }
+
     if plotParameters:
         import plotly.express as px
         import pandas as pd
@@ -343,7 +351,10 @@ def generate_descriptor(struct: Structure,
     if properties is not None:
         assert properties.shape == (256,)
         assert isinstance(properties, np.ndarray)
-        return properties
+        if returnMeta:
+            return properties, metaData
+        else:
+            return properties
     else:
         raise RuntimeError('KS2022_randomSolution descriptor failed to converge.')
 
