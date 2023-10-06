@@ -5,7 +5,6 @@ from onnxconverter_common import float16
 from onnxsim import simplify
 import onnx
 from tqdm import tqdm
-from importlib import resources
 
 
 class ONNXExporter:
@@ -99,6 +98,51 @@ class TorchExporter:
 
         name = f"{model}.pt"
         tracedModel.save(name)
+        print(f'--> Exported as {name}', flush=True)
+
+    def exportAll(self):
+        for model in tqdm(self.calculator.loadedModels):
+            self.export(model)
+        print('*****  Done exporting all models!  *****')
+
+
+class CoreMLExporter:
+    def __init__(self, calculator: Calculator):
+        self.calculator = calculator
+        assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
+        print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')
+
+    def export(self, model: str):
+        print(f'Exporting {model} to CoreML')
+        loadedModel = self.calculator.loadedModels[model]
+
+        descriptorUsed = self.calculator.models[model]['descriptor']
+        if descriptorUsed == 'Ward2017':
+            dLen = 271
+        elif descriptorUsed == 'KS2022':
+            dLen = 256
+        else:
+            raise NotImplementedError(f'CoreML export for {descriptorUsed} not implemented yet.')
+
+        loadedModel.eval()
+
+        inputs_converter = [ct.TensorType(name=descriptorUsed, shape=(dLen,))]
+        inputs_tracer = torch.zeros(dLen,)
+
+        if 'OnnxDropoutDynamic()' in {str(module) for module in list(loadedModel._modules.values())}:
+            inputs_tracer = (inputs_tracer, torch.zeros(1,))
+            inputs_converter.append(ct.TensorType(name='DropoutMode', shape=(1,)))
+
+        tracedModel = torch.jit.trace(loadedModel, inputs_tracer)
+
+        coreml_model = ct.convert(
+            model=tracedModel,
+            convert_to='mlprogram',
+            inputs=inputs_converter,
+            outputs=[ct.TensorType(name='Ef_eV')]
+        )
+        name = f"{model}.mlpackage"
+        coreml_model.save(name)
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self):
