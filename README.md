@@ -14,22 +14,21 @@
 
 ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/PhasesResearchLab/pysipfenn?label=Last%20Commit)
 ![GitHub Release Date - Published_At](https://img.shields.io/github/release-date/PhasesResearchLab/pysipfenn?label=Last%20Release)
-![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.12.0?color=g)
+![GitHub commits since tagged version](https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.13.0?color=g)
 ![GitHub issues](https://img.shields.io/github/issues/PhasesResearchLab/pysipfenn)
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg)](https://doi.org/10.5281/zenodo.7373089)
 
 ### Major News
-
-- **(v.12.2)** The license has been changed to LGPLv3 to allow for integration with proprietary software developed
+- **(v0.13.0)** Model exports are now effortless the new `pysipfenn.core.modelExporters` module, which also allows
+users to reduce models to FP16 precision or simplify model structure. It supports ONNX, PyTorch, and CoreML formats. The
+latter allows use of highly efficient Neural Engine on all modern Apple devices. Note that to use these features, you
+need to install additional dependencies with `pip install pysipfenn[dev]`.
+- **(v0.12.2)** The license has been changed to LGPLv3 to allow for integration with proprietary software developed
 by CALPHAD community, while supporting the development of new pySIPFENN features for all users. Many thanks to our colleagues from 
 [GTT-Technologies](https://gtt-technologies.de) and other participants of [50th CALPHAD 2023 conference in Boston](https://calphad.org/calphad-2023) for fruitful discussions.
-- **(v.12.0)** Official Python 3.11 support. 
-- **(v.12.0)** Automated matrix-testing on Linux / Mac / Windows with Python 3.9 / 3.10 / 3.11 through GitHub Actions CLI
-and test coverage report through Codecov. Tests are also generally improved and more extensive.
-- **(v0.11.0)** Some common questions are now addressed in the [documentation FAQ section](https://pysipfenn.readthedocs.io/en/stable/faq.html).
-- **(v0.11.0)** The model downloads from Zenodo are now multithreaded and are 15 times faster.
+- **(v0.12.0)** Official Python 3.11 support.
 - **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the
 [Materials Genome Foundation](https://materialsgenomefoundation.org), such a success! Over 100 of you simultaneously followed
 all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. At this point, we would also like to 
@@ -125,3 +124,13 @@ Then, move to the pySIPFENN folder and install in editable (`-e`) mode
     cd pySIPFENN
     pip install -e .
 
+### Developer Install
+
+If you want to utilize pySIPFENN beyond its core functionalities, for instance, to train new models on custom datasets
+or to export models in different formats or precisions, you need to install additional dependencies. This can be done
+by installing the `dev` extras with
+
+    pip install pysipfenn[dev]
+
+> Note: If you are using MacOS zsh shell, you may need to enclose the `dev` extras in quotes like 
+> `pip install "pysipfenn[dev]"` or `pip install ".[dev]"`.
