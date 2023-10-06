@@ -127,7 +127,8 @@ class TorchExporter:
         print(f'Initialized TorchExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def export(self, model: str):
-        """Export a loaded model to PyTorch PT format
+        """Export a loaded model to PyTorch PT format. Models are exported in eval mode (no dropout) and saved in the
+        current working directory.
 
         Args:
             model: The name of the model to export (must be loaded in the Calculator) and it must have a descriptor
@@ -170,15 +171,39 @@ class TorchExporter:
 
 
 class CoreMLExporter:
+    """Export models to the CoreML format to allow for easy loading and inference in CoreML in other projects,
+    particularly valuable for Apple devices, as pySIPFENN models can be run using the Neural Engine accelerator
+    with minimal power consumption and neat optimizations.
+
+    Args:
+        calculator: A calculator object with loaded models.
+
+    Attributes:
+        calculator: A calculator object with loaded models.
+    """
     def __init__(self, calculator: Calculator):
         self.calculator = calculator
         assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def export(self, model: str):
-        print(f'Exporting {model} to CoreML')
-        loadedModel = self.calculator.loadedModels[model]
+        """Export a loaded model to CoreML format. Models will be saved as {model}.mlpackage in the current working
+        directory. Models will be annotated with the feature vector name (Ward2017 or KS2022) and the output will be
+        named "property". The latter behavior will be adjusted in the future when model output name and unit will be
+        added to the model JSON metadata.
 
+        Args:
+            model: The name of the model to export (must be loaded in the Calculator) and it must have a descriptor
+                (Ward2017 or KS2022) defined in the calculator.models dictionary created when the Calculator was
+                initialized.
+
+        Returns:
+            None
+        """
+        print(f'Exporting {model} to CoreML')
+        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+        loadedModel = self.calculator.loadedModels[model]
+        assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
         descriptorUsed = self.calculator.models[model]['descriptor']
         if descriptorUsed == 'Ward2017':
             dLen = 271
@@ -202,13 +227,14 @@ class CoreMLExporter:
             model=tracedModel,
             convert_to='mlprogram',
             inputs=inputs_converter,
-            outputs=[ct.TensorType(name='Ef_eV')]
+            outputs=[ct.TensorType(name='property')]
         )
         name = f"{model}.mlpackage"
         coreml_model.save(name)
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self):
+        """Export all loaded models to CoreML format with the export function."""
         for model in tqdm(self.calculator.loadedModels):
             self.export(model)
         print('*****  Done exporting all models!  *****')
