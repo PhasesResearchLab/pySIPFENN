@@ -21,6 +21,7 @@ class ONNXExporter:
         #            self.calculator.loadedModels.update({
         #                net: onnx.load(f'{modelPath}/{net}.onnx')
         #            })
+        assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def simplify(self, model: str):
@@ -70,3 +71,37 @@ class ONNXExporter:
         print('*****  Done exporting all models!  *****')
 
 
+class TorchExporter:
+    def __init__(self, calculator: Calculator):
+        self.calculator = calculator
+        assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
+        print(f'Initialized TorchExporter with models: {list(self.calculator.loadedModels.keys())}')
+
+    def export(self, model: str):
+        print(f'Exporting {model} to PyTorch PT format')
+        loadedModel = self.calculator.loadedModels[model]
+
+        descriptorUsed = self.calculator.models[model]['descriptor']
+        if descriptorUsed == 'Ward2017':
+            dLen = 271
+        elif descriptorUsed == 'KS2022':
+            dLen = 256
+        else:
+            raise NotImplementedError(f'TorchExporter export for {descriptorUsed} not implemented yet.')
+
+        loadedModel.eval()
+
+        inputs_tracer = torch.zeros(dLen, )
+        if 'OnnxDropoutDynamic()' in {str(module) for module in list(loadedModel._modules.values())}:
+            inputs_tracer = (inputs_tracer, torch.zeros(1, ))
+
+        tracedModel = torch.jit.trace(loadedModel, inputs_tracer)
+
+        name = f"{model}.pt"
+        tracedModel.save(name)
+        print(f'--> Exported as {name}', flush=True)
+
+    def exportAll(self):
+        for model in tqdm(self.calculator.loadedModels):
+            self.export(model)
+        print('*****  Done exporting all models!  *****')
