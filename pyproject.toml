@@ -40,6 +40,13 @@ dependencies = [
     "dnspython",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "coremltools>=6.3",
+    "onnxconverter_common>=1.13.0",
+    "onnxsim==0.4.33"
+]
+
 [project.urls]
 "Research Page" = "https://phaseslab.com/sipfenn"
 "Homepage" = "https://pysipfenn.org"
