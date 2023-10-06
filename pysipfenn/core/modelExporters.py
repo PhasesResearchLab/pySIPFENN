@@ -54,7 +54,7 @@ class ONNXExporter:
         print(f'--> Simplified {model}', flush=True)
 
     def simplifyAll(self):
-        """Simplify all loaded models with simplify function."""
+        """Simplify all loaded models with the simplify function."""
         for model in tqdm(self.calculator.loadedModels):
             self.simplify(model)
         print('*****  Done simplifying all models!  *****')
@@ -78,7 +78,7 @@ class ONNXExporter:
         print(f'--> Converted {model} to FP16', flush=True)
 
     def toFP16All(self):
-        """Convert all loaded models to FP16 precision with toFP16 function."""
+        """Convert all loaded models to FP16 precision with the toFP16 function."""
         for model in tqdm(self.calculator.loadedModels):
             self.toFP16(model)
         print('*****  Done converting all models to FP16!  *****')
@@ -105,22 +105,44 @@ class ONNXExporter:
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self):
-        """Export all loaded models to ONNX format with export function."""
+        """Export all loaded models to ONNX format with the export function."""
         for model in tqdm(self.calculator.loadedModels):
             self.export(model)
         print('*****  Done exporting all models!  *****')
 
 
 class TorchExporter:
+    """Export models to the PyTorch PT format to allow for easy loading and inference in PyTorch in other projects.
+
+    Args:
+        calculator: A calculator object with loaded models.
+
+    Attributes:
+        calculator: A calculator object with loaded models.
+    """
     def __init__(self, calculator: Calculator):
+        """Initialize the TorchExporter with a calculator object that has loaded models."""
         self.calculator = calculator
         assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized TorchExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def export(self, model: str):
+        """Export a loaded model to PyTorch PT format
+
+        Args:
+            model: The name of the model to export (must be loaded in the Calculator) and it must have a descriptor
+                (Ward2017 or KS2022) defined in the calculator.models dictionary created when the Calculator was
+                initialized.
+
+        Returns:
+            None
+        """
         print(f'Exporting {model} to PyTorch PT format')
+
+        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
         loadedModel = self.calculator.loadedModels[model]
 
+        assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
         descriptorUsed = self.calculator.models[model]['descriptor']
         if descriptorUsed == 'Ward2017':
             dLen = 271
@@ -130,7 +152,6 @@ class TorchExporter:
             raise NotImplementedError(f'TorchExporter export for {descriptorUsed} not implemented yet.')
 
         loadedModel.eval()
-
         inputs_tracer = torch.zeros(dLen, )
         if 'OnnxDropoutDynamic()' in {str(module) for module in list(loadedModel._modules.values())}:
             inputs_tracer = (inputs_tracer, torch.zeros(1, ))
@@ -142,6 +163,7 @@ class TorchExporter:
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self):
+        """Export all loaded models to PyTorch PT format with the export function."""
         for model in tqdm(self.calculator.loadedModels):
             self.export(model)
         print('*****  Done exporting all models!  *****')
