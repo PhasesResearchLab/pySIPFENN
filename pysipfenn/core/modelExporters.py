@@ -1,25 +1,23 @@
 from pysipfenn import Calculator
 import torch
-import coremltools as ct
-from onnxconverter_common import float16
-from onnxsim import simplify
 import onnx
 from tqdm import tqdm
 
+try:
+    import coremltools as ct
+    from onnxconverter_common import float16
+    from onnxsim import simplify
+except ModuleNotFoundError as e:
+    print(f'Could not import {e.name}.\n')
+    print('Dependencies for exporting to CoreML, Torch, and ONNX are not installed by default with pySIPFENN. You need '
+          'to install pySIPFENN in "dev" mode like: pip install -e "pysipfenn[dev]", or like pip install -e ".[dev]" if'
+          'you are cloned it. See pysipfenn.org for more details.')
 
 class ONNXExporter:
     def __init__(self, calculator: Calculator):
         self.simplifiedDict = {}
         self.fp16Dict = {}
         self.calculator = calculator
-        #if len(self.calculator.loadedModels) == 0:
-        #    print(f'No models loaded in calculator. '
-        #          f'Reloading models into ONNX: {self.calculator.network_list_available}')
-        #    with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-        #        for net in tqdm(self.calculator.network_list_available):
-        #            self.calculator.loadedModels.update({
-        #                net: onnx.load(f'{modelPath}/{net}.onnx')
-        #            })
         assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
