@@ -55,7 +55,7 @@ pySIPFENN
     :alt: GitHub Release Date - Published_At
     :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
 
-.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.12.0?color=g
+.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.13.0?color=g
     :alt: GitHub commits since tagged version
     :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
 
@@ -81,6 +81,10 @@ is given in
 
 News
 ----
+-  **(v0.13.0)** Model exports are now effortless the new `pysipfenn.core.modelExporters` module, which also allows
+   users to reduce models to FP16 precision or simplify model structure. It supports ONNX, PyTorch, and CoreML formats. The
+   latter allows use of highly efficient Neural Engine on all modern Apple devices. Note that to use these features, you
+   need to install additional dependencies with `pip install pysipfenn[dev]`
 -  **(v.12.2)** The license has been changed to LGPLv3 to allow for integration with proprietary software developed
    by CALPHAD community, while supporting the development of new pySIPFENN features for all users. Many thanks to our colleagues from
    `GTT-Technologies <https://gtt-technologies.de>`__ and
