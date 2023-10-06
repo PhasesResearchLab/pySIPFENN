@@ -26,3 +26,14 @@ Then, move to the pySIPFENN folder and install in editable (`-e`) mode
 
     cd pySIPFENN
     pip install -e .
+
+# Developer Install
+
+If you want to utilize pySIPFENN beyond its core functionalities, for instance, to train new models on custom datasets
+or to export models in different formats or precisions, you need to install additional dependencies. This can be done
+by installing the `dev` extras with
+
+    pip install pysipfenn[dev]
+
+> Note: If you are using MacOS zsh shell, you may need to enclose the `dev` extras in quotes like 
+> `pip install "pysipfenn[dev]"` or `pip install ".[dev]"`.
