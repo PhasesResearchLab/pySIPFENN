@@ -13,14 +13,14 @@ class ONNXExporter:
         self.simplifiedDict = {}
         self.fp16Dict = {}
         self.calculator = calculator
-        if len(self.calculator.loadedModels) == 0:
-            print(f'No models loaded in calculator. '
-                  f'Reloading models into ONNX: {self.calculator.network_list_available}')
-            with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-                for net in tqdm(self.calculator.network_list_available):
-                    self.calculator.loadedModels.update({
-                        net: onnx.load(f'{modelPath}/{net}.onnx')
-                    })
+        #if len(self.calculator.loadedModels) == 0:
+        #    print(f'No models loaded in calculator. '
+        #          f'Reloading models into ONNX: {self.calculator.network_list_available}')
+        #    with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+        #        for net in tqdm(self.calculator.network_list_available):
+        #            self.calculator.loadedModels.update({
+        #                net: onnx.load(f'{modelPath}/{net}.onnx')
+        #            })
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def simplify(self, model: str):
@@ -68,3 +68,5 @@ class ONNXExporter:
         for model in tqdm(self.calculator.loadedModels):
             self.export(model)
         print('*****  Done exporting all models!  *****')
+
+
