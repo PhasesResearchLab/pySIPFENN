@@ -20,10 +20,13 @@ class ONNXExporter:
     (2) simplify the models using ONNX optimizer, and (3) convert them to FP16 precision, cutting the size in half.
 
     Args:
-        calculator: A calculator object with loaded models.
+        calculator: A calculator object with loaded models that has loaded PyTorch models (happens automatically
+        when the autoLoad argument is kept to its default value of True when initializing the Calculator). During the
+        initialization, the loaded PyTorch models are converted back to ONNX (in memory) to be then either adjusted or
+        persisted to disk.
 
     Attributes:
-        calculator: A calculator object with loaded models.
+        calculator: A calculator object with ONNX loaded models.
         simplifiedDict: A dictionary of models that have been simplified.
         fp16Dict: A dictionary of models that have been converted to FP16.
     """
