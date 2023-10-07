@@ -1,6 +1,7 @@
 from pysipfenn import Calculator
 import torch
 import onnx
+import io
 from tqdm import tqdm
 
 try:
@@ -28,11 +29,50 @@ class ONNXExporter:
     """
 
     def __init__(self, calculator: Calculator):
-        """Initialize the ONNXExporter with a calculator object that has loaded models."""
-        self.simplifiedDict = {}
-        self.fp16Dict = {}
+        """Initialize the ONNXExporter using a calculator object."""
+        self.simplifiedDict = {model: False for model in calculator.loadedModels.keys()}
+        self.fp16Dict = {model: False for model in calculator.loadedModels.keys()}
         self.calculator = calculator
         assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
+        print(f'Initialized ONNXExporter with PyTorch models: '
+              f'{list(self.calculator.loadedModels.keys())}'
+              f'\n Converting to ONNX models...')
+
+        for model in calculator.loadedModels:
+            print(f'Converting {model} to ONNX')
+            assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
+            descriptorUsed = self.calculator.models[model]['descriptor']
+            if descriptorUsed == 'Ward2017':
+                dLen = 271
+            elif descriptorUsed == 'KS2022':
+                dLen = 256
+            else:
+                raise NotImplementedError(f'ONNX export for {descriptorUsed} not implemented yet.')
+
+            assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+            loadedModel = self.calculator.loadedModels[model]
+            loadedModel.eval()
+
+            inputs_tracer = torch.zeros(dLen, )
+            if 'OnnxDropoutDynamic()' in {str(module) for module in list(loadedModel._modules.values())}:
+                inputs_tracer = (inputs_tracer, torch.zeros(1, ))
+
+            temp = io.BytesIO()
+            torch.onnx.export(
+                loadedModel,
+                inputs_tracer,
+                temp,
+                export_params=True,
+                opset_version=16,
+                do_constant_folding=True,
+                input_names=[descriptorUsed],
+                output_names=['property'],
+            )
+            temp.seek(0)
+            self.calculator.loadedModels.update({
+                model: onnx.load(temp)
+            })
+            del temp
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def simplify(self, model: str) -> None:
