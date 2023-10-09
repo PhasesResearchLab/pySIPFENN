@@ -23,6 +23,21 @@ class TestExporters(unittest.TestCase):
         self.assertEqual(self.c.descriptorData, [])
         self.assertEqual(self.c.inputFiles, [])
 
+    def testExceptions1(self):
+        '''Test that the exceptions are raised correctly by the exporters when Calculator is empty. Regardless of the
+        model presence, it will skip the automatic loading of models to pretend it is a fresh install.'''
+        c = pysipfenn.Calculator(autoLoad=False)
+
+        with self.assertRaises(AssertionError,
+                               msg='ONNXExporter did not raise an AssertionError on empty Calculator'):
+            onnxexp = pysipfenn.ONNXExporter(c)
+        with self.assertRaises(AssertionError,
+                               msg='TorchExporter did not raise an AssertionError on empty Calculator'):
+            torchexp = pysipfenn.TorchExporter(c)
+        with self.assertRaises(AssertionError,
+                               msg='CoreMLExporter did not raise an AssertionError on empty Calculator'):
+            coremlexp = pysipfenn.CoreMLExporter(c)
+
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testModelsLoaded(self):
         '''Test that the models are loaded correctly.'''
