@@ -55,13 +55,19 @@ class Calculator:
     """
 
     def __init__(self,
-                 autoLoad: bool = True):
-
+                 autoLoad: bool = True,
+                 verbose: bool = True):
+        if verbose:
+            print('*********  Initializing pySIPFENN Calculator  **********')
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
+            if verbose:
+                print(f'Loading model definitions from: {f.name}')
             self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
+        if verbose:
+            print(f'Found {len(self.network_list)} network definitions in models.json')
         # network names
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
@@ -71,15 +77,19 @@ class Calculator:
         if autoLoad:
             print(f'Loading all available models (autoLoad=True)')
             self.loadModels()
+        else:
+            print(f'Skipping model loading (autoLoad=False)')
 
         self.toRun = []
         self.descriptorData = []
         self.predictions = []
         self.inputFiles = []
-        print(f'*********  PySIPFENN Successfully Initialized  **********')
+        if verbose:
+            print(f'*********  pySIPFENN Successfully Initialized  **********')
 
     def __str__(self):
-        printOut = f'PySIPFENN Calculator Object. Version: {__version__}\n'
+        '''Prints the status of the Calculator object.'''
+        printOut = f'pySIPFENN Calculator Object. Version: {__version__}\n'
         printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-" * 80}\n'
         printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
         if len(self.inputFiles) > 0:
