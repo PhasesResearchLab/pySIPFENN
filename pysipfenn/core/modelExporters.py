@@ -13,6 +13,7 @@ except ModuleNotFoundError as e:
     print('Dependencies for exporting to CoreML, Torch, and ONNX are not installed by default with pySIPFENN. You need '
           'to install pySIPFENN in "dev" mode like: pip install -e "pysipfenn[dev]", or like pip install -e ".[dev]" if'
           'you are cloned it. See pysipfenn.org for more details.')
+    raise e
 
 
 class ONNXExporter:
