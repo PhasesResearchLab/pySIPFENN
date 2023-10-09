@@ -11,6 +11,7 @@ class TestExporters(unittest.TestCase):
     '''Test all model exporting features that can operate on the Calculator object. Note that this will require
     the models to be downloaded and the environment variable MODELS_FETCHED to be set to true if running in GitHub
     Actions.'''
+
     def setUp(self):
         '''Initialise the Calculator object for testing.'''
         self.c = pysipfenn.Calculator()
@@ -37,6 +38,34 @@ class TestExporters(unittest.TestCase):
         with self.assertRaises(AssertionError,
                                msg='CoreMLExporter did not raise an AssertionError on empty Calculator'):
             coremlexp = pysipfenn.CoreMLExporter(c)
+
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    def testExceptions2(self):
+        '''Test that the exceptions are raised correctly by the exporters when the models are loaded but the
+        descriptor they are trying to use is not defined in the exporter.'''
+        self.assertIn('SIPFENN_Krajewski2020_NN24', self.c.models.keys(),
+                      'This test requires the SIPFENN_Krajewski2020_NN24 model to be downloaded and loaded in the'
+                      'Calculator object.')
+        with self.assertRaises(KeyError,
+                               msg='Not loaded models tried to pass silently.'):
+            self.c.models['NotLoadedModel']['descriptor'] = 'NotAnImplementedDescriptor'
+
+        self.c.models['SIPFENN_Krajewski2020_NN24']['descriptor'] = 'NotAnImplementedDescriptor'
+
+        with self.assertRaises(NotImplementedError,
+                               msg='TorchExporter did not raise an NotImplementedError on undefined descriptor'):
+            torchexp = pysipfenn.TorchExporter(self.c)
+            torchexp.export('SIPFENN_Krajewski2020_NN24')
+
+        with self.assertRaises(NotImplementedError,
+                               msg='CoreMLExporter did not raise an NotImplementedError on undefined descriptor'):
+            coremlexp = pysipfenn.CoreMLExporter(self.c)
+            coremlexp.export('SIPFENN_Krajewski2020_NN24')
+
+        with self.assertRaises(NotImplementedError,
+                               msg='ONNXExporter did not raise an NotImplementedError on undefined descriptor'):
+            onnxexp = pysipfenn.ONNXExporter(self.c)
+            onnxexp.export('SIPFENN_Krajewski2020_NN24')
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testModelsLoaded(self):
@@ -93,5 +122,3 @@ class TestExporters(unittest.TestCase):
         assert self.coremlexp.calculator == self.c
 
         self.coremlexp.exportAll()
-
-
