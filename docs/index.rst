@@ -116,6 +116,7 @@ Index
 
 .. toctree::
    install
+   exportingmodels
    faq
    source/pysipfenn
    examples/sipfenn_examples
