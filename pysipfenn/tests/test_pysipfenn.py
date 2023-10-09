@@ -71,7 +71,7 @@ class TestCore(unittest.TestCase):
 
         with self.subTest(msg='Test Calculator printout after predictions'):
             printOut = str(self.c)
-            self.assertIn('PySIPFENN Calculator Object', printOut)
+            self.assertIn('pySIPFENN Calculator Object', printOut)
             self.assertIn('Models are located in', printOut)
             self.assertIn('Loaded Networks', printOut)
             self.assertIn('Last files selected as input', printOut)
@@ -206,7 +206,7 @@ class TestCore(unittest.TestCase):
         '''Test that the Calculator.__str__() method returns the correcttly formatted string after being initialized
         but before predictions'''
         printOut = str(self.c)
-        self.assertIn('PySIPFENN Calculator Object', printOut)
+        self.assertIn('pySIPFENN Calculator Object', printOut)
         self.assertIn('Models are located in', printOut)
         self.assertIn('Loaded Networks', printOut)
 
