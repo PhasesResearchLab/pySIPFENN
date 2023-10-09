@@ -1,5 +1,7 @@
 # Install pySIPFENN
 
+## Regular Install
+
 Installing pySIPFENN is simple and easy utilizing either **PyPI** package repository or cloning from 
 [**GitHub**](https://git.pysipfenn.org).
 While not required, it is recommended to first set up a virtual environment using venv or Conda. This ensures that 
@@ -27,7 +29,7 @@ Then, move to the pySIPFENN folder and install in editable (`-e`) mode
     cd pySIPFENN
     pip install -e .
 
-# Developer Install
+## Developer Install
 
 If you want to utilize pySIPFENN beyond its core functionalities, for instance, to train new models on custom datasets
 or to export models in different formats or precisions, you need to install additional dependencies. This can be done
