@@ -1,24 +1,24 @@
-pysipfenn.descriptorDefinitions
-===============================
+Featurizers
+===========
 
-pysipfenn.descriptorDefinitions.KS2022 module
----------------------------------------------
+descriptorDefinitions.KS2022
+----------------------------
 
 .. automodule:: pysipfenn.descriptorDefinitions.KS2022
    :members:
    :undoc-members:
    :show-inheritance:
 
-pysipfenn.descriptorDefinitions.KS2022\_dilute module
------------------------------------------------------
+descriptorDefinitions.KS2022\_dilute
+------------------------------------
 
 .. automodule:: pysipfenn.descriptorDefinitions.KS2022_dilute
    :members:
    :undoc-members:
    :show-inheritance:
 
-pysipfenn.descriptorDefinitions.Ward2017 module
------------------------------------------------
+descriptorDefinitions.Ward2017
+------------------------------
 
 .. automodule:: pysipfenn.descriptorDefinitions.Ward2017
    :members:

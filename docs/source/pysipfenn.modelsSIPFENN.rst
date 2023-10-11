@@ -1,5 +1,5 @@
-pysipfenn.modelsSIPFENN package
-===============================
+pySIPFENN Models
+================
 
 Module contents
 ---------------
