@@ -11,10 +11,3 @@ Subpackages
    pysipfenn.descriptorDefinitions
    pysipfenn.modelsSIPFENN
 
-Module Contents
----------------
-
-.. automodule:: pysipfenn
-   :members:
-   :undoc-members:
-   :show-inheritance:
