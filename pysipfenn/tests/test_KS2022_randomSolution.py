@@ -20,11 +20,11 @@ class TestKS2022(unittest.TestCase):
             reader = csv.reader(f)
             self.labels = [row[0] for row in reader]
 
-    def test_resutls(self):
+    def test_results(self):
         '''Test the descriptor generation function by comparing the results feature by feature to the reference data
         statistics, testing whether the result is within the observed range of values from the observed mean value allowing
         for additional 1% deviation from the mean value to handle numerical precision in cases where the feature
-        converges to exactly the mean value with near-zero range (e.g. coordiantion number in BCC in case of ideal
+        converges to exactly the mean value with near-zero range (e.g. coordination number in BCC in case of ideal
         lattice positions).'''
 
         testValues = KS2022_randomSolutions.profile(test='BCC', returnDescriptor=True)
