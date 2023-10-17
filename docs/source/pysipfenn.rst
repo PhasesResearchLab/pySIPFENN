@@ -10,4 +10,5 @@ Subpackages
    pysipfenn.core
    pysipfenn.descriptorDefinitions
    pysipfenn.modelsSIPFENN
+   pysipfenn.tests
 
