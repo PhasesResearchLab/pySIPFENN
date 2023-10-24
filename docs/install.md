@@ -9,7 +9,7 @@ one of the required versions of Python (3.9+) is used and there are no dependenc
 installed on your system (see [Miniconda install instructions](https://docs.conda.io/en/latest/miniconda.html)), you can create a 
 new environment with:
 
-    conda create -n pysipfenn python=3.9 jupyter numpy
+    conda create -n pysipfenn python=3.10 jupyter numpy
     conda activate pysipfenn
 
 And then simply install pySIPFENN from PyPI with

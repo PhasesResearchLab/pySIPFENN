@@ -104,7 +104,7 @@ one of the required versions of Python (3.9+) is used and there are no dependenc
 installed on your system (see instructions at https://docs.conda.io/en/latest/miniconda.html), you can create a 
 new environment with:
 
-    conda create -n pysipfenn-workshop python=3.9 jupyter
+    conda create -n pysipfenn-workshop python=3.10 jupyter
     conda activate pysipfenn-workshop
 
 And then simply install pySIPFENN from PyPI with
