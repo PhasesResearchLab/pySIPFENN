@@ -10,7 +10,6 @@ from collections import Counter
 from typing import List, Union, Tuple
 import random
 from importlib import resources
-import pandas as pd
 
 citations = [
     'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
