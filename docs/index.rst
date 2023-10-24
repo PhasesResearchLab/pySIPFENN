@@ -7,7 +7,7 @@
 pySIPFENN
 =========
 
-|GitHub top language| |PyPI - Python Version| |PyPI Version| |PyPI Downloads| |GitHub license|
+|GitHub top language| |PyPI - Python Version| |GitHub license| |PyPI Version| |PyPI Downloads|
 
 |Commit Build Status| |Build Status|  |Coverage Status|
 
@@ -43,9 +43,9 @@ pySIPFENN
     :alt: Coverage Status
     :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
 
-.. |GitHub license| image:: https://img.shields.io/github/license/PhasesResearchLab/pySIPFENN
+.. |GitHub license| image:: https://img.shields.io/badge/License-LGPL_v3-blue.svg
     :alt: GitHub license
-    :target: https://github.com/PhasesResearchLab/pySIPFENN
+    :target: https://www.gnu.org/licenses/lgpl-3.0
 
 .. |GitHub last commit| image:: https://img.shields.io/github/last-commit/PhasesResearchLab/pySIPFENN?label=Last%20Commit
     :alt: GitHub last commit (by committer)
