@@ -88,6 +88,14 @@ bandwidth. In such a case, we recommend trying again in a day or two.
 If your download is slow or fails during normal time periods, please let us know, and we
 will try to help you by providing the files directly.
 
+## Known problems with easy solutions
+
+### Torch and ONNX Issues
+
+- Some users recently reported getting `ImportError: cannot import name 'COMMON_SAFE_ASCII_CHARACTERS' from 'charset_normalizer.constant'` error when using both recent (mid-2023) `torch` and `Mac OS on M1/M2 Macs`. It seems to be some dependency issue between `onnx2torch` and `torchvision`, but it can be quickly solved with installing missing `chardet` package with pip as
+
+        pip install chardet
+
 ## More Complex Issues
 
 ### Out-Of-Memory Error / Models Cannot Load

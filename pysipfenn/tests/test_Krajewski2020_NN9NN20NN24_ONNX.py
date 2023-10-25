@@ -17,8 +17,14 @@ with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFile
     testStructure = Structure.from_file(f'{exampleInputsDir}/{testFile}')
 
 class TestKrajewski2020ModelsFromONNX(unittest.TestCase):
+    '''_Requires the NN9/20/24 models to be downloaded first._ It takes the 0-Cr8Fe18Ni4.POSCAR file from the
+    exampleInputFiles directory and calculates the energy with the NN9/20/24 models. The results are then compared to
+    the reference results obtained by authors using pySIPFENN (MxNet->ONNX->PyTorch) and SIPFENN (directly in MxNet)
+    to the 6th decimal place (0.001 meV/atom).
+    '''
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def test_resutls(self):
+        '''Runs the test.'''
         c = pysipfenn.Calculator()
         c.calculate_Ward2017(structList=[testStructure])
         c.makePredictions(models=c.loadedModels, toRun=toTest, dataInList=c.descriptorData)

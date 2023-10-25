@@ -9,10 +9,8 @@ try:
     from onnxconverter_common import float16
     from onnxsim import simplify
 except ModuleNotFoundError as e:
-    print(f'Could not import {e.name}.\n')
-    print('Dependencies for exporting to CoreML, Torch, and ONNX are not installed by default with pySIPFENN. You need '
-          'to install pySIPFENN in "dev" mode like: pip install -e "pysipfenn[dev]", or like pip install -e ".[dev]" if'
-          'you are cloned it. See pysipfenn.org for more details.')
+    print('Note: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
+          '"dev" mode like: pip install -e "pysipfenn[dev]", or like pip install -e ".[dev]" (see pysipfenn.org)')
 
 
 class ONNXExporter:
