@@ -12,14 +12,18 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_
 
 
 class TestCore(unittest.TestCase):
+    '''Test the core functionality of the Calculator object and other high-level API functions. It does not test the
+    correctness of the descriptor generation functions or models, as these are delegated to other tests.
+    '''
     def setUp(self):
         '''Initialise the Calculator object for testing. It will be used in all tests and is not modified in any way
-        by them.'''
+        by them.
+        '''
         self.c = pysipfenn.Calculator()
         self.assertIsNotNone(self.c)
 
     def testInit(self):
-        '''Test that the Calculator object is initialised correctly.'''
+        '''Test that the Calculator object is initialized correctly.'''
         self.assertEqual(self.c.predictions, [])
         self.assertEqual(self.c.toRun, [])
         self.assertEqual(self.c.descriptorData, [])
@@ -35,8 +39,9 @@ class TestCore(unittest.TestCase):
     def testDownloadAndLoadModels(self):
         '''Tests that the downloadModels() method works without errors in a case whwere the models are not already
         downloaded and loads them correctly using the loadModels() method. Then also load a model explicitly using
-        loadModel() and check that it is in the loadedModels list. Also check that arror is raised correctly if
-        a non-available model is requested to be loaded.'''
+        loadModel() and check that it is in the loadedModels list. Also check that error is raised correctly if
+        a non-available model is requested to be loaded.
+        '''
 
         self.c.downloadModels(network='all')
         self.c.loadModels(network='SIPFENN_Krajewski2020_NN24')
@@ -49,6 +54,9 @@ class TestCore(unittest.TestCase):
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_Ward2017(self):
+        '''Update the list of available models and identifies which models are compatible with the Ward2017 descriptor.
+        Then it runs featurization from the exampleInputFiles directory.
+        '''
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
         if toRun:
@@ -60,6 +68,10 @@ class TestCore(unittest.TestCase):
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_KS2022(self):
+        '''Update the list of available models and identifies which models are compatible with the KS2022 descriptor.
+        Then it runs featurization from the exampleInputFiles directory. It also tests the printout of the Calculator
+        object after the prediction run.
+        '''
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
         if toRun:
@@ -82,6 +94,11 @@ class TestCore(unittest.TestCase):
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromStructure_KS2022_dilute(self):
+        '''Update the list of available models and identifies which models are compatible with the KS2022_dilute
+        featurization (KS2022 descriptor). Then it runs featurization from the exampleInputFiles directory. It also
+        then checks that the 'pure' convenience magic works correctly by comparing the results to the original pure
+        structure results.
+        '''
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
         if toRun:
@@ -115,7 +132,8 @@ class TestCore(unittest.TestCase):
 
     def test_descriptorCalculate_Ward2017_serial(self):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in series. A separate test for
-        calculation accuracy is done in test_Ward2017.py'''
+        calculation accuracy is done in test_Ward2017.py.
+        '''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)[:6]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
@@ -124,7 +142,8 @@ class TestCore(unittest.TestCase):
 
     def test_descriptorCalculate_Ward2017_parallel(self):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in parallel. A separate test for
-        calculation accuracy is done in test_Ward2017.py'''
+        calculation accuracy is done in test_Ward2017.py.
+        '''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)[:6]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
@@ -133,7 +152,8 @@ class TestCore(unittest.TestCase):
 
     def test_descriptorCalculate_KS2022_serial(self):
         '''Test succesful execution of the descriptorCalculate() method with KS2022 in series. A separate test for
-        calculation accuracy is done in test_KS2022.py'''
+        calculation accuracy is done in test_KS2022.py.
+        '''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
@@ -142,7 +162,8 @@ class TestCore(unittest.TestCase):
 
     def test_descriptorCalculate_KS2022_parallel(self):
         '''Test succesful execution of the descriptorCalculate() method with KS2022 in parallel. A separate test for
-        calculation accuracy is done in test_KS2022.py'''
+        calculation accuracy is done in test_KS2022.py.
+        '''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
@@ -151,7 +172,8 @@ class TestCore(unittest.TestCase):
 
     def test_RunModels_Errors(self):
         '''Test that the runModels() and runModels_dilute() methods raise errors correctly when it is called with no
-        models to run or with a descriptor handling that has not been implemented'''
+        models to run or with a descriptor handling that has not been implemented.
+        '''
         with self.subTest(mgs='No models to run'):
             with self.assertRaises(AssertionError):
                 self.c.network_list_available = []
@@ -173,7 +195,8 @@ class TestCore(unittest.TestCase):
     def test_WriteDescriptorDataToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
         consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
-        structures based on the c.inputFileNames list'''
+        structures based on the c.inputFileNames list.
+        '''
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
             exampleInputFiles = natsorted(os.listdir(exampleInputsDir))[:4]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
@@ -203,8 +226,9 @@ class TestCore(unittest.TestCase):
                     self.assertEqual(line1, line2)
 
     def test_CalculatorPrint(self):
-        '''Test that the Calculator.__str__() method returns the correcttly formatted string after being initialized
-        but before predictions'''
+        '''Test that the Calculator.__str__() method returns the correctly formatted string after being initialized
+        but before predictions.
+        '''
         printOut = str(self.c)
         self.assertIn('pySIPFENN Calculator Object', printOut)
         self.assertIn('Models are located in', printOut)
