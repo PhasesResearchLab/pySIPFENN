@@ -10,7 +10,8 @@ IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_
 class TestExporters(unittest.TestCase):
     '''Test all model exporting features that can operate on the Calculator object. Note that this will require
     the models to be downloaded and the environment variable MODELS_FETCHED to be set to true if running in GitHub
-    Actions.'''
+    Actions.
+    '''
 
     def setUp(self):
         '''Initialise the Calculator object for testing.'''
@@ -25,8 +26,9 @@ class TestExporters(unittest.TestCase):
         self.assertEqual(self.c.inputFiles, [])
 
     def testExceptions1(self):
-        '''Test that the exceptions are raised correctly by the exporters when Calculator is empty. Regardless of the
-        model presence, it will skip the automatic loading of models to pretend it is a fresh install.'''
+        '''Test that the exceptions are raised correctly by the exporters when the Calculator is empty. Regardless of the
+        model presence, it will skip the automatic loading of models to pretend it is a fresh install.
+        '''
         c = pysipfenn.Calculator(autoLoad=False)
 
         with self.assertRaises(AssertionError,
@@ -41,8 +43,9 @@ class TestExporters(unittest.TestCase):
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testExceptions2(self):
-        '''Test that the exceptions are raised correctly by the exporters when the models are loaded but the
-        descriptor they are trying to use is not defined in the exporter.'''
+        '''Test that the exceptions are raised correctly by the exporters when the models are loaded, but the
+        descriptor they are trying to use is not defined in the exporter.
+        '''
         self.assertIn('SIPFENN_Krajewski2020_NN24', self.c.models.keys(),
                       'This test requires the SIPFENN_Krajewski2020_NN24 model to be downloaded and loaded in the'
                       'Calculator object.')
@@ -96,7 +99,8 @@ class TestExporters(unittest.TestCase):
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testONNXExport(self):
         '''Test that the ONNX export works with all models with no errors. For two of the models, the export will
-        also simplify or convert to FP16 to check that it gets correctly encoded in the exported file name.'''
+        also simplify or convert to FP16 to check that it gets correctly encoded in the exported file name.
+        '''
         self.onnxexp = pysipfenn.ONNXExporter(self.c)
         assert self.onnxexp.calculator == self.c
 
@@ -108,7 +112,8 @@ class TestExporters(unittest.TestCase):
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testTorchExport(self):
         '''Test that the PyTorch export works with all models with no errors. Please note that if you are using
-        custom descriptors, you will need to add them to the exporter definition in pysipfenn/core/modelExporters.py.'''
+        custom descriptors, you will need to add them to the exporter definition in pysipfenn/core/modelExporters.py.
+        '''
         self.torchexp = pysipfenn.TorchExporter(self.c)
         assert self.torchexp.calculator == self.c
 
@@ -117,7 +122,8 @@ class TestExporters(unittest.TestCase):
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testCoreMLExport(self):
         '''Test that the CoreML export works with all models with no errors. Please note that if you are using
-        custom descriptors, you will need to add them to the exporter definition in pysipfenn/core/modelExporters.py.'''
+        custom descriptors, you will need to add them to the exporter definition in pysipfenn/core/modelExporters.py.
+        '''
         self.coremlexp = pysipfenn.CoreMLExporter(self.c)
         assert self.coremlexp.calculator == self.c
 

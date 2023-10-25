@@ -81,7 +81,7 @@ and you should see new files like `MyModelNameGoesHere_simplified_fp16.onnx` in 
 
 ## PyTorch
 
-This is the simplest of the export methods because, as mentioned in [ONNXExporter](#onnxexporter) section, pySIPFENN 
+This is the simplest of the export methods because, as mentioned in [ONNXExporter](#ONNXExporter) section, pySIPFENN 
 models are already stored as PyTorch models; therefore, no conversion is needed. You can use it by simply calling 
 
     from pysipfenn import PyTorchExporter
@@ -106,7 +106,7 @@ other platforms as well, such as Linux or Windows, through [coremltools](https:/
 from Apple used by this exporter.
 
 Note that under the hood, CoreML uses the float16 precision, so the model predictions will numerically match those
-exported with [ONNXExporter](#onnxexporter) in float16 precision rather than the default pySIPFENN models. This can
+exported with [ONNXExporter](#ONNXExporter) in float16 precision rather than the default pySIPFENN models. This can
 be useful if you want to use the models on devices with limited memory, such as mobile phones or embedded devices, and 
 generally should not significantly affect the accuracy of the predictions.
 

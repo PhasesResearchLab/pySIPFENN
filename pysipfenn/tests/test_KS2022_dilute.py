@@ -15,10 +15,11 @@ class TestKS2022(unittest.TestCase):
     def setUp(self):
         '''Import the lables expected for the KS2022 dilute descriptor (same as KS2022) and initialize 4 test materials
         (mp-13, mp-27, mp-165, mp-1211280) to be used in the tests. The 4 test cases should be sufficient to test the
-        dilute descriptor as general KS2022 is tested more extensively and problems should propagate to the dilute
+        dilute descriptor as general KS2022 is tested more extensively, and problems should propagate to the dilute
         featurizer. To create the dilute structures, 2x2x2 supercells of the test materials are created and the
         atom at site 0 is replaced with aluminum. Results for the first test case, comparing general KS2022, explicit
-        base, and implicit (pure) base, are persisted in the KS2022_dilute_TestReslt.csv'''
+        base, and implicit (pure) base, are persisted in the KS2022_dilute_TestReslt.csv
+        '''
 
         with resources.files('pysipfenn'). \
                 joinpath('descriptorDefinitions/labels_KS2022_dilute.csv').open('r', newline='') as f:
@@ -67,7 +68,10 @@ class TestKS2022(unittest.TestCase):
 
     def test_resutls_explicitBase(self):
         '''Compare the KS2022_dilute featurizer results with general KS2022 using explicit base structures, i.e.
-        structures from before the dilute element was added.'''
+        structures from before the dilute element was added. Calculates the relative difference between the two and
+        requires it to be less than 1% for all fields except 0-valued fields, where the absolute difference is
+        required to be less than 1e-6.
+        '''
         for fo, trd, name in zip(self.functionOutput_explicitBase, self.testReferenceData, self.testMaterialsLabels):
             for p_fo, p_trd, l in zip(fo, trd, self.labels):
                 if p_trd>0.01 and p_fo>0.01:
@@ -80,10 +84,15 @@ class TestKS2022(unittest.TestCase):
 
 class TestKS2022_diluteProfiling(unittest.TestCase):
     '''Test the dilute version of KS2022 descriptor generation by profiling the execution time of the descriptor generation function
-        for one example structures in serial and parallel (8 workers) mode.'''
+    for one example dilute structure.
+    '''
     def test_serial(self):
+        '''Test the serial execution of the descriptor generation function 10 times.'''
         KS2022_dilute.profile(test='diluteNiAlloy', nRuns=10)
     def test_parallel(self):
+        '''Test the parallel execution of the descriptor generation function 64 times but in parallel with up to 8
+        workers to speed up the execution.
+        '''
         KS2022_dilute.profileParallel(test='diluteNiAlloy', nRuns=64)
 
 
