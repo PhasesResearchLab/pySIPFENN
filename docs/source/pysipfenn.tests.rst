@@ -25,6 +25,14 @@ KS2022 Dilute-Optimized Featurization Correctness
     :undoc-members:
     :show-inheritance:
 
+KS2022 Random Solution Featurization Correctness
+------------------------------------------------
+
+.. automodule:: pysipfenn.tests.test_KS2022_randomSolution
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Ward2017 Featurization Correctness
 ----------------------------------
 
