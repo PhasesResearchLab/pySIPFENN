@@ -4,7 +4,7 @@ pySIPFENN Models
 All default models for pySIPFENN are stored in the below Zenodo repository, which will be versioned with each release of
 new models:
 
-.. |Zenodo DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
     :target: https://doi.org/10.5281/zenodo.7373089
     :alt: Zenodo DOI
 
