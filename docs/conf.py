@@ -37,6 +37,8 @@ nb_execution_cache_path = "../temp/jupyter_cache"
 sphinx_github_changelog_token = password = os.environ.get("sphinx_github_changelog_token")
 
 # -- Options for autodoc -----------------------------------------------------
+
+add_module_names = False
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '../**/tests*']
 
