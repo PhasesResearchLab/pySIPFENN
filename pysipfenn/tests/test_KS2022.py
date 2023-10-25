@@ -9,8 +9,19 @@ from importlib import resources
 
 from pysipfenn.descriptorDefinitions import KS2022
 
+
 class TestKS2022(unittest.TestCase):
+    '''Tests the correctness of the KS2022 descriptor generation function by comparing the results to the reference data
+    for the first 25 structures in the exampleInputFiles directory, stored in the exampleInputFilesDescriptorTable.csv.
+    That file that is also used to test the correctness of the Ward2017, which is a superset of the KS2022.
+    '''
     def setUp(self):
+        '''Reads the reference data from the exampleInputFilesDescriptorTable.csv file and the labels from the first
+        row of that file. Then it reads the first 25 structures from the exampleInputFiles directory and generates the
+        descriptors for them. The results are stored in the functionOutput list. It defines the emptyLabelsIndx list
+        that contains the indices of the labels that are not used in the KS2022 (vs Ward2017) descriptor generation. It
+        also persists the test results in the KS2022_TestResult.csv file.
+        '''
         with resources.files('pysipfenn'). \
                 joinpath('tests/testCaseFiles/exampleInputFilesDescriptorTable.csv').open('r', newline='') as f:
             reader = csv.reader(f)
@@ -35,7 +46,12 @@ class TestKS2022(unittest.TestCase):
         self.functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:25])]
         with resources.files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
             f.writelines([f'{v}\n' for v in self.functionOutput[0]])
+
     def test_resutls(self):
+        '''Compares the results of the KS2022 descriptor generation function to the reference data on a field-by-field
+        basis by calculating the relative difference between the two and requiring it to be less than 1% for all fields
+        except 0-valued fields, where the absolute difference is required to be less than 1e-6.
+        '''
         for fo, trd, name in zip(self.functionOutput, self.testReferenceData, self.exampleInputFiles):
             for eli in self.emptyLabelsIndx:
                 trd.pop(eli)
@@ -50,12 +66,17 @@ class TestKS2022(unittest.TestCase):
 
 class TestKS2022Profiling(unittest.TestCase):
     '''Test the KS2022 descriptor generation by profiling the execution time of the descriptor generation function
-        for two example structures in serial and parallel (8 workers) mode.'''
+    for two example structures (JVASP-10001 and diluteNiAlloy).
+    '''
     def test_serial(self):
+        '''Test the serial execution of the descriptor generation function 4 times for each of the two examples.'''
         KS2022.profile(test='JVASP-10001', nRuns=4)
         KS2022.profile(test='diluteNiAlloy', nRuns=4)
 
     def test_parallel(self):
+        '''Test the parallel execution of the descriptor generation function 24 times for each of the two examples
+        but in parallel with up to 8 workers to speed up the execution.
+        '''
         KS2022.profileParallel(test='JVASP-10001', nRuns=24)
         KS2022.profileParallel(test='diluteNiAlloy', nRuns=24)
 
