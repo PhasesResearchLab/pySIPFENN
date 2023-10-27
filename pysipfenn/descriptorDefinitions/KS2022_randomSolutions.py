@@ -21,29 +21,30 @@ periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
 # Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+attribute_matrix = attribute_matrix[
+                   :, [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
-maxFeaturesInOQMD = np.array((13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835,
-                              0.671142, 0.648262, 0.74048, 89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0,
-                              95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 3631.95, 1395.25, 3631.95,
-                              3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
-                              213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908,
-                              2.0, 2.0, 2.0, 5.0, 1.80537, 5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0,
-                              5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 1.0, 0.406792, 1.0, 1.0, 1.0,
-                              5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
-                              20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853,
-                              2.78409, 7.853, 7.853, 7.853, 2.09127, 0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0,
-                              1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 102.0, 102.0, 102.0,
-                              244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0,
-                              3823.0, 18.0, 17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0,
-                              106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0,
-                              2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 14.0, 7.0,
-                              14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0,
-                              5.0, 2.5, 5.0, 5.0, 5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0,
-                              22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 55.0625, 115.765, 115.765, 115.765,
-                              7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
-                              2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725))
+maxFeaturesInOQMD = np.array(
+    [13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835,
+     0.671142, 0.648262, 0.74048, 89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0,
+     95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 3631.95, 1395.25, 3631.95,
+     3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
+     213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908,
+     2.0, 2.0, 2.0, 5.0, 1.80537, 5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0,
+     5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 1.0, 0.406792, 1.0, 1.0, 1.0,
+     5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
+     20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853,
+     2.78409, 7.853, 7.853, 7.853, 2.09127, 0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0,
+     1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 102.0, 102.0, 102.0,
+     244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0,
+     3823.0, 18.0, 17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0,
+     106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0,
+     2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 14.0, 7.0,
+     14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0,
+     5.0, 2.5, 5.0, 5.0, 5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0,
+     22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 55.0625, 115.765, 115.765, 115.765,
+     7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
+     2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
 
 
 def local_env_function(local_env, site):
@@ -53,7 +54,6 @@ def local_env_function(local_env, site):
         Args:
             local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
             site: The site number for which the local environment is being computed.
-            element_dict: A dictionary of the elements in the structure.
 
         Returns:
             A list of the local environment attributes.
@@ -93,9 +93,14 @@ def local_env_function(local_env, site):
     # Calculate Packing Efficiency info
     sphere_rad = min(neighbor_site['face_dist'] for neighbor_site in local_env.values())
     sphere_volume = (4.0 / 3.0) * math.pi * math.pow(sphere_rad, 3.0)
-    return [np.concatenate(
-        ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
-        elemental_properties_attributes[1]]
+    return [
+        np.concatenate(
+            (
+                [eff_coord_num, blen_average, blen_var, volume, sphere_volume],
+                elemental_properties_attributes[0]
+            )),
+        elemental_properties_attributes[1]
+    ]
 
 
 class LocalAttributeGenerator:
@@ -151,7 +156,7 @@ def generate_descriptor(struct: Structure,
                         minimumSitesPerExpansion: int = 50,
                         featureConvergenceCriterion: float = 0.01,
                         compositionConvergenceCriterion: float = 0.01,
-                        minimumElementOccurances: int = 10,
+                        minimumElementOccurrences: int = 10,
                         plotParameters: bool = False,
                         printProgress: bool = True,
                         returnMeta: bool = False,
@@ -166,8 +171,8 @@ def generate_descriptor(struct: Structure,
         comp: A pymatgen Composition object that will be randomly distributed on the structure within accuracy
             determined by the compositionConvergenceCriterion.
         minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling
-            dimension-by-dimension) before it will
-            be used as expansion step in each iteration adding local chemical environment information to the global pool.
+            dimension-by-dimension) before it will be used as expansion step in each iteration adding local chemical
+            environment information to the global pool.
             Optimal value will depend on the number of species and their relative fractions in the composition.
             Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result
             in slower computation. The default value is 50.
@@ -175,12 +180,12 @@ def generate_descriptor(struct: Structure,
             (statistics based on the
             global ensemble of local chemical environments) and the previous iteration (before last expansion)
             expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of
-            SIPFENN publication (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the
+            SIPFENN creation (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the
             maximum value.
         compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the
             current composition (all expansions) and the the target composition (comp). The default value is 0.01,
             corresponding to deviation depending on the number of elements in the composition.
-        minimumElementOccurances: The minimum number of times all elements must occur in the composition before it is
+        minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
         plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
@@ -221,7 +226,7 @@ def generate_descriptor(struct: Structure,
 
     while maxDiff > featureConvergenceCriterion \
             or compositionDistance > compositionConvergenceCriterion \
-            or minOccupationCount < minimumElementOccurances:
+            or minOccupationCount < minimumElementOccurrences:
         # Choose random structure occupation
         randomOccupation = random.choices(list(elementalFrequencies.keys()),
                                           weights=elementalFrequencies.values(),
@@ -281,7 +286,6 @@ def generate_descriptor(struct: Structure,
         properties = np.insert(properties, position, len(element_dict))
         # Calculate Valence Electron Statistics
         electron_occupation_dict = {'s': 0, 'p': 0, 'd': 0, 'f': 0}
-        total_valence_factor = 0
         for key, value in element_dict.items():
             electron_occupation_dict['s'] += value * attribute_matrix[Element(key).Z - 1][8]
             electron_occupation_dict['p'] += value * attribute_matrix[Element(key).Z - 1][9]
@@ -420,10 +424,10 @@ def profile(test: str = 'FCC',
             f'KS2022 Random Solid Solution profiling/testing task will calculate a descriptor for a random FCC alloy.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[3.475145865948011, 0.0, 2.1279131306516942e-16], [5.588460777961125e-16, 3.475145865948011, 2.1279131306516942e-16], [0.0, 0.0, 3.475145865948011]], "pbc": [true, true, true], "a": 3.475145865948011, "b": 3.475145865948011, "c": 3.475145865948011, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 41.968081364279875}, "sites": [{"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.5], "xyz": [2.7942303889805623e-16, 1.7375729329740055, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.5], "xyz": [1.7375729329740055, 0.0, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.0], "xyz": [1.7375729329740057, 1.7375729329740055, 2.1279131306516942e-16], "properties": {}, "label": "Ni"}]}'
     elif test == 'BCC':
-        print('KS2022 Random Solution profiling/testing taks will calculate the descriptor for a random BCC alloy.')
+        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random BCC alloy.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[2.863035498949916, 0.0, 1.75310362981713e-16], [4.60411223268961e-16, 2.863035498949916, 1.75310362981713e-16], [0.0, 0.0, 2.863035498949916]], "pbc": [true, true, true], "a": 2.863035498949916, "b": 2.863035498949916, "c": 2.863035498949916, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 23.468222587900303}, "sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Fe"}, {"species": [{"element": "Fe", "occu": 1}], "abc": [0.5, 0.5, 0.5], "xyz": [1.4315177494749582, 1.431517749474958, 1.4315177494749582], "properties": {}, "label": "Fe"}]}'
     elif test == 'HCP':
-        print('KS2022 Random Solution profiling/testing taks will calculate the descriptor for a random HCP alloy.')
+        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random HCP alloy.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[1.4678659615336875, -2.54241842407729, 0.0], [1.4678659615336875, 2.54241842407729, 0.0], [0.0, 0.0, 4.64085615]], "pbc": [true, true, true], "a": 2.9357319230673746, "b": 2.9357319230673746, "c": 4.64085615, "alpha": 90.0, "beta": 90.0, "gamma": 120.00000000000001, "volume": 34.6386956150451}, "sites": [{"species": [{"element": "Ti", "occu": 1}], "abc": [0.3333333333333333, 0.6666666666666666, 0.25], "xyz": [1.4678659615336875, 0.8474728080257632, 1.1602140375], "properties": {}, "label": "Ti"}, {"species": [{"element": "Ti", "occu": 1}], "abc": [0.6666666666666667, 0.33333333333333337, 0.75], "xyz": [1.4678659615336878, -0.8474728080257634, 3.4806421125], "properties": {}, "label": "Ti"}]}'
     else:
         raise NotImplementedError(f'Unrecognized test name: {test}')
@@ -437,8 +441,8 @@ def profile(test: str = 'FCC',
         s = Structure.from_dict(json.loads(matStr))
         from tqdm.contrib.concurrent import process_map
         d = process_map(generate_descriptor,
-                        [s for i in range(nIterations)],
-                        [comp for i in range(nIterations)],
+                        [s for _ in range(nIterations)],
+                        [comp for _ in range(nIterations)],
                         chunksize=1,
                         max_workers=8)
     else:
@@ -459,6 +463,7 @@ def profile(test: str = 'FCC',
                 f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
             return None
     print('Done!')
+
 
 if __name__ == "__main__":
     profile(test='FCC', plotParameters=True)
