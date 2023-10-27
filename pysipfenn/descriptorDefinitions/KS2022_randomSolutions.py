@@ -154,7 +154,7 @@ def magpie_mode(attribute_properties, axis=0):
 def generate_descriptor(struct: Structure,
                         comp: Composition,
                         minimumSitesPerExpansion: int = 50,
-                        featureConvergenceCriterion: float = 0.01,
+                        featureConvergenceCriterion: float = 0.005,
                         compositionConvergenceCriterion: float = 0.01,
                         minimumElementOccurrences: int = 10,
                         plotParameters: bool = False,
@@ -348,8 +348,8 @@ def generate_descriptor(struct: Structure,
         fig = px.line(pd.DataFrame(diffArray, columns=labels), title='KS2022 Descriptor Parameters',
                       range_y=[-0.5, 0.5])
         # Add horizontal lines at convergence criteria of +/- 0.01.
-        fig.add_hline(y=0.01, line_dash='dash', line_color='red')
-        fig.add_hline(y=-0.01, line_dash='dash', line_color='red')
+        fig.add_hline(y=featureConvergenceCriterion, line_dash='dash', line_color='red')
+        fig.add_hline(y=-featureConvergenceCriterion, line_dash='dash', line_color='red')
 
         fig.show()
 
