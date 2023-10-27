@@ -395,7 +395,7 @@ def profile(test: str = 'FCC',
             comp: Composition = Composition('Cr12.8 Fe12.8 Co12.8 Ni12.8 Cu12.8 Al35.9'),
             nIterations: int = 1,
             plotParameters: bool = False,
-            returnDescriptor: bool = False):
+            returnDescriptorAndMeta: bool = False):
     """Profiles the descriptor in series using one of the test structures."""
     if test == 'FCC':
         print(
@@ -412,7 +412,8 @@ def profile(test: str = 'FCC',
 
     if nIterations == 1:
         s = Structure.from_dict(json.loads(matStr))
-        d = generate_descriptor(s, comp, plotParameters=plotParameters)
+        d, meta = generate_descriptor(s, comp, plotParameters=plotParameters, returnMeta=True)
+        print(f"Got meta with :{meta.keys()} keys")
     elif nIterations > 1:
         print(f'Running {nIterations} iterations in parallel...')
         s = Structure.from_dict(json.loads(matStr))
@@ -433,8 +434,8 @@ def profile(test: str = 'FCC',
         if nIterations == 1:
             with open(name, 'w+') as f:
                 f.writelines([f'{v}\n' for v in d])
-            if returnDescriptor:
-                return d
+            if returnDescriptorAndMeta:
+                return d, meta
         else:
             with open(name, 'w+') as f:
                 f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
