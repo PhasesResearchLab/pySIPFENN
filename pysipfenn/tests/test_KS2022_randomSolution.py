@@ -29,7 +29,8 @@ class TestKSRandomSolution2022(unittest.TestCase):
         feature converges to near exactly the mean value with near-zero range (e.g. coordination number in BCC in case
         of ideal lattice positions).
         '''
-        testValues = KS2022_randomSolutions.profile(test='BCC', returnDescriptor=True)
+        testValues, meta = KS2022_randomSolutions.profile(test='BCC', returnDescriptorAndMeta=True)
+
         for testValue, descriptorRange, descriptorMean, label in zip(
                 testValues,
                 self.descriptorRangeList,
@@ -39,10 +40,14 @@ class TestKSRandomSolution2022(unittest.TestCase):
                 self.assertGreaterEqual(testValue, (0.98*descriptorMean)-descriptorRange)
                 self.assertLessEqual(testValue, (1.02*descriptorMean)+descriptorRange)
 
+        for field in ['diffHistory', 'propHistory', 'finalAtomsN', 'finalCompositionDistance']:
+            with self.subTest(msg=f'{field} present in meta'):
+                self.assertIn(field, meta)
+
     def test_errors(self):
         '''Check if correct errors are raised when: (1) the test structure is not implemented.'''
         with self.assertRaises(NotImplementedError):
-            KS2022_randomSolutions.profile(test='CrazyStructure', returnDescriptor=True)
+            KS2022_randomSolutions.profile(test='CrazyStructure')
 
 
 class TestKS2022RandomSolutionProfiling(unittest.TestCase):
