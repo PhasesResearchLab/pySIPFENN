@@ -44,6 +44,10 @@ class TestKSRandomSolution2022(unittest.TestCase):
             with self.subTest(msg=f'{field} present in meta'):
                 self.assertIn(field, meta)
 
+        with self.subTest(msg="Verify runtime of onlyStructural function to select slices of the descriptor"):
+            structuralValues = KS2022_randomSolutions.onlyStructural(testValues)
+            self.assertEqual(len(structuralValues), 103)
+
     def test_errors(self):
         '''Check if correct errors are raised when: (1) the test structure is not implemented.'''
         with self.assertRaises(NotImplementedError):
