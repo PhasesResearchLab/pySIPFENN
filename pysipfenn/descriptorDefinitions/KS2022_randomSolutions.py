@@ -395,8 +395,26 @@ def profile(test: str = 'FCC',
             comp: Composition = Composition('Cr12.8 Fe12.8 Co12.8 Ni12.8 Cu12.8 Al35.9'),
             nIterations: int = 1,
             plotParameters: bool = False,
-            returnDescriptorAndMeta: bool = False):
-    """Profiles the descriptor in series using one of the test structures."""
+            returnDescriptorAndMeta: bool = False) -> Union[None, Tuple[np.ndarray, dict]]:
+    """Profiles the descriptor using one of the test structures.
+
+    Args:
+        test: The test structure to use. Options are 'FCC', 'BCC', and 'HCP'.
+        comp: The composition to use. Should be a Composition pymatgen object.
+        nIterations: The number of iterations to run. If 1, the descriptor will be calculated once and may be available
+            in the return value. If >1, the descriptor will be calculated nIterations times and the result will
+            be persisted in `f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'` file in the current
+            working directory.
+        plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
+        returnDescriptorAndMeta: If True, a tuple containing the descriptor and a dictionary containing the convergence
+            history will be returned. The default value is False.
+
+    Returns:
+        Depending on the value of nIterations and returnDescriptorAndMeta, the return value will be either a tuple of
+        the descriptor and a dictionary containing the convergence history, or None. In either case, the descriptor
+        will be persisted in `f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'` file.
+    """
+
     if test == 'FCC':
         print(
             f'KS2022 Random Solid Solution profiling/testing task will calculate a descriptor for a random FCC alloy.')
@@ -439,6 +457,7 @@ def profile(test: str = 'FCC',
         else:
             with open(name, 'w+') as f:
                 f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
+            return None
     print('Done!')
 
 if __name__ == "__main__":
