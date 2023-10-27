@@ -7,7 +7,7 @@ from tqdm.contrib.concurrent import process_map
 from pysipfenn.descriptorDefinitions import KS2022_randomSolutions
 
 
-class TestKS2022(unittest.TestCase):
+class TestKSRandomSolution2022(unittest.TestCase):
     def setUp(self):
         '''Load the feature ranges and means from the test file as calculated for the testing/profiling case included
         in the KS2022_randomSolution script run for 50 iterations over BCC Cr12.8 Fe12.8 Co12.8 Ni12.8 Cu12.8 Al35.9
@@ -38,6 +38,11 @@ class TestKS2022(unittest.TestCase):
             with self.subTest(msg=f'{label} in BCC alloy'):
                 self.assertGreaterEqual(testValue, (0.98*descriptorMean)-descriptorRange)
                 self.assertLessEqual(testValue, (1.02*descriptorMean)+descriptorRange)
+
+    def test_errors(self):
+        '''Check if correct errors are raised when: (1) the test structure is not implemented.'''
+        with self.assertRaises(NotImplementedError):
+            KS2022_randomSolutions.profile(test='CrazyStructure', returnDescriptor=True)
 
 
 class TestKS2022RandomSolutionProfiling(unittest.TestCase):
