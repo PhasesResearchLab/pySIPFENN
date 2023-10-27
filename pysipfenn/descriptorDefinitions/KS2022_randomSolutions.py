@@ -408,8 +408,7 @@ def profile(test: str = 'FCC',
         print('KS2022 Random Solution profiling/testing taks will calculate the descriptor for a random HCP alloy.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[1.4678659615336875, -2.54241842407729, 0.0], [1.4678659615336875, 2.54241842407729, 0.0], [0.0, 0.0, 4.64085615]], "pbc": [true, true, true], "a": 2.9357319230673746, "b": 2.9357319230673746, "c": 4.64085615, "alpha": 90.0, "beta": 90.0, "gamma": 120.00000000000001, "volume": 34.6386956150451}, "sites": [{"species": [{"element": "Ti", "occu": 1}], "abc": [0.3333333333333333, 0.6666666666666666, 0.25], "xyz": [1.4678659615336875, 0.8474728080257632, 1.1602140375], "properties": {}, "label": "Ti"}, {"species": [{"element": "Ti", "occu": 1}], "abc": [0.6666666666666667, 0.33333333333333337, 0.75], "xyz": [1.4678659615336878, -0.8474728080257634, 3.4806421125], "properties": {}, "label": "Ti"}]}'
     else:
-        print('Unrecognized test name.')
-        return None
+        raise NotImplementedError(f'Unrecognized test name: {test}')
 
     if nIterations == 1:
         s = Structure.from_dict(json.loads(matStr))
