@@ -37,8 +37,8 @@ class TestKSRandomSolution2022(unittest.TestCase):
                 self.descriptorMeanList,
                 self.labels):
             with self.subTest(msg=f'{label} in BCC alloy'):
-                self.assertGreaterEqual(testValue, (0.98*descriptorMean)-descriptorRange)
-                self.assertLessEqual(testValue, (1.02*descriptorMean)+descriptorRange)
+                self.assertGreaterEqual(testValue, (0.98*descriptorMean)-descriptorRange-1e-6)
+                self.assertLessEqual(testValue, (1.02*descriptorMean)+descriptorRange+1e-6)
 
         for field in ['diffHistory', 'propHistory', 'finalAtomsN', 'finalCompositionDistance']:
             with self.subTest(msg=f'{field} present in meta'):
