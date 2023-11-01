@@ -17,6 +17,14 @@ descriptorDefinitions.KS2022\_dilute
    :undoc-members:
    :show-inheritance:
 
+descriptorDefinitions.KS2022\_randomSolutions
+------------------------------------
+
+.. automodule:: pysipfenn.descriptorDefinitions.KS2022_randomSolutions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 descriptorDefinitions.Ward2017
 ------------------------------
 

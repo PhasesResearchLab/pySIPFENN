@@ -1,11 +1,4 @@
 # Authors: Jonathan Siegel, Adam M. Krajewski
-#
-# Calculates the descriptor first introduced by Ward and Wolverton.
-#
-# Please Cite:
-# L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
-# “Including crystal structure attributes in machine learning models of formation energies
-# via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
 
 import math
 import time
@@ -18,7 +11,11 @@ import json
 from tqdm import tqdm
 from collections import Counter
 
-citation = 'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.'
+citations = [
+    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+    'Materials Science, Volume 208, 2022, 111254'
+    ]
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -26,6 +23,7 @@ attribute_matrix = np.nan_to_num(attribute_matrix)
 # Only select attributes actually used in Magpie.
 attribute_matrix = attribute_matrix[:,
                    [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+
 
 # A prototype function which computes a weighted average over neighbors,
 # weighted by the area of the voronoi cell between them.
@@ -67,17 +65,20 @@ def local_env_function(local_env, site, struct):
     sphere_volume = (4.0 / 3.0) * math.pi * math.pow(sphere_rad, 3.0)
     return [np.concatenate(
         ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
-            elemental_properties_attributes[1]]
+        elemental_properties_attributes[1]]
+
 
 def findDilute(struct):
     spoList = struct.species_and_occu
     spCount = dict(Counter(spoList))
-    spDilute = [spoList.index(sp) for sp in spCount if spCount[sp]==1]
-    if len(spCount)-len(spDilute)==1:
+    spDilute = [spoList.index(sp) for sp in spCount if spCount[sp] == 1]
+    if len(spCount) - len(spDilute) == 1:
         return spDilute[0]
     else:
-        print('Custom dilute structure descriptor calculation is defined only one dilute species in a single element matrix')
+        print(
+            'Custom dilute structure descriptor calculation is defined only one dilute species in a single element matrix')
         raise RuntimeError
+
 
 def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env_function):
     local_generator = LocalAttributeGenerator(struct, local_funct)
@@ -89,12 +90,12 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
             if s1s != s2s:
                 diluteSite.append(i)
                 continue
-        if len(diluteSite)==1:
+        if len(diluteSite) == 1:
             diluteSite = diluteSite[0]
         else:
             print('Sites in the provided base structure matched the investigated one exactly')
             raise TypeError
-    elif baseStruct=='pure':
+    elif baseStruct == 'pure':
         baseStruct = struct.copy()
         for sp in set(baseStruct.species):
             baseStruct.replace_species({sp: 'A'})
@@ -136,14 +137,16 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
 
     for siteN in equivalentSitesMultiplicities:
         localAttributes = [local_generator.generate_local_attributes(siteN)]
-        attribute_list += localAttributes*equivalentSitesMultiplicities[siteN]
+        attribute_list += localAttributes * equivalentSitesMultiplicities[siteN]
 
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
+
 
 # A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
 # a function which computes the local environment attributes.
 class LocalAttributeGenerator:
-    def __init__(self, struct, local_env_func, nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(self, struct, local_env_func,
+                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
@@ -167,6 +170,7 @@ class LocalAttributeGenerator:
 
         return local_env_result
 
+
 # Calculates the attributes corresponding to the most common elements.
 def magpie_mode(attribute_properties, axis=0):
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
@@ -186,6 +190,7 @@ def magpie_mode(attribute_properties, axis=0):
         output += attribute_matrix[int(elem) - 1, :]
     return output / len(top_elements)
 
+
 def generate_descriptor(struct: Structure, baseStruct='pure'):
     diff_properties, attribute_properties = generate_voronoi_attributes(struct, baseStruct=baseStruct)
     properties = np.concatenate(
@@ -195,13 +200,13 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
              np.min(diff_properties, axis=0),
              np.max(diff_properties, axis=0),
              np.max(diff_properties, axis=0) - np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
-        np.stack(
-            (np.mean(attribute_properties, axis=0),
-             np.max(attribute_properties, axis=0) - np.min(attribute_properties, axis=0),
-             np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
-             np.max(attribute_properties, axis=0),
-             np.min(attribute_properties, axis=0),
-             magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+         np.stack(
+             (np.mean(attribute_properties, axis=0),
+              np.max(attribute_properties, axis=0) - np.min(attribute_properties, axis=0),
+              np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
+              np.max(attribute_properties, axis=0),
+              np.min(attribute_properties, axis=0),
+              magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
     # Normalize Bond Length properties.
     properties[6] /= properties[5]
     properties[7] /= properties[5]
@@ -213,13 +218,7 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
     # Renormalize the packing efficiency.
     properties[12] *= len(attribute_properties) / struct.volume
     # Calculate and insert stoichiometry attributes.
-    element_dict = {}
-    for composition in struct.species_and_occu:
-        for key, value in composition.get_el_amt_dict().items():
-            if key in element_dict:
-                element_dict[key] += value / len(struct.species_and_occu)
-            else:
-                element_dict[key] = value / len(struct.species_and_occu)
+    element_dict = struct.composition.fractional_composition.as_dict()
     position = 118
     for p in [10, 7, 5, 3, 2]:
         properties = np.insert(properties, position,
@@ -250,12 +249,15 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
     properties = properties.astype(np.float32)
     return properties
 
+
 def cite():
     return citation
 
+
 def profile(test='JVASP-10001', nRuns=10):
     if test == 'diluteNiAlloy':
-        print(f'KS2022 profiling/testing task will calculate a descriptor for a dilute Ni alloy {nRuns} times in series.')
+        print(
+            f'KS2022 profiling/testing task will calculate a descriptor for a dilute Ni alloy {nRuns} times in series.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": [[6.995692, 0.0, 0.0], [0.0, 6.995692, 0.0], [0.0, 0.0, 6.995692]], "a": 6.995692, "b": 6.995692, "c": 6.995692, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 342.36711365619243}, "sites": [{"species": [{"element": "Cr", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "label": "Cr", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.0, 0.5], "xyz": [0.0, 0.0, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.0], "xyz": [0.0, 3.497846, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.5], "xyz": [0.0, 3.497846, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.0], "xyz": [3.497846, 0.0, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.5], "xyz": [3.497846, 0.0, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.0], "xyz": [3.497846, 3.497846, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.5], "xyz": [3.497846, 3.497846, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.25, 0.0], "xyz": [1.748923, 1.748923, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.25, 0.5], "xyz": [1.748923, 1.748923, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.7500000000000001, 0.0], "xyz": [1.748923, 5.2467690000000005, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.7500000000000001, 0.5], "xyz": [1.748923, 5.2467690000000005, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.25, 0.0], "xyz": [5.2467690000000005, 1.748923, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.25, 0.5], "xyz": [5.2467690000000005, 1.748923, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.7500000000000001, 0.0], "xyz": [5.2467690000000005, 5.2467690000000005, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.7500000000000001, 0.5], "xyz": [5.2467690000000005, 5.2467690000000005, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.0, 0.25], "xyz": [1.748923, 0.0, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.0, 0.7500000000000001], "xyz": [1.748923, 0.0, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.5, 0.25], "xyz": [1.748923, 3.497846, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.5, 0.7500000000000001], "xyz": [1.748923, 3.497846, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.0, 0.25], "xyz": [5.2467690000000005, 0.0, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.0, 0.7500000000000001], "xyz": [5.2467690000000005, 0.0, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.5, 0.25], "xyz": [5.2467690000000005, 3.497846, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.5, 0.7500000000000001], "xyz": [5.2467690000000005, 3.497846, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.25, 0.25], "xyz": [0.0, 1.748923, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.25, 0.7500000000000001], "xyz": [0.0, 1.748923, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.7500000000000001, 0.25], "xyz": [0.0, 5.2467690000000005, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.7500000000000001, 0.7500000000000001], "xyz": [0.0, 5.2467690000000005, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.25, 0.25], "xyz": [3.497846, 1.748923, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.25, 0.7500000000000001], "xyz": [3.497846, 1.748923, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.7500000000000001, 0.25], "xyz": [3.497846, 5.2467690000000005, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.7500000000000001, 0.7500000000000001], "xyz": [3.497846, 5.2467690000000005, 5.2467690000000005], "label": "Ni", "properties": {}}], "@version": null}'
     else:
         print('Unrecognized test name.')
@@ -267,19 +269,22 @@ def profile(test='JVASP-10001', nRuns=10):
         f.writelines([f'{v}\n' for v in d])
     print('Done!')
 
+
 def profileParallel(test='JVASP-10001', nRuns=1000):
     from tqdm.contrib.concurrent import process_map
     if test == 'diluteNiAlloy':
-        print(f'KS2022 profiling/testing task will calculate a descriptor for a dilute Ni alloy {nRuns} times in parallel with 8 workers.')
+        print(
+            f'KS2022 profiling/testing task will calculate a descriptor for a dilute Ni alloy {nRuns} times in parallel with 8 workers.')
         matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": null, "lattice": {"matrix": [[6.995692, 0.0, 0.0], [0.0, 6.995692, 0.0], [0.0, 0.0, 6.995692]], "a": 6.995692, "b": 6.995692, "c": 6.995692, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 342.36711365619243}, "sites": [{"species": [{"element": "Cr", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "label": "Cr", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.0, 0.5], "xyz": [0.0, 0.0, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.0], "xyz": [0.0, 3.497846, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.5], "xyz": [0.0, 3.497846, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.0], "xyz": [3.497846, 0.0, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.5], "xyz": [3.497846, 0.0, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.0], "xyz": [3.497846, 3.497846, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.5], "xyz": [3.497846, 3.497846, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.25, 0.0], "xyz": [1.748923, 1.748923, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.25, 0.5], "xyz": [1.748923, 1.748923, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.7500000000000001, 0.0], "xyz": [1.748923, 5.2467690000000005, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.7500000000000001, 0.5], "xyz": [1.748923, 5.2467690000000005, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.25, 0.0], "xyz": [5.2467690000000005, 1.748923, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.25, 0.5], "xyz": [5.2467690000000005, 1.748923, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.7500000000000001, 0.0], "xyz": [5.2467690000000005, 5.2467690000000005, 0.0], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.7500000000000001, 0.5], "xyz": [5.2467690000000005, 5.2467690000000005, 3.497846], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.0, 0.25], "xyz": [1.748923, 0.0, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.0, 0.7500000000000001], "xyz": [1.748923, 0.0, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.5, 0.25], "xyz": [1.748923, 3.497846, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.25, 0.5, 0.7500000000000001], "xyz": [1.748923, 3.497846, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.0, 0.25], "xyz": [5.2467690000000005, 0.0, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.0, 0.7500000000000001], "xyz": [5.2467690000000005, 0.0, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.5, 0.25], "xyz": [5.2467690000000005, 3.497846, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.7500000000000001, 0.5, 0.7500000000000001], "xyz": [5.2467690000000005, 3.497846, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.25, 0.25], "xyz": [0.0, 1.748923, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.25, 0.7500000000000001], "xyz": [0.0, 1.748923, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.7500000000000001, 0.25], "xyz": [0.0, 5.2467690000000005, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.7500000000000001, 0.7500000000000001], "xyz": [0.0, 5.2467690000000005, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.25, 0.25], "xyz": [3.497846, 1.748923, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.25, 0.7500000000000001], "xyz": [3.497846, 1.748923, 5.2467690000000005], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.7500000000000001, 0.25], "xyz": [3.497846, 5.2467690000000005, 1.748923], "label": "Ni", "properties": {}}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.7500000000000001, 0.7500000000000001], "xyz": [3.497846, 5.2467690000000005, 5.2467690000000005], "label": "Ni", "properties": {}}], "@version": null}'
     else:
         print('Unrecognized test name.')
         return None
     s = Structure.from_dict(json.loads(matStr))
-    #s.make_supercell(scaling_matrix=[2,2,2])
+    # s.make_supercell(scaling_matrix=[2,2,2])
     sList = [s] * nRuns
     descList = process_map(generate_descriptor, sList, max_workers=8)
     print('Done!')
+
 
 if __name__ == "__main__":
     profile(test='diluteNiAlloy')
