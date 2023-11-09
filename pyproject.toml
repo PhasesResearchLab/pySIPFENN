@@ -42,7 +42,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "coremltools>=6.3",
+    "coremltools>=7.0",
     "onnxconverter_common>=1.13.0",
     "onnxsim==0.4.33"
 ]
