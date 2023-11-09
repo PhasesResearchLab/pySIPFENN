@@ -28,11 +28,11 @@ readme = "README.md"
 
 requires-python = ">=3.9"
 dependencies = [
-    "pymatgen>=2023.05.31",
+    "pymatgen>=2023.10.3",
     "torch>=2.0",
     "onnx2torch>=1.5.2",
     "onnx>=1.13.0",
-    "numpy>=1.22.0",
+    "numpy>=1.25.0",
     "tqdm>=4.65.0",
     "natsort>=8.3.0",
     "pymongo>=4.2",
