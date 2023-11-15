@@ -1,18 +1,22 @@
-# General Imports
+# Standard Library Imports
 import os
-import yaml
-
-import natsort
-from pySmartDL import SmartDL
 import csv
-import numpy as np
-from pymatgen.core import Structure
 import json
+from time import perf_counter
+from typing import List, Union, Dict
+from importlib import resources
+
+# Helper Imports
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
-from time import perf_counter
+import natsort
+from pySmartDL import SmartDL
 
-from importlib import resources
+# Scientific Computing Imports
+import numpy as np
+from pymatgen.core import Structure, Composition
+
+# Machine Learning Imports
 import torch
 import onnx2torch
 import onnx
