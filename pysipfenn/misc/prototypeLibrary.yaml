@@ -10,7 +10,6 @@
     1
     Direct
       0.00000   0.00000   0.00000
-
 - name: BCC
   origin: https://www.oqmd.org/materials/prototype/A2_W
   POSCAR: |
@@ -23,7 +22,6 @@
     1
     Direct
       0.00000   0.00000   0.00000
-
 - name: HCP
   origin: https://www.oqmd.org/materials/prototype/A3_Mg
   POSCAR: |
@@ -37,7 +35,6 @@
     Direct
       0.33333   0.66667   0.25000
       0.66667   0.33333   0.75000
-
 - name: Diamond
   origin: https://www.oqmd.org/materials/prototype/C(cF8)
   POSCAR: |
@@ -51,7 +48,6 @@
     Direct
       0.500000   0.500000   0.500000
       0.750000   0.750000   0.750000
-
 - name: DHCP
   origin: https://www.oqmd.org/materials/prototype/La
   POSCAR: |
@@ -67,7 +63,6 @@
       0.33333   0.66667   0.25000
       0.00000   0.00000   0.50000
       0.66667   0.33333   0.75000
-
 - name: Sn_A5
   origin: https://www.oqmd.org/materials/prototype/A5_Sn
   POSCAR: |
@@ -81,4 +76,3 @@
     Direct
       0.00000   0.00000   0.00000
       0.75000   0.25000   0.50000
-  
