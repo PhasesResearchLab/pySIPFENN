@@ -21,7 +21,12 @@ import torch
 import onnx2torch
 import onnx
 
-from typing import List, Union, Dict
+# YAML Handling Imports and Configuration
+from ruamel.yaml import YAML
+from ruamel.yaml.scalarstring import LiteralScalarString
+yaml_safeLoader=YAML(typ='safe')
+yaml_customDumper=YAML()
+yaml_customDumper.top_level_colon_align = True
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
@@ -145,7 +150,7 @@ class Calculator:
         """
         if customPath == 'default':
             with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
-                prototypes = yaml.safe_load(f)
+                prototypes = yaml_safeLoader.load(f)
         else:
             with open(customPath, 'r') as f:
                 prototypes = yaml_safeLoader.load(f)
