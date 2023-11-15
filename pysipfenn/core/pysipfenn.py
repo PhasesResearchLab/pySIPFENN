@@ -24,9 +24,6 @@ import onnx
 # YAML Handling Imports and Configuration
 from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import LiteralScalarString
-yaml_safeLoader=YAML(typ='safe')
-yaml_customDumper=YAML()
-yaml_customDumper.top_level_colon_align = True
 
 # Descriptor Generators
 from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
@@ -148,6 +145,8 @@ class Calculator:
         Returns:
             None
         """
+        yaml_safeLoader = YAML(typ='safe')
+
         if customPath == 'default':
             with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
                 prototypes = yaml_safeLoader.load(f)
@@ -180,6 +179,9 @@ class Calculator:
         Returns:
             None
         """
+        yaml_customDumper = YAML()
+        yaml_customDumper.top_level_colon_align = True
+
         self.parsePrototypeLibrary(customPath=customPath, printCustomLibrary=True)
         print(f'Now, {len(self.prototypeLibrary)} prototype structures are present into the prototype library. '
               f'Persisting them for future use.')
