@@ -1,5 +1,6 @@
 # General Imports
 import os
+import yaml
 
 import natsort
 from pySmartDL import SmartDL
@@ -12,7 +13,6 @@ from tqdm.contrib.concurrent import process_map
 from time import perf_counter
 
 from importlib import resources
-
 import torch
 import onnx2torch
 import onnx
@@ -80,6 +80,9 @@ class Calculator:
         else:
             print(f'Skipping model loading (autoLoad=False)')
 
+        self.prototypeLibrary = {}
+        self.parsePrototypeLibrary(verbose=verbose)
+
         self.toRun = []
         self.descriptorData = []
         self.predictions = []
@@ -120,6 +123,27 @@ class Calculator:
             else:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
+
+    def parsePrototypeLibrary(self, verbose=False) -> None:
+        """Parses the prototype library YAML file in the `misc` directory, interprets them into pymatgen Structure
+        objects, and stores them in the prototypeLibrary dict attribute of the Calculator object.
+
+        Args:
+            verbose: If True, prints the number of prototypes loaded.
+
+        Returns:
+            None
+        """
+        with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
+            prototypes = yaml.safe_load(f)
+        for prototype in prototypes:
+            self.prototypeLibrary.update({
+                prototype['name']: {
+                    'structure': Structure.from_str(prototype['POSCAR'], fmt='poscar')
+                }
+            })
+        if verbose:
+            print(f'Loaded {len(self.prototypeLibrary)} prototype structures from the prototype library.')
 
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
