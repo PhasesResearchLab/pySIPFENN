@@ -168,6 +168,36 @@ class Calculator:
         if verbose:
             print(f'{len(self.prototypeLibrary)} prototype structures present into the prototype library.')
 
+    def appendPrototypeLibrary(self, customPath: str) -> None:
+        """Parses a custom prototype library YAML file and appends it into the internal prototypeLibrary of the
+        pySIPFENN package. They will be persisted for future use and, by default, they will be loaded automatically
+        when instantiating the Calculator object.
+
+        Args:
+            customPath: Path to the prototype library YAML file to be appended to the internal prototypeLibrary of the
+                pySIPFENN package.
+
+        Returns:
+            None
+        """
+        self.parsePrototypeLibrary(customPath=customPath, printCustomLibrary=True)
+        print(f'Now, {len(self.prototypeLibrary)} prototype structures are present into the prototype library. '
+              f'Persisting them for future use.')
+        with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
+            # Restructutre the prototype library back to original format of a list of dictionaries
+            print(self.prototypeLibrary)
+            prototypeList = [
+                {'name': key,
+                 'origin': value['origin'],
+                 'POSCAR': LiteralScalarString(str(value['POSCAR']))
+                 }
+                for key, value in self.prototypeLibrary.items()]
+            print(prototypeList)
+            # Persist the prototype library
+            yaml_customDumper.dump(prototypeList, f)
+            print(f'Updated prototype library persisted to {f.name}')
+
+
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
         on disk, it is skipped. If a specific network is given, only that network is downloaded possibly overwriting
