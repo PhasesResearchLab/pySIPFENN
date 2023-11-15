@@ -128,7 +128,10 @@ class Calculator:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
 
-    def parsePrototypeLibrary(self, customPath: str = "default", verbose: bool = False) -> None:
+    def parsePrototypeLibrary(self,
+                              customPath: str = "default",
+                              verbose: bool = False,
+                              printCustomLibrary: bool = False) -> None:
         """Parses the prototype library YAML file in the `misc` directory, interprets them into pymatgen Structure
         objects, and stores them in the prototypeLibrary dict attribute of the Calculator object.
 
@@ -145,7 +148,10 @@ class Calculator:
                 prototypes = yaml.safe_load(f)
         else:
             with open(customPath, 'r') as f:
-                prototypes = yaml.safe_load(f)
+                prototypes = yaml_safeLoader.load(f)
+                if printCustomLibrary:
+                    for prototype in prototypes:
+                        print(f'{prototype["name"]}:\n{prototype["POSCAR"]}')
         for prototype in prototypes:
             self.prototypeLibrary.update({
                 prototype['name']: {
