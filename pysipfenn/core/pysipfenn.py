@@ -124,18 +124,24 @@ class Calculator:
                 print('\u292B ' + netName)
         self.network_list_available = detectedNets
 
-    def parsePrototypeLibrary(self, verbose=False) -> None:
+    def parsePrototypeLibrary(self, customPath: str = "default", verbose: bool = False) -> None:
         """Parses the prototype library YAML file in the `misc` directory, interprets them into pymatgen Structure
         objects, and stores them in the prototypeLibrary dict attribute of the Calculator object.
 
         Args:
-            verbose: If True, prints the number of prototypes loaded.
+            customPath: Path to the prototype library YAML file. Defaults to magic string 'default', which loads the
+                default prototype library included in the package in the `misc` directory.
+            verbose: If True, it prints the number of prototypes loaded.
 
         Returns:
             None
         """
-        with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
-            prototypes = yaml.safe_load(f)
+        if customPath == 'default':
+            with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
+                prototypes = yaml.safe_load(f)
+        else:
+            with open(customPath, 'r') as f:
+                prototypes = yaml.safe_load(f)
         for prototype in prototypes:
             self.prototypeLibrary.update({
                 prototype['name']: {
@@ -143,7 +149,7 @@ class Calculator:
                 }
             })
         if verbose:
-            print(f'Loaded {len(self.prototypeLibrary)} prototype structures from the prototype library.')
+            print(f'{len(self.prototypeLibrary)} prototype structures present into the prototype library.')
 
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
