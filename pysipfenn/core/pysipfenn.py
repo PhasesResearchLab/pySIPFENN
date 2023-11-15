@@ -160,7 +160,9 @@ class Calculator:
         for prototype in prototypes:
             self.prototypeLibrary.update({
                 prototype['name']: {
-                    'structure': Structure.from_str(prototype['POSCAR'], fmt='poscar')
+                    'POSCAR': prototype['POSCAR'],
+                    'structure': Structure.from_str(prototype['POSCAR'], fmt='poscar'),
+                    'origin': prototype['origin']
                 }
             })
         if verbose:
