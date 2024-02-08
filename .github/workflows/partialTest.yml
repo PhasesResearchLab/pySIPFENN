@@ -1,6 +1,10 @@
 name: Core Functions
 
-on: [push, pull_request]
+on: 
+  push:
+    paths:
+      - 'pysipfenn/**'
+  workflow_dispatch:
 
 jobs:
   coreTest:
