@@ -1,6 +1,10 @@
 name: Small Benchmarks
 
-on: [push]
+on: 
+  push:
+    paths:
+      - 'pysipfenn/descriptorDefinitions/**'
+  workflow_dispatch:
 
 jobs:
   benchmark:
