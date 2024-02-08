@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite our research article as:"
+authors:
+- family-names: "Krajewski"
+  given-names: "Adam M."
+  orcid: "https://orcid.org/0000-0002-2266-0099"
+- family-names: "Siegel"
+  given-names: "Jonathan"
+  orcid: "https://orcid.org/0000-0002-1493-4889"
+- family-names: "Jinhao"
+  given-names: "Xu"
+- family-names: "Liu"
+  given-names: "Zi-Kui"
+  orcid: "https://orcid.org/0000-0003-3346-3696"
+title: "Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks"
+doi: 10.1016/j.commatsci.2022.111254
+date-released: 2020-08-31
+url: "https://github.com/PhasesResearchLab/pySIPFENN"
