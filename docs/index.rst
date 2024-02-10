@@ -9,9 +9,9 @@ pySIPFENN
 
 |GitHub top language| |PyPI - Python Version| |GitHub license| |PyPI Version| |PyPI Downloads|
 
-|Commit Build Status| |Build Status|  |Coverage Status|
-
 |GitHub last commit| |GitHub last release| |GitHub commits since tagged version| |GitHub issues|
+
+|Full| |Linux| |MacM1| |MacIntel| |Windows| |Coverage Status|
 
 |Paper DOI| |Zenodo DOI|
 
@@ -31,13 +31,25 @@ pySIPFENN
     :target: https://pypi.org/project/pysipfenn/
     :alt: PyPI
 
-.. |Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yaml/badge.svg
+.. |Full| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yaml/badge.svg
     :alt: Build Status
-    :target: https://github.com/PhasesResearchLab/pySIPFENN
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yaml
+    
+.. |Linux| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_LinuxUbuntu.yaml/badge.svg
+    :alt: Linux Status 
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_LinuxUbuntu.yaml
 
-.. |Commit Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests.yaml/badge.svg
-    :alt: Commit Build Status
-    :target: https://github.com/PhasesResearchLab/pySIPFENN
+.. |MacM1| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml/badge.svg
+    :alt: Mac M1 Status 
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml
+
+.. |MacIntel| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacIntel.yaml/badge.svg
+    :alt: Mac M1 Status 
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacIntel.yaml
+
+.. |Windows| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_Windows.yaml/badge.svg
+    :alt: Windows Status 
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_Windows.yaml
 
 .. |Coverage Status| image:: https://codecov.io/gh/PhasesResearchLab/pySIPFENN/branch/main/graph/badge.svg?token=S2J0KR0WKQ
     :alt: Coverage Status
