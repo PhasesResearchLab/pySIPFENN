@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
     - main
+  push:
+    paths:
+      - '.github/workflows/fullTest.yaml'
   workflow_dispatch:
 
 jobs:

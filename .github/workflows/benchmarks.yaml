@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'pysipfenn/descriptorDefinitions/**'
+      - '.github/workflows/benchmarks.yaml'
   workflow_dispatch:
 
 jobs:
