@@ -31,11 +31,11 @@ pySIPFENN
     :target: https://pypi.org/project/pysipfenn/
     :alt: PyPI
 
-.. |Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yml/badge.svg
+.. |Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/fullTest.yaml/badge.svg
     :alt: Build Status
     :target: https://github.com/PhasesResearchLab/pySIPFENN
 
-.. |Commit Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/partialTest.yml/badge.svg
+.. |Commit Build Status| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests.yaml/badge.svg
     :alt: Commit Build Status
     :target: https://github.com/PhasesResearchLab/pySIPFENN
 
