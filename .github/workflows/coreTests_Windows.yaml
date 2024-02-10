@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'pysipfenn/**'
-      - '.github/workflows/coreTests.yaml'
+      - '.github/workflows/coreTests_Windows.yaml'
   workflow_dispatch:
 
 jobs:
@@ -12,9 +12,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
-        platform: [ubuntu-latest, macos-12, macos-14, windows-latest]
       fail-fast: false
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       
@@ -33,4 +32,4 @@ jobs:
           python -m pip install -e .
       - name: Test with pytest
         run: |
-          pytest --cov=pysipfenn --cov-report=xml
+          pytest
