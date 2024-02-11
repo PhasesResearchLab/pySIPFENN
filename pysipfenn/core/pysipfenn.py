@@ -1,5 +1,6 @@
 # General Imports
 import os
+import gc
 
 import natsort
 from pySmartDL import SmartDL
@@ -693,6 +694,17 @@ class Calculator:
                 for dd in self.descriptorData:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i += 1
+
+    def destroy(self) -> None:
+            """Deallocates all loaded models and clears all data from the Calculator object."""
+            self.loadedModels.clear()
+            self.toRun.clear()
+            self.descriptorData.clear()
+            self.predictions.clear()
+            self.inputFiles.clear()
+            gc.collect()
+            print("Calculator and all loaded models deallocated. All data cleared.")
+            del self
 
 
 def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
