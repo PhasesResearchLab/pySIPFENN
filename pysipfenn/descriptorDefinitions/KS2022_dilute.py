@@ -4,18 +4,13 @@ import math
 import time
 import numpy as np
 import os
-from pymatgen.core import Structure, Element
+from pymatgen.core import Structure, Element, PeriodicSite
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 import json
 from tqdm import tqdm
 from collections import Counter
-
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254'
-    ]
+from typing import List
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -27,7 +22,11 @@ attribute_matrix = attribute_matrix[:,
 
 # A prototype function which computes a weighted average over neighbors,
 # weighted by the area of the voronoi cell between them.
-def local_env_function(local_env, site, struct):
+def local_env_function(
+        local_env: dict,
+        site: PeriodicSite,
+        struct: Structure,
+) -> List[np.ndarray]:
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
         local_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -68,7 +67,7 @@ def local_env_function(local_env, site, struct):
         elemental_properties_attributes[1]]
 
 
-def findDilute(struct):
+def findDilute(struct: Structure) -> int:
     spoList = struct.species_and_occu
     spCount = dict(Counter(spoList))
     spDilute = [spoList.index(sp) for sp in spCount if spCount[sp] == 1]
@@ -80,7 +79,12 @@ def findDilute(struct):
         raise RuntimeError
 
 
-def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env_function):
+def generate_voronoi_attributes(
+        struct: Structure,
+        baseStruct: str = 'pure',
+        local_funct=local_env_function
+) -> (np.ndarray, np.ndarray):
+
     local_generator = LocalAttributeGenerator(struct, local_funct)
 
     # Generate a base structure of pure elemental solid or take one as input
@@ -99,7 +103,7 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
         baseStruct = struct.copy()
         for sp in set(baseStruct.species):
             baseStruct.replace_species({sp: 'A'})
-        # Find position of the 1 dilute atom and calculate output for it
+        # Find the position of the 1 dilute atom and calculate output for it
         diluteSite = findDilute(struct)
     else:
         raise TypeError
@@ -145,17 +149,20 @@ def generate_voronoi_attributes(struct, baseStruct='pure', local_funct=local_env
 # A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
 # a function which computes the local environment attributes.
 class LocalAttributeGenerator:
-    def __init__(self, struct, local_env_func,
-                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(
+            self,
+            struct: Structure,
+            local_env_func,
+            nn_generator: VoronoiNN = VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n], self.struct)
 
-    def generate_local_attributes_diluteSite(self, n):
+    def generate_local_attributes_diluteSite(self, n: int):
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         local_env_result = self.function(local_env, self.struct[n], self.struct)
 
@@ -172,7 +179,10 @@ class LocalAttributeGenerator:
 
 
 # Calculates the attributes corresponding to the most common elements.
-def magpie_mode(attribute_properties, axis=0):
+def magpie_mode(
+        attribute_properties,
+        axis: int = 0
+) -> np.ndarray:
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
@@ -191,7 +201,10 @@ def magpie_mode(attribute_properties, axis=0):
     return output / len(top_elements)
 
 
-def generate_descriptor(struct: Structure, baseStruct='pure'):
+def generate_descriptor(
+        struct: Structure,
+        baseStruct='pure'
+) -> np.ndarray:
     diff_properties, attribute_properties = generate_voronoi_attributes(struct, baseStruct=baseStruct)
     properties = np.concatenate(
         (np.stack(
@@ -250,11 +263,15 @@ def generate_descriptor(struct: Structure, baseStruct='pure'):
     return properties
 
 
-def cite():
-    return citation
+def cite() -> List[str]:
+    return [
+    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+    'Materials Science, Volume 208, 2022, 111254'
+    ]
 
 
-def profile(test='JVASP-10001', nRuns=10):
+def profile(test='JVASP-10001', nRuns=10) -> None:
     if test == 'diluteNiAlloy':
         print(
             f'KS2022 profiling/testing task will calculate a descriptor for a dilute Ni alloy {nRuns} times in series.')
@@ -270,7 +287,7 @@ def profile(test='JVASP-10001', nRuns=10):
     print('Done!')
 
 
-def profileParallel(test='JVASP-10001', nRuns=1000):
+def profileParallel(test='JVASP-10001', nRuns=1000) -> None:
     from tqdm.contrib.concurrent import process_map
     if test == 'diluteNiAlloy':
         print(
