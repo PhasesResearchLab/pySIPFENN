@@ -210,13 +210,21 @@ def generate_descriptor(struct: Structure,
     propHistory = []
     diffHistory = []
     allOccupations = []
-    maxDiff = 1
-    compositionDistance = 0
+    maxDiff = 5
+    compositionDistance = 1
     minOccupationCount = 0
-    properties = None
+    properties: np.ndarray = None
+    currentComposition: Composition = None
 
     if printProgress:
         print(f'#Atoms | Comp. Distance AVG | Convergence Crit. MAX | Occupation Count MIN')
+
+    if maxDiff < featureConvergenceCriterion:
+        raise AssertionError('Invalid convergence criteria (maxDiff < featureConvergenceCriterion).')
+    if compositionDistance < compositionConvergenceCriterion:
+        raise AssertionError('Invalid convergence criteria (compositionDistance > compositionConvergenceCriterion).')
+    if minOccupationCount > minimumElementOccurrences:
+        raise AssertionError('Invalid convergence criteria (minOccupationCount > minimumElementOccurrences).')
 
     while maxDiff > featureConvergenceCriterion \
             or compositionDistance > compositionConvergenceCriterion \
@@ -356,7 +364,8 @@ def generate_descriptor(struct: Structure,
                 'diffHistory': diffHistory,
                 'propHistory': propHistory,
                 'finalAtomsN': attribute_properties.shape[0],
-                'finalCompositionDistance': compositionDistance
+                'finalCompositionDistance': compositionDistance,
+                'finalComposition': currentComposition.fractional_composition
             }
         else:
             return properties
