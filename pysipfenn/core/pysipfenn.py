@@ -26,7 +26,9 @@ from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import LiteralScalarString
 
 # Descriptor Generators
-from pysipfenn.descriptorDefinitions import Ward2017, KS2022, KS2022_dilute
+from pysipfenn.descriptorDefinitions import (
+    Ward2017, KS2022, KS2022_dilute, KS2022_randomSolutions
+)
 
 # - add new ones here if extending the code
 
@@ -356,6 +358,73 @@ class Calculator:
                 return descList
             else:
                 raise ValueError('`baseStruct` must be (1) `pure`, (2) `Structure` or a list of them.')
+
+    def calculate_KS2022_randomSolutions(
+            self,
+            baseStruct: Union[str, List[str], Structure, List[Structure], List[Union[Composition, str]]],
+            compList: Union[str, List[str], Composition, List[Composition], List[Union[Composition, str]]],
+            minimumSitesPerExpansion: int = 50,
+            featureConvergenceCriterion: float = 0.005,
+            compositionConvergenceCriterion: float = 0.01,
+            minimumElementOccurrences: int = 10,
+            plotParameters: bool = False,
+            printProgress: bool = False,
+            mode: str = 'serial',
+            max_workers: int = 8) -> List[np.ndarray]:
+        """Calculates KS2022 descriptors corresponding to random solid solutions occupying base structure / lattice
+        sites for a list of compositions through method described in `descriptorDefinitions.KS2022_randomSolutions`
+        submodule. The results are stored in the descriptorData attribute. The function returns the list of descriptors
+        in numpy format as well.
+
+        Args:
+            baseStruct: The base structure to generate a random solid solution (RSS). It does _not_ need to be a simple
+                Bravis lattice, such as BCC lattice, but can be any `Structure` object or a list of them, if you need to
+                define them on per-case basis. In addition to `Structure` objects, you can use "magic" strings
+                corresponding to one of the structures in the library you can find under `pysipfenn.misc` directory or
+                loaded under `self.prototypeLibrary` attribute. The magic strings include, but are not limited to:
+                'BCC', 'FCC', 'HCP', 'DHCP', 'Diamond', and so on. You can invoke them by their name, e.g. `BCC`, or
+                by passing `self.prototypeLibrary['BCC']['structure']` directly. If you pass a list to `baseStruct`,
+                you are allowed to mix-and-match `Structure` objects and magic strings.
+            compList: The composition to populate the supercell with until KS2022 descriptor converges. You can use
+                pymatgen's `Composition` objects or strings of valid chemical formulas (symbol - atomic fraction pairs),
+                like 'Fe0.5Ni0.3Cr0.2', 'Fe50 Ni30 Cr20', or 'Fe5 Ni3 Cr2'. You can either pass a single entity, in
+                which case it will be used for all structures (use to run the same composition for different base
+                structures), or a list of entities, in which case pairs will be used in the order of the list. If you
+                pass a list to `compList`, you are allowed to mix-and-match `Composition` objects and composition
+                strings.
+            minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling
+                dimension-by-dimension) before it is used as expansion step/batch in each iteration of adding local
+                chemical environment information to the global ensemble.
+                The optimal value will depend on the number of species and their relative fractions in the composition.
+                Generally, low values (<20ish) will result in a slower convergence, as some extreme local chemical
+                environments will have strong influence on the global ensemble, and too high values (>150ish) will
+                result in a needlessly slow computation for not-complex compositions, as at least two iterations will
+                be processed. The default value is 50 and works well for simple cases.
+            featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration
+                (statistics based on the global ensemble of local chemical environments) and the previous iteration
+                (before last expansion) expressed as a fraction of the maximum value of each feature found in the OQMD
+                database at the time of SIPFENN creation (see `KS2022_randomSolutions/maxFeaturesInOQMD` array).
+                The default value is 0.01, corresponding to 1% of the maximum value.
+            compositionConvergenceCriterion: The maximum average difference between any element fraction belonging to
+                the current composition (net of all expansions) and the target composition (`comp`). The default value
+                is 0.01, corresponding to 1% deviation, which interpretation will depend on the number of elements
+                in the composition.
+            minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it
+                is considered converged. This setting prevents the algorithm from converging before very dilute elements
+                like C in low-carbon steel, have had a chance to occur. The default value is 10.
+            plotParameters: If True, the convergence history will be plotted using plotly. The default value is False,
+                but tracking them is recommended and will be accesiible in the `metas` attribute of the Calculator under
+                the key `RSS_convergence`.
+            printProgress: If True, the progress will be printed to the console. The default value is False.
+            mode: Mode of calculation. Options are `serial` (default) and `parallel`.
+            max_workers: Number of workers to use in parallel mode. Defaults to 8.
+
+        Returns:
+            A list of `numpy.ndarrays` containing the KS2022 descriptor, just like the ordinary `KS2022`. **Please note
+            the stochastic nature of this algorithm**. The result will likely vary slightly between runs and parameters,
+            so if convergence is critical, verify it with a test matrix of `minimumSitesPerExpansion`,
+            `featureConvergenceCriterion`, and `compositionConvergenceCriterion` values.
+        """
 
 
     def loadModels(self, network: str = 'all') -> None:
