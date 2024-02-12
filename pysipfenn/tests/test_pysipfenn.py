@@ -6,7 +6,7 @@ import pysipfenn
 from importlib import resources
 from natsort import natsorted
 
-from pymatgen.core import Structure
+from pymatgen.core import Structure, Composition
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
@@ -356,6 +356,37 @@ class TestCoreRSS(unittest.TestCase):
             self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
             self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
 
+    def test_descriptorCalculate_KS2022_randomSolution_parallel_multiple(self):
+        """Test successful execution of manu composition-structure pairs given in ordered lists of input."""
+        myBCC = self.c.prototypeLibrary['BCC']['structure']
+
+        with self.subTest(msg="Running multiple compositions occupying multiple prototypes"):
+            d2 = self.c.calculate_KS2022_randomSolutions(
+                ['FCC', myBCC, 'BCC', 'HCP'],
+                ['WMo', Composition('WMo'), 'FeNi', 'CrNi'],
+                mode='parallel',
+                max_workers=4)
+            self.assertEqual(len(d2), 4, "Four composition-structure pairs should be processed.")
+            for i in range(4):
+                self.assertEqual(len(d2[i]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertNotAlmostEquals(
+                float(d2[0][0]),
+                float(d2[1][0]),
+                places=6, msg="Coordination number (KS2022[0]) should be different for BCC and FCC.")
+            self.assertAlmostEqual(
+                float(d2[1][0]),
+                float(d2[2][0]),
+                places=6, msg="Coordination number (KS2022[0]) should be the same for both BCCs.")
+
+        with self.subTest(msg='Verify that the metadata was correctly recorded.'):
+            assert len(self.c.metas['RSS']) == 4, "There should be 4 metadata records."
+            for meta in self.c.metas['RSS']:
+                self.assertIn('diffHistory', meta)
+                self.assertIn('propHistory', meta)
+                self.assertIn('finalAtomsN', meta)
+                self.assertIn('finalCompositionDistance', meta)
+                self.assertIn('finalComposition', meta)
+                
 
 if __name__ == '__main__':
     unittest.main()
