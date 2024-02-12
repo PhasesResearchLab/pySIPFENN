@@ -97,7 +97,7 @@ class Calculator:
             print(f'*********  pySIPFENN Successfully Initialized  **********')
 
     def __str__(self):
-        '''Prints the status of the Calculator object.'''
+        """Prints the status of the `Calculator` object."""
         printOut = f'pySIPFENN Calculator Object. Version: {__version__}\n'
         printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-" * 80}\n'
         printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
@@ -115,10 +115,8 @@ class Calculator:
         return printOut
 
     def updateModelAvailability(self) -> None:
-        """
-            Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
-            current ONNX model definitions.
-        """
+        """Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
+        current ONNX model definitions."""
         with resources.files('pysipfenn.modelsSIPFENN') as p:
             all_files = os.listdir(p)
         detectedNets = []
@@ -145,7 +143,7 @@ class Calculator:
             verbose: If True, it prints the number of prototypes loaded. Defaults to False, but note that `Calculator`
                 class automatically initializes with verbose=True.
             printCustomLibrary: If True, it prints the name and POSCAR of each prototype being added to the prototype
-                library. Defaults to False.
+                library. Has no effect if customPath is 'default'. Defaults to False.
 
         Returns:
             None
@@ -162,10 +160,18 @@ class Calculator:
                     for prototype in prototypes:
                         print(f'{prototype["name"]}:\n{prototype["POSCAR"]}')
         for prototype in prototypes:
+            assert isinstance(prototype['name'], str), 'Prototype name must be a string.'
+            assert isinstance(prototype['POSCAR'], str), 'Prototype POSCAR must be a string.'
+            assert isinstance(prototype['origin'], str), 'Prototype origin must be a string.'
+            struct = Structure.from_str(prototype['POSCAR'], fmt='poscar')
+            assert struct.is_valid(), f'Invalid structure for prototype {prototype["name"]}'
+            assert struct.is_ordered, f'Unordered structure for prototype {prototype["name"]}. Make sure that the ' \
+                                        f'POSCAR file is in the direct format and that no prior randomization has ' \
+                                        f'been applied to the structure occupancies.'
             self.prototypeLibrary.update({
                 prototype['name']: {
                     'POSCAR': prototype['POSCAR'],
-                    'structure': Structure.from_str(prototype['POSCAR'], fmt='poscar'),
+                    'structure': struct,
                     'origin': prototype['origin']
                 }
             })
@@ -193,8 +199,8 @@ class Calculator:
 
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
-        on disk, it is skipped. If a specific network is given, only that network is downloaded possibly overwriting
-        the existing one. If the networks name is not recognized message is printed.
+        on disk, it is skipped. If a specific network is given, only that network is downloaded, possibly overwriting
+        the existing one. If the network name is not recognized, the message will be printed.
 
         Args:
             network: Name of the network to download. Defaults to 'all'.
@@ -799,10 +805,11 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
         # Restructutre the prototype library back to original format of a list of dictionaries
         print(prototypeLibrary)
         prototypeList = [
-            {'name': key,
-             'origin': value['origin'],
-             'POSCAR': LiteralScalarString(str(value['POSCAR']))
-             }
+            {
+                'name': key,
+                'origin': value['origin'],
+                'POSCAR': LiteralScalarString(str(value['POSCAR']))
+            }
             for key, value in prototypeLibrary.items()]
         print(prototypeList)
         # Persist the prototype library
