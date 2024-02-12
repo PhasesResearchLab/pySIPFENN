@@ -75,7 +75,9 @@ def findDilute(struct: Structure) -> int:
         return spDilute[0]
     else:
         print(
-            'Custom dilute structure descriptor calculation is defined only one dilute species in a single element matrix')
+            'The automated dilute structure descriptor calculation is defined only for cases where there is exactly ONE'
+            ' dilute species, which exists in a SINGLE component matrix. If you are using a multi-component system, '
+            'please provide a base `Structure` object manually.')
         raise RuntimeError
 
 
