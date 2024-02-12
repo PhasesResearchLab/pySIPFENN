@@ -170,6 +170,64 @@ class TestCore(unittest.TestCase):
             descList = self.c.calculate_KS2022(structList=testStructures, mode='parallel', max_workers=4)
             self.assertEqual(len(descList), len(testStructures))
 
+    def test_descriptorCalculate_KS2022_dilute_serial(self):
+        """Test succesful execution of the descriptorCalculate() method with KS2022_dilute in series based on an Al
+        prototype loaded from the default prototype library. A separate test for calculation accuracy is done in
+        test_KS2022.py"""
+        diluteStruct = self.c.prototypeLibrary['FCC']['structure'].copy()
+        diluteStruct.make_supercell([2, 2, 2])
+        diluteStruct.replace(0, 'Fe')
+        testStructures = [diluteStruct.copy()]*2
+        descList = self.c.calculate_KS2022_dilute(structList=testStructures, mode='serial')
+        self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+        for desc in descList:
+            self.assertListEqual(
+                desc.tolist(),
+                descList[0].tolist(),
+                "All descriptors should be equal for the same structure are the same."
+            )
+
+
+    def test_descriptorCalculate_KS2022_dilute_parallel(self):
+        """Test succesful execution of the descriptorCalculate() method with KS2022_dilute in parallel based on an Al
+        prototype loaded from the default prototype library. A separate test for calculation accuracy is done in
+        test_KS2022.py"""
+        with self.subTest(msg="Constructing dilute structures"):
+            diluteStruct = self.c.prototypeLibrary['FCC']['structure'].copy()
+            diluteStruct.make_supercell([2, 2, 2])
+            testStructures = []
+            for i in range(8):
+                tempStruct = diluteStruct.copy()
+                tempStruct.replace(i, 'Fe')
+                testStructures.append(tempStruct)
+
+        with self.subTest(msg="Running parallel calculation with default 'pure' base structure"):
+            descList = self.c.calculate_KS2022_dilute(structList=testStructures, mode='parallel', max_workers=4)
+            self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+
+        with self.subTest(msg="All descriptors should be equal for the same structure as sites are equivalent"):
+            temp0 = descList[0].tolist()
+            for desc in descList:
+                temp1 = desc.tolist()
+                for t0, t1 in zip(temp0, temp1):
+                    self.assertAlmostEqual(t0, t1, places=6)
+
+        with self.subTest(msg="Running parallel calculation with defined base structures"):
+            baseStructs = [diluteStruct.copy()]*8
+            descList = self.c.calculate_KS2022_dilute(
+                structList=testStructures,
+                baseStruct=baseStructs,
+                mode='parallel',
+                max_workers=4)
+            self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+
+        with self.subTest(msg="All descriptors should be equal for the same structure as sites are equivalent"):
+            for desc in descList:
+                temp1 = desc.tolist()
+                for t0, t1 in zip(temp0, temp1):
+                    self.assertAlmostEqual(t0, t1, places=6)
+
+
     def test_RunModels_Errors(self):
         '''Test that the runModels() and runModels_dilute() methods raise errors correctly when it is called with no
         models to run or with a descriptor handling that has not been implemented.
