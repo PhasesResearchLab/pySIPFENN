@@ -343,6 +343,19 @@ class TestCoreRSS(unittest.TestCase):
                 , places=6, msg="mean_NeighDiff_shell1_Number (KS2022[13]) should be different (1.0vs2.0)."
             )
 
+    def test_descriptorCalculate_KS2022_randomSolution_parallel_pair(self):
+        """Test successful execution of a composition-structure pair in parallel mode. Just for the input passing
+        validation."""
+
+        with self.subTest(msg="Running single composition-structure pair"):
+            d1 = self.c.calculate_KS2022_randomSolutions(
+                'BCC',
+                'FeNi',
+                mode='parallel',
+                max_workers=1)
+            self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
+            self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
+
 
 if __name__ == '__main__':
     unittest.main()
