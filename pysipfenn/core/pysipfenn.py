@@ -184,25 +184,11 @@ class Calculator:
         Returns:
             None
         """
-        yaml_customDumper = YAML()
-        yaml_customDumper.top_level_colon_align = True
 
-        self.parsePrototypeLibrary(customPath=customPath, printCustomLibrary=True)
+        self.parsePrototypeLibrary(customPath=customPath, printCustomLibrary=True, verbose=True)
         print(f'Now, {len(self.prototypeLibrary)} prototype structures are present into the prototype library. '
               f'Persisting them for future use.')
-        with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
-            # Restructutre the prototype library back to original format of a list of dictionaries
-            print(self.prototypeLibrary)
-            prototypeList = [
-                {'name': key,
-                 'origin': value['origin'],
-                 'POSCAR': LiteralScalarString(str(value['POSCAR']))
-                 }
-                for key, value in self.prototypeLibrary.items()]
-            print(prototypeList)
-            # Persist the prototype library
-            yaml_customDumper.dump(prototypeList, f)
-            print(f'Updated prototype library persisted to {f.name}')
+        overwritePrototypeLibrary(self.prototypeLibrary)
 
 
     def downloadModels(self, network: str = 'all') -> None:
@@ -801,3 +787,24 @@ def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
     ), axis=-1, dtype=np.float32)
 
     return ks2022
+
+def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
+    """Destructively overwrites the prototype library with a custom one. Used by the `appendPrototypeLibrary` function
+    to persist its changes. The other main use it to restore the default one to the original state based on a backup
+    made earlier (see tests for an example)."""
+    yaml_customDumper = YAML()
+    yaml_customDumper.top_level_colon_align = True
+
+    with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
+        # Restructutre the prototype library back to original format of a list of dictionaries
+        print(prototypeLibrary)
+        prototypeList = [
+            {'name': key,
+             'origin': value['origin'],
+             'POSCAR': LiteralScalarString(str(value['POSCAR']))
+             }
+            for key, value in prototypeLibrary.items()]
+        print(prototypeList)
+        # Persist the prototype library
+        yaml_customDumper.dump(prototypeList, f)
+        print(f'Updated prototype library persisted to {f.name}')
