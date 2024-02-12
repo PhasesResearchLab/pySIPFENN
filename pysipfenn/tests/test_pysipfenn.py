@@ -227,7 +227,6 @@ class TestCore(unittest.TestCase):
                 for t0, t1 in zip(temp0, temp1):
                     self.assertAlmostEqual(t0, t1, places=6)
 
-
     def test_RunModels_Errors(self):
         '''Test that the runModels() and runModels_dilute() methods raise errors correctly when it is called with no
         models to run or with a descriptor handling that has not been implemented.
@@ -291,6 +290,35 @@ class TestCore(unittest.TestCase):
         self.assertIn('pySIPFENN Calculator Object', printOut)
         self.assertIn('Models are located in', printOut)
         self.assertIn('Loaded Networks', printOut)
+
+
+class TestCoreRSS(unittest.TestCase):
+    """Test the high-level API functionality of the Calculator object in regard to random solution structures (RSS). It
+    does not test the accuracy, just all runtime modes and known physicality of the results (e.g., FCC should have
+    coordination number of `12`).
+
+    Note:
+        The execution of the descriptorCalculate() method with KS2022_randomSolution is done under coarse settings
+        (for speed reasons) and should not be used for any accuracy tests. A separate testing for calculation accuracy
+        against consistency and reference values is done in `test_KS2022_randomSolutions.py`.
+    """
+    def setUp(self):
+        self.c = pysipfenn.Calculator()
+        self.assertIsNotNone(self.c)
+
+    def test_descriptorCalculate_KS2022_randomSolution_serial_pair(self):
+        """Test successful execution of a composition-structure pair in series"""
+
+        with self.subTest(msg="Running single composition-structure pair"):
+            d1 = self.c.calculate_KS2022_randomSolutions(
+                'BCC',
+                'FeNi',
+                minimumSitesPerExpansion=16,
+                featureConvergenceCriterion=0.02,
+                compositionConvergenceCriterion=0.05,
+                mode='serial')
+            self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
+            self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
 
 
 if __name__ == '__main__':
