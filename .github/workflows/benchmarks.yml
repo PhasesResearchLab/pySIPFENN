@@ -7,9 +7,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
-        platform: [ubuntu-latest]
       fail-fast: false
-    runs-on: ${{ matrix.platform }}
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
       
