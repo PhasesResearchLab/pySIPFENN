@@ -30,7 +30,7 @@ jobs:
           python -m pip install -e .
       - name: Test with pytest
         run: |
-          pytest
+          pytest --durations=0
           
   testFullPython310:
     needs: coreTests
@@ -55,7 +55,7 @@ jobs:
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
-        run: pytest
+        run: pytest --durations=0
         env:
           MODELS_FETCHED: true
       
