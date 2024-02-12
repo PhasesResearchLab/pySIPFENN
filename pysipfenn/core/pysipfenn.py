@@ -374,7 +374,7 @@ class Calculator:
 
     def calculate_KS2022_randomSolutions(
             self,
-            baseStruct: Union[str, List[str], Structure, List[Structure], List[Union[Composition, str]]],
+            baseStructList: Union[str, Structure, List[str], List[Structure], List[Union[Composition, str]]],
             compList: Union[str, List[str], Composition, List[Composition], List[Union[Composition, str]]],
             minimumSitesPerExpansion: int = 50,
             featureConvergenceCriterion: float = 0.005,
@@ -390,7 +390,7 @@ class Calculator:
         in numpy format as well.
 
         Args:
-            baseStruct: The base structure to generate a random solid solution (RSS). It does _not_ need to be a simple
+            baseStructList: The base structure to generate a random solid solution (RSS). It does _not_ need to be a simple
                 Bravis lattice, such as BCC lattice, but can be any `Structure` object or a list of them, if you need to
                 define them on per-case basis. In addition to `Structure` objects, you can use "magic" strings
                 corresponding to one of the structures in the library you can find under `pysipfenn.misc` directory or
@@ -426,19 +426,91 @@ class Calculator:
                 is considered converged. This setting prevents the algorithm from converging before very dilute elements
                 like C in low-carbon steel, have had a chance to occur. The default value is 10.
             plotParameters: If True, the convergence history will be plotted using plotly. The default value is False,
-                but tracking them is recommended and will be accesiible in the `metas` attribute of the Calculator under
-                the key `RSS_convergence`.
+                but tracking them is recommended and will be accessible in the `metas` attribute of the Calculator under
+                the key `RSS`.
             printProgress: If True, the progress will be printed to the console. The default value is False.
             mode: Mode of calculation. Options are `serial` (default) and `parallel`.
             max_workers: Number of workers to use in parallel mode. Defaults to 8.
 
         Returns:
-            A list of `numpy.ndarrays` containing the KS2022 descriptor, just like the ordinary `KS2022`. **Please note
+            A list of `numpy.ndarray`s containing the KS2022 descriptor, just like the ordinary `KS2022`. **Please note
             the stochastic nature of this algorithm**. The result will likely vary slightly between runs and parameters,
             so if convergence is critical, verify it with a test matrix of `minimumSitesPerExpansion`,
             `featureConvergenceCriterion`, and `compositionConvergenceCriterion` values.
         """
+        # LIST-LIST: Assert that if both baseStruct and compList are lists, they have the same length
+        if isinstance(baseStructList, list) and isinstance(compList, list):
+            assert len(baseStructList) == len(compList), \
+                'baseStruct and compList must have the same length if both are lists. If you want to use the same ' \
+                'entity for all calculations, do not wrap it.'
 
+        # STRING / STRUCT handling and extension
+        if isinstance(baseStructList, str) or isinstance(baseStructList, Structure):
+            baseStructList = [baseStructList]
+            if isinstance(compList, list) and len(compList) > 1:
+                baseStructList = baseStructList * len(compList)
+        else:
+            assert isinstance(baseStructList, list), 'baseStruct must be a list if it is not a string or Structure.'
+
+        if isinstance(compList, str) or isinstance(compList, Composition):
+            compList = [compList]
+            if isinstance(baseStructList, list) and len(baseStructList) > 1:
+                compList = compList * len(baseStructList)
+        else:
+            assert isinstance(compList, list), 'compList must be a list if it is not a string or Composition.'
+
+        # LISTS of STRING / STRUCT
+        for i in range(len(baseStructList)):
+            assert isinstance(baseStructList[i], (str, Structure)), \
+                'baseStruct must be a list of strings or Structure objects.'
+            if isinstance(baseStructList[i], str):
+                baseStructList[i] = string2prototype(self, baseStructList[i])
+
+        for i in range(len(compList)):
+            assert isinstance(compList[i], (str, Composition)), \
+                'compList must be a list of strings or Composition objects.'
+            if isinstance(compList[i], str):
+                c = Composition(compList[i])
+                assert c.valid, f'Unrecognized composition string: {compList}. Please provide a valid composition ' \
+                                f'string, e.g. "Fe0.5Ni0.3Cr0.2", "Fe50 Ni30 Cr20", or "Fe5 Ni3 Cr2".'
+                compList[i] = c
+
+        assert len(baseStructList) == len(compList), 'baseStruct and compList must have the same length at this point.'
+        pairedInputAndSettings, descList, metaList = [], [], []
+
+        for i in range(len(baseStructList)):
+            pairedInputAndSettings.append(
+                (baseStructList[i],
+                 compList[i],
+                 minimumSitesPerExpansion,
+                 featureConvergenceCriterion,
+                 compositionConvergenceCriterion,
+                 minimumElementOccurrences,
+                 plotParameters,
+                 printProgress,
+                 True))
+
+        if mode == 'serial':
+            for base, comp, *settings in tqdm(pairedInputAndSettings):
+                desc, meta = KS2022_randomSolutions.generate_descriptor(base, comp, *settings)
+                descList.append(desc)
+                metaList.append(meta)
+
+        elif mode == 'parallel':
+            print(pairedInputAndSettings)
+            descList, metaList = zip(*process_map(
+                wrapper_KS2022_randomSolutions_generate_descriptor,
+                pairedInputAndSettings,
+                max_workers=max_workers
+            ))
+        else:
+            raise ValueError('Incorrect calculation mode selected. Must be either `serial` or `parallel`.')
+
+        if self.verbose:
+            print('Done!')
+        self.descriptorData = descList
+        self.metas['RSS'] = metaList
+        return descList
 
     def loadModels(self, network: str = 'all') -> None:
         """
@@ -903,7 +975,28 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
         yaml_customDumper.dump(prototypeList, f)
         print(f'Updated prototype library persisted to {f.name}')
 
-# WRAPPERS
+# HELPERS
+def string2prototype(c: Calculator, prototype: str) -> Structure:
+    """Converts a prototype string to a pymatgen Structure object.
 
+    Args:
+        c: Calculator object with the `prototypeLibrary`.
+        prototype: Prototype string.
+
+    Returns:
+        Structure object.
+    """
+    assert isinstance(prototype, str), 'Prototype string must be a string.'
+    assert prototype in c.prototypeLibrary, \
+        f'Unrecognized magic string for baseStruct: {prototype}. Please use one of the recognized magic ' \
+        f'strings: {list(c.prototypeLibrary.keys())} or provide a Structure object.'
+    s: Structure = c.prototypeLibrary[prototype]['structure']
+    assert s.is_valid(), f'Invalid structure: {s}'
+    return s
+
+# WRAPPERS
 def wrapper_KS2022_dilute_generate_descriptor(args):
     return KS2022_dilute.generate_descriptor(*args)
+
+def wrapper_KS2022_randomSolutions_generate_descriptor(args):
+    return KS2022_randomSolutions.generate_descriptor(*args)
