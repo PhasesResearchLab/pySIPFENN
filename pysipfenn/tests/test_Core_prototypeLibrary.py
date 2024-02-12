@@ -46,3 +46,53 @@ class TestPL(unittest.TestCase):
         with self.subTest(msg="Has correct formula"):
             self.assertEqual(fcc["structure"].formula, "Cu1")
 
+    def test_customPrototypeLoad(self):
+        """Test that a custom prototype can be loaded. Then test that a custom prototype can be appended to the default
+        library and stay there."""
+
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml') as f:
+            self.c.parsePrototypeLibrary(customPath=f, verbose=True, printCustomLibrary=True)
+
+        with self.subTest(msg="Custom prototype present with correct parse"):
+            self.assertTrue("NicePhase" in self.c.prototypeLibrary)
+            self.assertEqual(self.c.prototypeLibrary["NicePhase"]["origin"], "https://somecustomsource.org")
+
+        with self.subTest(msg="Nice phase is a valid pymatgen Structure"):
+            self.assertTrue(isinstance(self.c.prototypeLibrary["NicePhase"]["structure"], Structure))
+            self.assertTrue(self.c.prototypeLibrary["NicePhase"]["structure"].is_valid())
+            self.assertEqual(self.c.prototypeLibrary["NicePhase"]["structure"].formula, "U1")
+
+        with self.subTest(msg="FCC prototype still present"):
+            self.assertTrue("FCC" in self.c.prototypeLibrary)
+
+        with self.subTest(msg="Test that it does not affect the default prototype library"):
+            otherC = pysipfenn.Calculator(autoLoad=False)
+            self.assertTrue("NicePhase" not in otherC.prototypeLibrary)
+
+        # Create a backup of the default library
+        self.c = pysipfenn.Calculator(autoLoad=False)
+        backup = self.c.prototypeLibrary.copy()
+
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml') as f:
+            self.c.appendPrototypeLibrary(customPath=f)
+
+        with self.subTest(msg="Custom prototype present and valid in a different Calculator instance"):
+            otherC = pysipfenn.Calculator(autoLoad=False)
+            self.assertTrue("NicePhase" in otherC.prototypeLibrary)
+            self.assertEqual(otherC.prototypeLibrary["NicePhase"]["origin"], "https://somecustomsource.org")
+            self.assertTrue(isinstance(otherC.prototypeLibrary["NicePhase"]["structure"], Structure))
+            self.assertTrue(otherC.prototypeLibrary["NicePhase"]["structure"].is_valid())
+            self.assertEqual(otherC.prototypeLibrary["NicePhase"]["structure"].formula, "U1")
+
+        with self.subTest(msg="FCC/BCC/HCP prototype still present in a different Calculator instance"):
+            self.assertTrue("FCC" in otherC.prototypeLibrary)
+            self.assertTrue("BCC" in otherC.prototypeLibrary)
+            self.assertTrue("HCP" in otherC.prototypeLibrary)
+
+        with self.subTest(msg="Restore the original prototype library"):
+            pysipfenn.overwritePrototypeLibrary(backup)
+
+
+
+
+
