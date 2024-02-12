@@ -5,17 +5,12 @@ import numpy as np
 import os
 from pymatgen.core import Structure, Element, Composition
 from pymatgen.analysis.local_env import VoronoiNN
-import json
 from collections import Counter
 from typing import List, Union, Tuple
 import random
 from importlib import resources
-
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254'
-]
+from tqdm.contrib.concurrent import process_map
+import pysipfenn
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -194,7 +189,7 @@ def generate_descriptor(struct: Structure,
             descriptor. The default value is False.
 
     Returns: By default, a numpy array containing the KS2022 descriptor. Please note the stochastic nature of the
-    algorithm and that the result may vary slightly between runs and parameters. If returnMeta is True,
+    algorithm, and that the result may vary slightly between runs and parameters. If returnMeta is True,
     a tuple containing the descriptor and a dictionary containing the convergence history will be returned.
     """
 
@@ -327,13 +322,6 @@ def generate_descriptor(struct: Structure,
                       f'{"(init)":^21} | '
                       f'{minOccupationCount:^4}')
 
-    if returnMeta:
-        metaData = {'diffHistory': diffHistory,
-                    'propHistory': propHistory,
-                    'finalAtomsN': attribute_properties.shape[0],
-                    'finalCompositionDistance': compositionDistance
-                    }
-
     if plotParameters:
         import plotly.express as px
         import pandas as pd
@@ -359,7 +347,12 @@ def generate_descriptor(struct: Structure,
         assert properties.shape == (256,)
         assert isinstance(properties, np.ndarray)
         if returnMeta:
-            return properties, metaData
+            return properties, {
+                'diffHistory': diffHistory,
+                'propHistory': propHistory,
+                'finalAtomsN': attribute_properties.shape[0],
+                'finalCompositionDistance': compositionDistance
+            }
         else:
             return properties
     else:
@@ -368,7 +361,11 @@ def generate_descriptor(struct: Structure,
 
 def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citations
+    return [
+        'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+        'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+        'Materials Science, Volume 208, 2022, 111254'
+    ]
 
 
 def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
@@ -380,8 +377,8 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
     Returns:
         A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
         descriptor is used as a fingerprint to compare polymorphs of the same compound.
-
     """
+
     assert isinstance(descriptor, np.ndarray)
     assert descriptor.shape == (256,)
     descriptorSplit = np.split(descriptor, [68, 73, 93, 98, 113])
@@ -418,54 +415,44 @@ def profile(test: str = 'FCC',
         the descriptor and a dictionary containing the convergence history, or None. In either case, the descriptor
         will be persisted in `f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'` file.
     """
+    c = pysipfenn.Calculator(autoLoad=False)
 
-    if test == 'FCC':
-        print(
-            f'KS2022 Random Solid Solution profiling/testing task will calculate a descriptor for a random FCC alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[3.475145865948011, 0.0, 2.1279131306516942e-16], [5.588460777961125e-16, 3.475145865948011, 2.1279131306516942e-16], [0.0, 0.0, 3.475145865948011]], "pbc": [true, true, true], "a": 3.475145865948011, "b": 3.475145865948011, "c": 3.475145865948011, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 41.968081364279875}, "sites": [{"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.5], "xyz": [2.7942303889805623e-16, 1.7375729329740055, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.5], "xyz": [1.7375729329740055, 0.0, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.0], "xyz": [1.7375729329740057, 1.7375729329740055, 2.1279131306516942e-16], "properties": {}, "label": "Ni"}]}'
-    elif test == 'BCC':
-        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random BCC alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[2.863035498949916, 0.0, 1.75310362981713e-16], [4.60411223268961e-16, 2.863035498949916, 1.75310362981713e-16], [0.0, 0.0, 2.863035498949916]], "pbc": [true, true, true], "a": 2.863035498949916, "b": 2.863035498949916, "c": 2.863035498949916, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 23.468222587900303}, "sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Fe"}, {"species": [{"element": "Fe", "occu": 1}], "abc": [0.5, 0.5, 0.5], "xyz": [1.4315177494749582, 1.431517749474958, 1.4315177494749582], "properties": {}, "label": "Fe"}]}'
-    elif test == 'HCP':
-        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random HCP alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[1.4678659615336875, -2.54241842407729, 0.0], [1.4678659615336875, 2.54241842407729, 0.0], [0.0, 0.0, 4.64085615]], "pbc": [true, true, true], "a": 2.9357319230673746, "b": 2.9357319230673746, "c": 4.64085615, "alpha": 90.0, "beta": 90.0, "gamma": 120.00000000000001, "volume": 34.6386956150451}, "sites": [{"species": [{"element": "Ti", "occu": 1}], "abc": [0.3333333333333333, 0.6666666666666666, 0.25], "xyz": [1.4678659615336875, 0.8474728080257632, 1.1602140375], "properties": {}, "label": "Ti"}, {"species": [{"element": "Ti", "occu": 1}], "abc": [0.6666666666666667, 0.33333333333333337, 0.75], "xyz": [1.4678659615336878, -0.8474728080257634, 3.4806421125], "properties": {}, "label": "Ti"}]}'
-    else:
+    try:
+        s = c.prototypeLibrary[test]['structure']
+    except KeyError:
         raise NotImplementedError(f'Unrecognized test name: {test}')
 
     if nIterations == 1:
-        s = Structure.from_dict(json.loads(matStr))
         d, meta = generate_descriptor(s, comp, plotParameters=plotParameters, returnMeta=True)
         print(f"Got meta with :{meta.keys()} keys")
     elif nIterations > 1:
         print(f'Running {nIterations} iterations in parallel...')
-        s = Structure.from_dict(json.loads(matStr))
-        from tqdm.contrib.concurrent import process_map
         d = process_map(generate_descriptor,
                         [s for _ in range(nIterations)],
                         [comp for _ in range(nIterations)],
                         chunksize=1,
                         max_workers=8)
     else:
-        d = None
-
-    if d is None:
         print('No descriptors generated.')
         return None
+
+    name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
+    if nIterations == 1:
+        with open(name, 'w+') as f:
+            f.writelines([f'{v}\n' for v in d])
+        if returnDescriptorAndMeta:
+            return d, meta
     else:
-        name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
-        if nIterations == 1:
-            with open(name, 'w+') as f:
-                f.writelines([f'{v}\n' for v in d])
-            if returnDescriptorAndMeta:
-                return d, meta
-        else:
-            with open(name, 'w+') as f:
-                f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
-            return None
+        with open(name, 'w+') as f:
+            f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
+        return None
     print('Done!')
 
 
 if __name__ == "__main__":
+    print('You are running the KS2022_randomSolutions.py file directly. It is intended to be used as a module. '
+          'A profiling task will now commence, going over several cases. This will take a while.')
+
     profile(test='FCC', plotParameters=True)
     profile(test='BCC', plotParameters=True)
     profile(test='HCP', plotParameters=True)
