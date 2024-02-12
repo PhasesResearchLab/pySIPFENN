@@ -156,30 +156,29 @@ def generate_descriptor(struct: Structure,
                         printProgress: bool = True,
                         returnMeta: bool = False,
                         ) -> Union[np.ndarray, Tuple[np.ndarray, dict]]:
-    """Main functionality. Generates the KS2022 descriptor for a given composition randomly distributed on a given
-    structure until the convergence criteria are met. The descriptor is KS2022 which is compatible with all KS2022
-    models and approaches values that would be reached by infinite supercell size.
+    """**Main functionality.** Generates the KS2022 descriptor for a given composition randomly distributed on a given
+    structure until the convergence criteria are met. The descriptor is **KS2022** which is compatible with all KS2022
+    models. It approaches values that would be reached by infinite supercell size.
     
     Args:
-        struct: A pymatgen Structure object that will be used as the basis for the structure to be generated. It can
+        struct: A pymatgen `Structure` object that will be used as the basis for the structure to be generated. It can
             be occupied by any species without affecting the result since all will be replaced by the composition.
-        comp: A pymatgen Composition object that will be randomly distributed on the structure within accuracy
-            determined by the compositionConvergenceCriterion.
+        comp: A pymatgen `Composition` object that will be randomly distributed on the structure within accuracy
+            determined by the `compositionConvergenceCriterion`.
         minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling
-            dimension-by-dimension) before it will be used as expansion step in each iteration adding local chemical
+            dimension-by-dimension) before it is used as an expansion step in each iteration adding local chemical
             environment information to the global pool.
             Optimal value will depend on the number of species and their relative fractions in the composition.
             Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result
             in slower computation. The default value is 50.
-        featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration
-            (statistics based on the
-            global ensemble of local chemical environments) and the previous iteration (before last expansion)
-            expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of
-            SIPFENN creation (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the
-            maximum value.
+        featureConvergenceCriterion: **The maximum difference between any feature belonging to the current iteration
+            (statistics based on the global ensemble of local chemical environments) and the previous two iterations
+            (before the last expansion, and the one before that)** expressed as a fraction of the maximum value of each
+            structure-dependent KS2022 feature found in the OQMD database at the time of SIPFENN creation
+            (see `maxFeaturesInOQMD` array). The default value is 0.005, corresponding to 0.5% of the maximum value.
         compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the
-            current composition (all expansions) and the the target composition (comp). The default value is 0.01,
-            corresponding to deviation depending on the number of elements in the composition.
+            current composition (superposition of all expansions) and the target composition (comp). The default value
+            is 0.01, corresponding to deviation depending on the number of elements in the composition.
         minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
@@ -305,11 +304,16 @@ def generate_descriptor(struct: Structure,
         propHistory.append(properties)
         # Calculate the difference between the current step and the previous step and divide it by maximum value of
         # each feature found in OQMD to normalize the difference.
-        if len(propHistory) > 1:
+        if len(propHistory) > 2:
+            # Current iteration diff
             diff = np.subtract(properties, propHistory[-2])
             diff /= maxFeaturesInOQMD
             diffHistory.append(diff)
-            maxDiff = np.max(np.abs(diff))
+            # Calculate the additional diff to one level older iteration
+            diff2 = np.subtract(properties, propHistory[-3])
+            diff2 /= maxFeaturesInOQMD
+            # Calculate the maximum difference across both differences
+            maxDiff = max(np.concatenate((diff, diff2), axis=0))
             if printProgress:
                 print(f'{attribute_properties.shape[0]:^6} | '
                       f'{compositionDistance: 18.6f} | '
@@ -321,6 +325,7 @@ def generate_descriptor(struct: Structure,
                       f'{compositionDistance: 18.6f} | '
                       f'{"(init)":^21} | '
                       f'{minOccupationCount:^4}')
+    # ^^^ End of the long while-loop above
 
     if plotParameters:
         import plotly.express as px
