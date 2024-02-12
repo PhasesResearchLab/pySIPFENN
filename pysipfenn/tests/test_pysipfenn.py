@@ -320,6 +320,29 @@ class TestCoreRSS(unittest.TestCase):
             self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
             self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
 
+    def test_descriptorCalculate_KS2022_randomSolution_serial_multiple(self):
+        """Test successful execution (in series) of multiple compositions occupying the same FCC lattice."""
+        with self.subTest(msg="Running multiple compositions occupying the same FCC lattice"):
+            d2 = self.c.calculate_KS2022_randomSolutions(
+                'FCC',
+                ['FeNi', 'CrNi'],
+                minimumSitesPerExpansion=16,
+                featureConvergenceCriterion=0.02,
+                compositionConvergenceCriterion=0.05,
+                mode='serial')
+            self.assertEqual(len(d2), 2, "Two composition-structure pairs should be processed.")
+            self.assertEqual(len(d2[0]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertEqual(len(d2[1]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertAlmostEqual(
+                float(d2[0][0]),
+                float(d2[1][0])
+                , places=6, msg="Coordination number (KS2022[0]) should be the same (12) for both compositions.")
+            self.assertNotAlmostEquals(
+                float(d2[0][13]),
+                float(d2[1][13])
+                , places=6, msg="mean_NeighDiff_shell1_Number (KS2022[13]) should be different (1.0vs2.0)."
+            )
+
 
 if __name__ == '__main__':
     unittest.main()
