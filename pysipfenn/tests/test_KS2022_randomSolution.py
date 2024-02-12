@@ -29,7 +29,10 @@ class TestKSRandomSolution2022(unittest.TestCase):
         feature converges to near exactly the mean value with near-zero range (e.g. coordination number in BCC in case
         of ideal lattice positions).
         '''
-        testValues, meta = KS2022_randomSolutions.profile(test='BCC', returnDescriptorAndMeta=True, plotParameters=True)
+        testValues, meta = KS2022_randomSolutions.profile(
+            test='BCC',
+            returnDescriptorAndMeta=True,
+            plotParameters=True)
 
         for testValue, descriptorRange, descriptorMean, label in zip(
                 testValues,
