@@ -427,9 +427,15 @@ def profile(test: str = 'FCC',
     except KeyError:
         raise NotImplementedError(f'Unrecognized test name: {test}')
 
+    name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
+
     if nIterations == 1:
         d, meta = generate_descriptor(s, comp, plotParameters=plotParameters, returnMeta=True)
         print(f"Got meta with :{meta.keys()} keys")
+        with open(name, 'w+') as f:
+            f.writelines([f'{v}\n' for v in d])
+        if returnDescriptorAndMeta:
+            return d, meta
     elif nIterations > 1:
         print(f'Running {nIterations} iterations in parallel...')
         d = process_map(generate_descriptor,
@@ -437,20 +443,13 @@ def profile(test: str = 'FCC',
                         [comp for _ in range(nIterations)],
                         chunksize=1,
                         max_workers=8)
+        with open(name, 'w+') as f:
+            f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
+        return None
     else:
         print('No descriptors generated.')
         return None
 
-    name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
-    if nIterations == 1:
-        with open(name, 'w+') as f:
-            f.writelines([f'{v}\n' for v in d])
-        if returnDescriptorAndMeta:
-            return d, meta
-    else:
-        with open(name, 'w+') as f:
-            f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
-        return None
     print('Done!')
 
 
