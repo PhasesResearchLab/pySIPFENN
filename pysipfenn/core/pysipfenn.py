@@ -101,7 +101,8 @@ class Calculator:
     def __str__(self):
         """Prints the status of the `Calculator` object."""
         printOut = f'pySIPFENN Calculator Object. Version: {__version__}\n'
-        printOut += f'Models are located in:\n{resources.files("pysipfenn.modelsSIPFENN")}\n{"-" * 80}\n'
+        printOut += f'Models are located in:\n   {resources.files("pysipfenn.modelsSIPFENN")}\n'
+        printOut += f'Auxiliary files (incl. structure prototypes):\n   {resources.files("pysipfenn.misc")}\n{"-" * 80}\n'
         printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
         if len(self.inputFiles) > 0:
             printOut += f'Last files selected as input: {len(self.inputFiles)}\n'
@@ -125,9 +126,9 @@ class Calculator:
         for net, netName in zip(self.network_list, self.network_list_names):
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
-                print('\u2714 ' + netName)
+                print('✔ ' + netName)
             else:
-                print('\u292B ' + netName)
+                print('⨯ ' + netName)
         self.network_list_available = detectedNets
 
     def parsePrototypeLibrary(self,
