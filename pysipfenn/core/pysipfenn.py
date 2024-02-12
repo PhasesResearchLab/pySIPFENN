@@ -134,13 +134,18 @@ class Calculator:
                               customPath: str = "default",
                               verbose: bool = False,
                               printCustomLibrary: bool = False) -> None:
-        """Parses the prototype library YAML file in the `misc` directory, interprets them into pymatgen Structure
-        objects, and stores them in the prototypeLibrary dict attribute of the Calculator object.
+        """Parses the prototype library YAML file in the `misc` directory, interprets them into pymatgen `Structure`
+        objects, and stores them in the `self.prototypeLibrary` dict attribute of the Calculator object. You can use it
+        also to temporarily append a custom prototype library (by providing a path) which will live as long as the
+        Calculator. For permanent changes, use `appendPrototypeLibrary()`.
 
         Args:
-            customPath: Path to the prototype library YAML file. Defaults to magic string 'default', which loads the
+            customPath: Path to the prototype library YAML file. Defaults to the magic string 'default', which loads the
                 default prototype library included in the package in the `misc` directory.
-            verbose: If True, it prints the number of prototypes loaded.
+            verbose: If True, it prints the number of prototypes loaded. Defaults to False, but note that `Calculator`
+                class automatically initializes with verbose=True.
+            printCustomLibrary: If True, it prints the name and POSCAR of each prototype being added to the prototype
+                library. Defaults to False.
 
         Returns:
             None
@@ -168,9 +173,9 @@ class Calculator:
             print(f'{len(self.prototypeLibrary)} prototype structures present into the prototype library.')
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
-        """Parses a custom prototype library YAML file and appends it into the internal prototypeLibrary of the
-        pySIPFENN package. They will be persisted for future use and, by default, they will be loaded automatically
-        when instantiating the Calculator object.
+        """Parses a custom prototype library YAML file and permanently appends it into the internal prototypeLibrary
+        of the pySIPFENN package. They will be persisted for future use and, by default, they will be loaded
+        automatically when instantiating the Calculator object, similar to your custom models.
 
         Args:
             customPath: Path to the prototype library YAML file to be appended to the internal prototypeLibrary of the
