@@ -43,7 +43,7 @@ class TestKSRandomSolution2022(unittest.TestCase):
                 self.assertGreaterEqual(testValue, (0.98*descriptorMean)-descriptorRange-1e-6)
                 self.assertLessEqual(testValue, (1.02*descriptorMean)+descriptorRange+1e-6)
 
-        for field in ['diffHistory', 'propHistory', 'finalAtomsN', 'finalCompositionDistance']:
+        for field in ['diffHistory', 'propHistory', 'finalAtomsN', 'finalCompositionDistance', 'finalComposition']:
             with self.subTest(msg=f'{field} present in meta'):
                 self.assertIn(field, meta)
 
