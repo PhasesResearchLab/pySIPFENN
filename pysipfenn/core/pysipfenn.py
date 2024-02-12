@@ -303,7 +303,7 @@ class Calculator:
                                 structList: List[Structure],
                                 baseStruct: Union[str, List[Structure]] = 'pure',
                                 mode: str = 'serial',
-                                max_workers: int = 8) -> list:
+                                max_workers: int = 8) -> List[np.ndarray]:
         """Calculates KS2022 descriptors for a list of dilute structures (either based on pure elements and on custom
         base structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
         substantial compared to the KS2022 descriptor, which is more general and can be used on any structure. The
@@ -323,7 +323,7 @@ class Calculator:
             max_workers: Number of workers to use in parallel mode. Defaults to 8.
 
         Returns:
-            List of KS2022 descriptor (feature vector) for each structure.
+            List of KS2022 descriptor (feature vector) np.ndarray for each structure.
         """
 
         if baseStruct == 'pure' or isinstance(baseStruct, Structure):
@@ -333,8 +333,9 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
             elif mode == 'parallel':
-                descList = process_map(KS2022_dilute.generate_descriptor(baseStruct=baseStruct),
-                                       structList,
+                pairedInput = list(zip(structList, [baseStruct] * len(structList)))
+                descList = process_map(wrapper_KS2022_dilute_generate_descriptor,
+                                       pairedInput,
                                        max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
@@ -347,11 +348,15 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
             elif mode == 'parallel':
-                descList = process_map(KS2022_dilute.generate_descriptor,
-                                       structList, baseStruct, max_workers=max_workers)
+                pairedInput = list(zip(structList, baseStruct))
+                descList = process_map(wrapper_KS2022_dilute_generate_descriptor,
+                                       pairedInput, max_workers=max_workers)
                 print('Done!')
                 self.descriptorData = descList
                 return descList
+            else:
+                raise ValueError('`baseStruct` must be (1) `pure`, (2) `Structure` or a list of them.')
+
 
     def loadModels(self, network: str = 'all') -> None:
         """
@@ -770,7 +775,7 @@ class Calculator:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i += 1
 
-
+# UTILS
 def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
     """Converts a Ward 2017 descriptor to a KS2022 descriptor (which is its subset).
 
@@ -815,3 +820,8 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
         # Persist the prototype library
         yaml_customDumper.dump(prototypeList, f)
         print(f'Updated prototype library persisted to {f.name}')
+
+# WRAPPERS
+
+def wrapper_KS2022_dilute_generate_descriptor(args):
+    return KS2022_dilute.generate_descriptor(*args)
