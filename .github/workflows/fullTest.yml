@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   testPython309:
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
     steps:
@@ -37,7 +37,7 @@ jobs:
   
   testPython310:
     needs: testPython309
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       
@@ -64,7 +64,7 @@ jobs:
           
   testPython311:
     needs: testPython310
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       
