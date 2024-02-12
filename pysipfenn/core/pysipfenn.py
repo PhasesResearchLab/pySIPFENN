@@ -45,7 +45,11 @@ class Calculator:
         structure-informed descriptors (feature vectors) and predicting properties using models that utilize them.
 
         Args:
-            autoLoad: Automatically load all available models. Default: True.
+            autoLoad: Automatically load all available ML models based on the `models.json` file. This _will_ require
+                significant memory and time if they are available, so for featurization and other non-model-requiring
+                tasks, it is recommended to set this to False. Defaults to True.
+            verbose: Print initialization messages and several other non-critical messages during runtime procedures.
+                Defaults to True.
 
         Attributes:
             models: Dictionary with all model information based on the models.json file in the modelsSIPFENN
@@ -67,6 +71,7 @@ class Calculator:
                  verbose: bool = True):
         if verbose:
             print('*********  Initializing pySIPFENN Calculator  **********')
+            self.verbose = verbose
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
@@ -94,6 +99,9 @@ class Calculator:
         self.toRun = []
         self.descriptorData = []
         self.predictions = []
+        self.metas = {
+            'RSS': []
+        }
         self.inputFiles = []
         if verbose:
             print(f'*********  pySIPFENN Successfully Initialized  **********')
@@ -264,12 +272,12 @@ class Calculator:
         """
         if mode == 'serial':
             descList = [Ward2017.generate_descriptor(s) for s in tqdm(structList)]
-            print('Done!')
+            if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
         elif mode == 'parallel':
             descList = process_map(Ward2017.generate_descriptor, structList, max_workers=max_workers)
-            print('Done!')
+            if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
 
@@ -293,12 +301,12 @@ class Calculator:
         """
         if mode == 'serial':
             descList = [KS2022.generate_descriptor(s) for s in tqdm(structList)]
-            print('Done!')
+            if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
         elif mode == 'parallel':
             descList = process_map(KS2022.generate_descriptor, structList, max_workers=max_workers)
-            print('Done!')
+            if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
 
@@ -332,7 +340,8 @@ class Calculator:
         if baseStruct == 'pure' or isinstance(baseStruct, Structure):
             if mode == 'serial':
                 descList = [KS2022_dilute.generate_descriptor(s, baseStruct=baseStruct) for s in tqdm(structList)]
-                print('Done!')
+                if self.verbose:
+                    print('Done!')
                 self.descriptorData = descList
                 return descList
             elif mode == 'parallel':
@@ -340,21 +349,24 @@ class Calculator:
                 descList = process_map(wrapper_KS2022_dilute_generate_descriptor,
                                        pairedInput,
                                        max_workers=max_workers)
-                print('Done!')
+                if self.verbose:
+                    print('Done!')
                 self.descriptorData = descList
                 return descList
 
         elif isinstance(baseStruct, List) and len(baseStruct) == len(structList):
             if mode == 'serial':
                 descList = [KS2022_dilute.generate_descriptor(s, bs) for s, bs in tqdm(zip(structList, baseStruct))]
-                print('Done!')
+                if self.verbose:
+                    print('Done!')
                 self.descriptorData = descList
                 return descList
             elif mode == 'parallel':
                 pairedInput = list(zip(structList, baseStruct))
                 descList = process_map(wrapper_KS2022_dilute_generate_descriptor,
                                        pairedInput, max_workers=max_workers)
-                print('Done!')
+                if self.verbose:
+                    print('Done!')
                 self.descriptorData = descList
                 return descList
             else:
