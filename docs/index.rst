@@ -1,5 +1,5 @@
 .. image:: _static/SIPFENN_logo_small.png
-    :width: 300pt
+    :width: 250pt
     :alt: logo
     :align: center
 
@@ -23,7 +23,7 @@ pySIPFENN
     :alt: PyPI - Python Version
     :target: https://www.python.org/downloads/release/python-3100/
 
-.. |PyPI Version| image:: https://img.shields.io/pypi/v/pysipfenn
+.. |PyPI Version| image:: https://img.shields.io/pypi/v/pysipfenn?label=PyPI&color=green
     :target: https://pypi.org/project/pysipfenn/
     :alt: PyPI
 

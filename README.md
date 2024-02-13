@@ -1,9 +1,9 @@
 ## pySIPFENN
-![GitHub top language](https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pysipfenn)
+[![GitHub top language](https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn)](https://github.com/PhasesResearchLab/pySIPFENN)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pysipfenn)](https://pypi.org/project/pysipfenn)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL_v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-![PyPI](https://img.shields.io/pypi/v/pysipfenn)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/pysipfenn)
+[![PyPI - Version](https://img.shields.io/pypi/v/pysipfenn?label=PyPI&color=green)](https://pypi.org/project/pysipfenn)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/pysipfenn)](https://pypi.org/project/pysipfenn)
 
 [![Core Linux (Ubuntu)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_LinuxUbuntu.yaml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_LinuxUbuntu.yaml)
 [![Core Mac M1](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml/badge.svg)](https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml)
@@ -14,7 +14,6 @@
 
 [![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
 [![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
-
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg)](https://doi.org/10.5281/zenodo.7373089)
 
