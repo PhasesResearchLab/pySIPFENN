@@ -764,12 +764,90 @@ class Calculator:
 
         return self.predictions
 
-    def runFromDirectory(self,
-                         directory: str,
-                         descriptor: str,
-                         mode: str = 'serial',
-                         max_workers: int = 4
-                         ) -> List[list]:
+    def runModels_randomSolutions(
+            self,
+            descriptor: str,
+            baseStructList: Union[str, Structure, List[str], List[Structure], List[Union[Composition, str]]],
+            compList: Union[str, List[str], Composition, List[Composition], List[Union[Composition, str]]],
+            minimumSitesPerExpansion: int = 50,
+            featureConvergenceCriterion: float = 0.005,
+            compositionConvergenceCriterion: float = 0.01,
+            minimumElementOccurrences: int = 10,
+            plotParameters: bool = False,
+            printProgress: bool = False,
+            mode: str = 'serial',
+            max_workers: int = 8,
+        ) -> List[List[float]]:
+        """A top-level convenience wrapper for the ``calculate_KS2022_randomSolutions`` function. It passes all the
+        arguments to that function directly (except for ``descriptor`` and uses its result to run all applicable models.
+        The result is a list of predictions for all run networks.
+
+        Args:
+            descriptor: Descriptor to use for predictions. Must be one of the descriptors which support the random
+            solid solution structures (i.e. `*_randomSolutions`). See ``pysipfenn.descriptorDefinitions`` to see
+            available modules or add yours here. As of v0.15.0, the only available descriptor is
+            ``'KS2022'`` through its ``KS2022_randomSolutions`` submodule.
+            baseStructList: See ``calculate_KS2022_randomSolutions`` for details. You can mix-and-match ``Structure``
+                objects and magic strings, either individually (to use the same entity for all calculations) or in a
+                list.
+            compList: See ``calculate_KS2022_randomSolutions`` for details. You can mix-and-match ``Composition``
+                objects and composition strings, either individually (to use the same entity for all calculations)
+                or in a list.
+            minimumSitesPerExpansion: See ``calculate_KS2022_randomSolutions``.
+            featureConvergenceCriterion: See ``calculate_KS2022_randomSolutions``.
+            compositionConvergenceCriterion: See ``calculate_KS2022_randomSolutions``.
+            minimumElementOccurrences: See ``calculate_KS2022_randomSolutions``.
+            plotParameters: See ``calculate_KS2022_randomSolutions``.
+            printProgress: See ``calculate_KS2022_randomSolutions``.
+            mode: Computation mode. ``'serial'`` or ``'parallel'``. Default is ``'serial'``. Parallel mode is not
+                recommended for small datasets.
+
+        Returns:
+            List of predictions. They will correspond to the order of the networks in ``self.toRun`` established by the
+            ``findCompatibleModels()`` function. If a network is not available, it will not be included in the list.
+        """
+
+        self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
+        if len(self.toRun) == 0:
+            print('The list of models to run is empty. This may be caused by selecting a descriptor not '
+                  'defined/available, or if the selected descriptor does not correspond to any available network. '
+                  'Check spelling and invoke the downloadModels() function if you are using base models.')
+            raise AssertionError
+        else:
+            print(f'Running {self.toRun} models')
+
+        print('Calculating descriptors...')
+        if descriptor == 'KS2022':
+            self.descriptorData = self.calculate_KS2022_randomSolutions(
+                baseStructList=baseStructList,
+                compList=compList,
+                minimumSitesPerExpansion=minimumSitesPerExpansion,
+                featureConvergenceCriterion=featureConvergenceCriterion,
+                compositionConvergenceCriterion=compositionConvergenceCriterion,
+                minimumElementOccurrences=minimumElementOccurrences,
+                plotParameters=plotParameters,
+                printProgress=printProgress,
+                mode=mode,
+                max_workers=max_workers
+            )
+        else:
+            print('Descriptor handing not implemented. Check spelling.')
+            raise AssertionError
+
+        self.makePredictions(
+            models=self.loadedModels,
+            toRun=self.toRun,
+            dataInList=self.descriptorData)
+
+        return self.predictions
+
+    def runFromDirectory(
+            self,
+            directory: str,
+            descriptor: str,
+            mode: str = 'serial',
+            max_workers: int = 4
+    ) -> List[list]:
         """Runs all loaded models on a list of Structures it automatically imports from a specified directory. The
         directory must contain only atomic structures in formats such as ``'poscar'``, ``'cif'``, ``'json'``, ``'mcsqs'``, etc.,
         or a mix of these. The structures are automatically sorted using natsort library, so the order of the
