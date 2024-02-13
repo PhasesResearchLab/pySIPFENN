@@ -5,17 +5,12 @@ import numpy as np
 import os
 from pymatgen.core import Structure, Element, Composition
 from pymatgen.analysis.local_env import VoronoiNN
-import json
 from collections import Counter
 from typing import List, Union, Tuple
 import random
 from importlib import resources
-
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254'
-]
+from tqdm.contrib.concurrent import process_map
+import pysipfenn
 
 periodic_table_size = 112
 attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
@@ -161,30 +156,29 @@ def generate_descriptor(struct: Structure,
                         printProgress: bool = True,
                         returnMeta: bool = False,
                         ) -> Union[np.ndarray, Tuple[np.ndarray, dict]]:
-    """Main functionality. Generates the KS2022 descriptor for a given composition randomly distributed on a given
-    structure until the convergence criteria are met. The descriptor is KS2022 which is compatible with all KS2022
-    models and approaches values that would be reached by infinite supercell size.
+    """**Main functionality.** Generates the KS2022 descriptor for a given composition randomly distributed on a given
+    structure until the convergence criteria are met. The descriptor is **KS2022** which is compatible with all KS2022
+    models. It approaches values that would be reached by infinite supercell size.
     
     Args:
-        struct: A pymatgen Structure object that will be used as the basis for the structure to be generated. It can
+        struct: A pymatgen `Structure` object that will be used as the basis for the structure to be generated. It can
             be occupied by any species without affecting the result since all will be replaced by the composition.
-        comp: A pymatgen Composition object that will be randomly distributed on the structure within accuracy
-            determined by the compositionConvergenceCriterion.
+        comp: A pymatgen `Composition` object that will be randomly distributed on the structure within accuracy
+            determined by the `compositionConvergenceCriterion`.
         minimumSitesPerExpansion: The minimum number of sites that the base structure will be expanded to (doubling
-            dimension-by-dimension) before it will be used as expansion step in each iteration adding local chemical
+            dimension-by-dimension) before it is used as an expansion step in each iteration adding local chemical
             environment information to the global pool.
             Optimal value will depend on the number of species and their relative fractions in the composition.
             Generally, low values will result in slower convergence (<20ish) and too high values (>150ish) will result
             in slower computation. The default value is 50.
-        featureConvergenceCriterion: The maximum difference between any feature belonging to the current iteration
-            (statistics based on the
-            global ensemble of local chemical environments) and the previous iteration (before last expansion)
-            expressed as a fraction of the maximum value of each feature found in the OQMD database at the time of
-            SIPFENN creation (see maxFeaturesInOQMD array). The default value is 0.01, corresponding to 1% of the
-            maximum value.
+        featureConvergenceCriterion: **The maximum difference between any feature belonging to the current iteration
+            (statistics based on the global ensemble of local chemical environments) and the previous two iterations
+            (before the last expansion, and the one before that)** expressed as a fraction of the maximum value of each
+            structure-dependent KS2022 feature found in the OQMD database at the time of SIPFENN creation
+            (see `maxFeaturesInOQMD` array). The default value is 0.005, corresponding to 0.5% of the maximum value.
         compositionConvergenceCriterion: The maximum average difference between any element fraction belonging in the
-            current composition (all expansions) and the the target composition (comp). The default value is 0.01,
-            corresponding to deviation depending on the number of elements in the composition.
+            current composition (superposition of all expansions) and the target composition (comp). The default value
+            is 0.01, corresponding to deviation depending on the number of elements in the composition.
         minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
@@ -194,7 +188,7 @@ def generate_descriptor(struct: Structure,
             descriptor. The default value is False.
 
     Returns: By default, a numpy array containing the KS2022 descriptor. Please note the stochastic nature of the
-    algorithm and that the result may vary slightly between runs and parameters. If returnMeta is True,
+    algorithm, and that the result may vary slightly between runs and parameters. If returnMeta is True,
     a tuple containing the descriptor and a dictionary containing the convergence history will be returned.
     """
 
@@ -216,13 +210,21 @@ def generate_descriptor(struct: Structure,
     propHistory = []
     diffHistory = []
     allOccupations = []
-    maxDiff = 1
-    compositionDistance = 0
+    maxDiff = 5
+    compositionDistance = 1
     minOccupationCount = 0
-    properties = None
+    properties: np.ndarray = None
+    currentComposition: Composition = None
 
     if printProgress:
         print(f'#Atoms | Comp. Distance AVG | Convergence Crit. MAX | Occupation Count MIN')
+
+    if maxDiff < featureConvergenceCriterion:
+        raise AssertionError('Invalid convergence criteria (maxDiff < featureConvergenceCriterion).')
+    if compositionDistance < compositionConvergenceCriterion:
+        raise AssertionError('Invalid convergence criteria (compositionDistance > compositionConvergenceCriterion).')
+    if minOccupationCount > minimumElementOccurrences:
+        raise AssertionError('Invalid convergence criteria (minOccupationCount > minimumElementOccurrences).')
 
     while maxDiff > featureConvergenceCriterion \
             or compositionDistance > compositionConvergenceCriterion \
@@ -310,11 +312,16 @@ def generate_descriptor(struct: Structure,
         propHistory.append(properties)
         # Calculate the difference between the current step and the previous step and divide it by maximum value of
         # each feature found in OQMD to normalize the difference.
-        if len(propHistory) > 1:
+        if len(propHistory) > 2:
+            # Current iteration diff
             diff = np.subtract(properties, propHistory[-2])
             diff /= maxFeaturesInOQMD
             diffHistory.append(diff)
-            maxDiff = np.max(np.abs(diff))
+            # Calculate the additional diff to one level older iteration
+            diff2 = np.subtract(properties, propHistory[-3])
+            diff2 /= maxFeaturesInOQMD
+            # Calculate the maximum difference across both differences
+            maxDiff = max(np.concatenate((diff, diff2), axis=0))
             if printProgress:
                 print(f'{attribute_properties.shape[0]:^6} | '
                       f'{compositionDistance: 18.6f} | '
@@ -326,13 +333,7 @@ def generate_descriptor(struct: Structure,
                       f'{compositionDistance: 18.6f} | '
                       f'{"(init)":^21} | '
                       f'{minOccupationCount:^4}')
-
-    if returnMeta:
-        metaData = {'diffHistory': diffHistory,
-                    'propHistory': propHistory,
-                    'finalAtomsN': attribute_properties.shape[0],
-                    'finalCompositionDistance': compositionDistance
-                    }
+    # ^^^ End of the long while-loop above
 
     if plotParameters:
         import plotly.express as px
@@ -359,7 +360,13 @@ def generate_descriptor(struct: Structure,
         assert properties.shape == (256,)
         assert isinstance(properties, np.ndarray)
         if returnMeta:
-            return properties, metaData
+            return properties, {
+                'diffHistory': diffHistory,
+                'propHistory': propHistory,
+                'finalAtomsN': attribute_properties.shape[0],
+                'finalCompositionDistance': compositionDistance,
+                'finalComposition': currentComposition.fractional_composition
+            }
         else:
             return properties
     else:
@@ -368,7 +375,11 @@ def generate_descriptor(struct: Structure,
 
 def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citations
+    return [
+        'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+        'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+        'Materials Science, Volume 208, 2022, 111254'
+    ]
 
 
 def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
@@ -380,8 +391,8 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
     Returns:
         A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
         descriptor is used as a fingerprint to compare polymorphs of the same compound.
-
     """
+
     assert isinstance(descriptor, np.ndarray)
     assert descriptor.shape == (256,)
     descriptorSplit = np.split(descriptor, [68, 73, 93, 98, 113])
@@ -418,54 +429,43 @@ def profile(test: str = 'FCC',
         the descriptor and a dictionary containing the convergence history, or None. In either case, the descriptor
         will be persisted in `f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'` file.
     """
+    c = pysipfenn.Calculator(autoLoad=False)
 
-    if test == 'FCC':
-        print(
-            f'KS2022 Random Solid Solution profiling/testing task will calculate a descriptor for a random FCC alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[3.475145865948011, 0.0, 2.1279131306516942e-16], [5.588460777961125e-16, 3.475145865948011, 2.1279131306516942e-16], [0.0, 0.0, 3.475145865948011]], "pbc": [true, true, true], "a": 3.475145865948011, "b": 3.475145865948011, "c": 3.475145865948011, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 41.968081364279875}, "sites": [{"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.0, 0.5, 0.5], "xyz": [2.7942303889805623e-16, 1.7375729329740055, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.0, 0.5], "xyz": [1.7375729329740055, 0.0, 1.7375729329740055], "properties": {}, "label": "Ni"}, {"species": [{"element": "Ni", "occu": 1}], "abc": [0.5, 0.5, 0.0], "xyz": [1.7375729329740057, 1.7375729329740055, 2.1279131306516942e-16], "properties": {}, "label": "Ni"}]}'
-    elif test == 'BCC':
-        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random BCC alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[2.863035498949916, 0.0, 1.75310362981713e-16], [4.60411223268961e-16, 2.863035498949916, 1.75310362981713e-16], [0.0, 0.0, 2.863035498949916]], "pbc": [true, true, true], "a": 2.863035498949916, "b": 2.863035498949916, "c": 2.863035498949916, "alpha": 90.0, "beta": 90.0, "gamma": 90.0, "volume": 23.468222587900303}, "sites": [{"species": [{"element": "Fe", "occu": 1}], "abc": [0.0, 0.0, 0.0], "xyz": [0.0, 0.0, 0.0], "properties": {}, "label": "Fe"}, {"species": [{"element": "Fe", "occu": 1}], "abc": [0.5, 0.5, 0.5], "xyz": [1.4315177494749582, 1.431517749474958, 1.4315177494749582], "properties": {}, "label": "Fe"}]}'
-    elif test == 'HCP':
-        print('KS2022 Random Solution profiling/testing task will calculate the descriptor for a random HCP alloy.')
-        matStr = '{"@module": "pymatgen.core.structure", "@class": "Structure", "charge": 0, "lattice": {"matrix": [[1.4678659615336875, -2.54241842407729, 0.0], [1.4678659615336875, 2.54241842407729, 0.0], [0.0, 0.0, 4.64085615]], "pbc": [true, true, true], "a": 2.9357319230673746, "b": 2.9357319230673746, "c": 4.64085615, "alpha": 90.0, "beta": 90.0, "gamma": 120.00000000000001, "volume": 34.6386956150451}, "sites": [{"species": [{"element": "Ti", "occu": 1}], "abc": [0.3333333333333333, 0.6666666666666666, 0.25], "xyz": [1.4678659615336875, 0.8474728080257632, 1.1602140375], "properties": {}, "label": "Ti"}, {"species": [{"element": "Ti", "occu": 1}], "abc": [0.6666666666666667, 0.33333333333333337, 0.75], "xyz": [1.4678659615336878, -0.8474728080257634, 3.4806421125], "properties": {}, "label": "Ti"}]}'
-    else:
+    try:
+        s = c.prototypeLibrary[test]['structure']
+    except KeyError:
         raise NotImplementedError(f'Unrecognized test name: {test}')
 
+    name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
+
     if nIterations == 1:
-        s = Structure.from_dict(json.loads(matStr))
         d, meta = generate_descriptor(s, comp, plotParameters=plotParameters, returnMeta=True)
         print(f"Got meta with :{meta.keys()} keys")
+        with open(name, 'w+') as f:
+            f.writelines([f'{v}\n' for v in d])
+        if returnDescriptorAndMeta:
+            return d, meta
     elif nIterations > 1:
         print(f'Running {nIterations} iterations in parallel...')
-        s = Structure.from_dict(json.loads(matStr))
-        from tqdm.contrib.concurrent import process_map
         d = process_map(generate_descriptor,
                         [s for _ in range(nIterations)],
                         [comp for _ in range(nIterations)],
                         chunksize=1,
                         max_workers=8)
-    else:
-        d = None
-
-    if d is None:
-        print('No descriptors generated.')
+        with open(name, 'w+') as f:
+            f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
         return None
     else:
-        name = f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'
-        if nIterations == 1:
-            with open(name, 'w+') as f:
-                f.writelines([f'{v}\n' for v in d])
-            if returnDescriptorAndMeta:
-                return d, meta
-        else:
-            with open(name, 'w+') as f:
-                f.writelines([f'{",".join([str(v) for v in di])}\n' for di in d])
-            return None
+        print('No descriptors generated.')
+        return None
+
     print('Done!')
 
 
 if __name__ == "__main__":
+    print('You are running the KS2022_randomSolutions.py file directly. It is intended to be used as a module. '
+          'A profiling task will now commence, going over several cases. This will take a while.')
+
     profile(test='FCC', plotParameters=True)
     profile(test='BCC', plotParameters=True)
     profile(test='HCP', plotParameters=True)

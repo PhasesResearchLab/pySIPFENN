@@ -1,0 +1,78 @@
+- name: FCC
+  origin: https://www.oqmd.org/materials/prototype/A1_Cu
+  POSCAR: |
+    A1_Cu
+    1.0
+      0.00000   1.80750   1.80750
+      1.80750   0.00000   1.80750
+      1.80750   1.80750   0.00000
+    Cu
+    1
+    Direct
+      0.00000   0.00000   0.00000
+- name: BCC
+  origin: https://www.oqmd.org/materials/prototype/A2_W
+  POSCAR: |
+    W
+    1.0
+     -1.58250   1.58250   1.58250
+      1.58250  -1.58250   1.58250
+      1.58250   1.58250  -1.58250
+    W
+    1
+    Direct
+      0.00000   0.00000   0.00000
+- name: HCP
+  origin: https://www.oqmd.org/materials/prototype/A3_Mg
+  POSCAR: |
+    Mg
+    1.0
+      3.20900   0.00000   0.00000
+     -1.60450   2.77907   0.00000
+      0.00000   0.00000   5.21100
+    Mg
+    2
+    Direct
+      0.33333   0.66667   0.25000
+      0.66667   0.33333   0.75000
+- name: Diamond
+  origin: https://www.oqmd.org/materials/prototype/C(cF8)
+  POSCAR: |
+    Si
+    1.0
+      0.000000   2.732954   2.732954
+      2.732954   0.000000   2.732954
+      2.732954   2.732954   0.000000
+    Si
+    2
+    Direct
+      0.500000   0.500000   0.500000
+      0.750000   0.750000   0.750000
+- name: DHCP
+  origin: https://www.oqmd.org/materials/prototype/La
+  POSCAR: |
+    Nd
+    1.0
+      3.68789   0.00000   0.00000
+     -1.84394   3.19380   0.00000
+      0.00000   0.00000  11.88128
+    Nd
+    4
+    Direct
+      0.00000   0.00000   0.00000
+      0.33333   0.66667   0.25000
+      0.00000   0.00000   0.50000
+      0.66667   0.33333   0.75000
+- name: Sn_A5
+  origin: https://www.oqmd.org/materials/prototype/A5_Sn
+  POSCAR: |
+    Sn
+    1.0
+     -2.91550   2.91550   1.59100
+      2.91550  -2.91550   1.59100
+      2.91550   2.91550  -1.59100
+    Sn
+    2
+    Direct
+      0.00000   0.00000   0.00000
+      0.75000   0.25000   0.50000

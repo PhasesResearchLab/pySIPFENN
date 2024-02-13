@@ -15,22 +15,22 @@ except ModuleNotFoundError as e:
 
 class ONNXExporter:
     """Export models to the ONNX format (what they ship in by default) to allow (1) exporting modified pySIPFENN models,
-    (2) simplify the models using ONNX optimizer, and (3) convert them to FP16 precision, cutting the size in half.
+    (2) simplify the models using ONNX optimizer, and (3) convert them to `FP16` precision, cutting the size in half.
 
     Args:
-        calculator: A calculator object with loaded models that has loaded PyTorch models (happens automatically
-        when the autoLoad argument is kept to its default value of True when initializing the Calculator). During the
+        calculator: A ``Calculator`` object with loaded models that has loaded PyTorch models (happens automatically
+        when the ``autoLoad`` argument is kept to its default value of ``True`` when initializing the Calculator). During the
         initialization, the loaded PyTorch models are converted back to ONNX (in memory) to be then either adjusted or
         persisted to disk.
 
     Attributes:
-        calculator: A calculator object with ONNX loaded models.
-        simplifiedDict: A dictionary of models that have been simplified.
-        fp16Dict: A dictionary of models that have been converted to FP16.
+        calculator: A Calculator object with ONNX loaded models.
+        simplifiedDict: A boolean dictionary of models that have been simplified.
+        fp16Dict: A boolean dictionary of models that have been converted to FP16.
     """
 
     def __init__(self, calculator: Calculator):
-        """Initialize the ONNXExporter using a calculator object."""
+        """Initialize the ``ONNXExporter`` using a calculator object."""
         self.simplifiedDict = {model: False for model in calculator.loadedModels.keys()}
         self.fp16Dict = {model: False for model in calculator.loadedModels.keys()}
         self.calculator = calculator
@@ -80,7 +80,7 @@ class ONNXExporter:
         """Simplify a loaded model using the ONNX optimizer.
 
         Args:
-            model: The name of the model to simplify (must be loaded in the Calculator).
+            model: The name of the model to simplify (must be loaded in the ``Calculator``).
 
         Returns:
             None
@@ -100,11 +100,11 @@ class ONNXExporter:
             self.simplify(model)
         print('*****  Done simplifying all models!  *****')
 
-    def toFP16(self, model: str):
+    def toFP16(self, model: str) -> None:
         """Convert a loaded model to FP16 precision.
 
         Args:
-            model: The name of the model to convert to FP16 (must be loaded in the Calculator).
+            model: The name of the model to convert to FP16 (must be loaded in the ``Calculator``).
 
         Returns:
             None
@@ -124,11 +124,13 @@ class ONNXExporter:
             self.toFP16(model)
         print('*****  Done converting all models to FP16!  *****')
 
-    def export(self, model: str):
-        """Export a loaded model to ONNX format.
+    def export(self, model: str, append: str = '') -> None:
+        """Export a loaded model to ``ONNX``format.
 
         Args:
-            model: The name of the model to export (must be loaded in the Calculator).
+            model: The name of the model to export (must be loaded in the ``Calculator``).
+            append: A string to append to the exported model name after the model name, simplification marker, and
+                FP16 marker. Useful for adding a version number or other information to the exported model name.
 
         Returns:
             None
@@ -141,25 +143,29 @@ class ONNXExporter:
             name += '_simplified'
         if self.fp16Dict[model]:
             name += '_fp16'
+        if append:
+            name += f'_{append}'
         name += '.onnx'
         onnx.save(loadedModel, name)
         print(f'--> Exported as {name}', flush=True)
 
-    def exportAll(self):
-        """Export all loaded models to ONNX format with the export function."""
+    def exportAll(self, append: str = '') -> None:
+        """Export all loaded models to ``ONNX`` format with the export function. ``append`` string can be passed to the export
+        function to append to the exported model name.
+        """
         for model in tqdm(self.calculator.loadedModels):
-            self.export(model)
+            self.export(model, append=append)
         print('*****  Done exporting all models!  *****')
 
 
 class TorchExporter:
-    """Export models to the PyTorch PT format to allow for easy loading and inference in PyTorch in other projects.
+    """Export models to the ``PyTorch PT`` format to allow for easy loading and inference in PyTorch in other projects.
 
     Args:
-        calculator: A calculator object with loaded models.
+        calculator: A ``Calculator`` object with loaded models.
 
     Attributes:
-        calculator: A calculator object with loaded models.
+        calculator: A ``Calculator`` object with loaded models.
     """
     def __init__(self, calculator: Calculator):
         """Initialize the TorchExporter with a calculator object that has loaded models."""
@@ -167,14 +173,16 @@ class TorchExporter:
         assert len(self.calculator.loadedModels) > 0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized TorchExporter with models: {list(self.calculator.loadedModels.keys())}')
 
-    def export(self, model: str):
-        """Export a loaded model to PyTorch PT format. Models are exported in eval mode (no dropout) and saved in the
+    def export(self, model: str, append: str = '') -> None:
+        """Export a loaded model to ``PyTorch PT`` format. Models are exported in eval mode (no dropout) and saved in the
         current working directory.
 
         Args:
-            model: The name of the model to export (must be loaded in the Calculator) and it must have a descriptor
-                (Ward2017 or KS2022) defined in the calculator.models dictionary created when the Calculator was
+            model: The name of the model to export (must be loaded in the ``Calculator``) and it must have a descriptor
+                (``Ward2017`` or ``KS2022``) defined in the ``Calculator.models`` dictionary created when the ``Calculator`` was
                 initialized.
+            append: A string to append to the exported model name after the model name. Useful for adding a version
+                number or other information to the exported model name.
 
         Returns:
             None
@@ -200,43 +208,47 @@ class TorchExporter:
 
         tracedModel = torch.jit.trace(loadedModel, inputs_tracer)
 
-        name = f"{model}.pt"
+        name = f"{model}{f'_{append}' if append else ''}.pt"
         tracedModel.save(name)
         print(f'--> Exported as {name}', flush=True)
 
-    def exportAll(self):
-        """Export all loaded models to PyTorch PT format with the export function."""
+    def exportAll(self, append: str = '') -> None:
+        """Exports all loaded models to PyTorch PT format with the export function. `append` can be passed to the export
+        function
+        """
         for model in tqdm(self.calculator.loadedModels):
-            self.export(model)
+            self.export(model, append=append)
         print('*****  Done exporting all models!  *****')
 
 
 class CoreMLExporter:
-    """Export models to the CoreML format to allow for easy loading and inference in CoreML in other projects,
+    """Export models to the ``CoreML`` format to allow for easy loading and inference in ``CoreML`` in other projects,
     particularly valuable for Apple devices, as pySIPFENN models can be run using the Neural Engine accelerator
     with minimal power consumption and neat optimizations.
 
     Args:
-        calculator: A calculator object with loaded models.
+        calculator: A ``Calculator`` object with loaded models.
 
     Attributes:
-        calculator: A calculator object with loaded models.
+        calculator: A ``Calculator`` object with loaded models.
     """
     def __init__(self, calculator: Calculator):
         self.calculator = calculator
         assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')
 
-    def export(self, model: str):
-        """Export a loaded model to CoreML format. Models will be saved as {model}.mlpackage in the current working
-        directory. Models will be annotated with the feature vector name (Ward2017 or KS2022) and the output will be
+    def export(self, model: str, append: str = '') -> None:
+        """Export a loaded model to ``CoreML`` format. Models will be saved as ``{model}.mlpackage`` in the current working
+        directory. Models will be annotated with the feature vector name (``Ward2017`` or ``KS2022``) and the output will be
         named "property". The latter behavior will be adjusted in the future when model output name and unit will be
         added to the model JSON metadata.
 
         Args:
-            model: The name of the model to export (must be loaded in the Calculator) and it must have a descriptor
-                (Ward2017 or KS2022) defined in the calculator.models dictionary created when the Calculator was
+            model: The name of the model to export (must be loaded in the ``Calculator``) and it must have a descriptor
+                (``Ward2017`` or ``KS2022``) defined in the ``calculator.models`` dictionary created when the ``Calculator`` was
                 initialized.
+            append: A string to append to the exported model name after the model name. Useful for adding a version
+                number or other information to the exported model name.
 
         Returns:
             None
@@ -270,12 +282,14 @@ class CoreMLExporter:
             inputs=inputs_converter,
             outputs=[ct.TensorType(name='property')]
         )
-        name = f"{model}.mlpackage"
+        name = f"{model}{f'_{append}' if append else ''}.mlpackage"
         coreml_model.save(name)
         print(f'--> Exported as {name}', flush=True)
 
-    def exportAll(self):
-        """Export all loaded models to CoreML format with the export function."""
+    def exportAll(self, append: str = '') -> None:
+        """Export all loaded models to ``CoreML`` format with the export function. ``append`` can be passed to the export
+        function to append to all exported model names.
+        """
         for model in tqdm(self.calculator.loadedModels):
-            self.export(model)
+            self.export(model, append=append)
         print('*****  Done exporting all models!  *****')

@@ -6,7 +6,7 @@ import pysipfenn
 from importlib import resources
 from natsort import natsorted
 
-from pymatgen.core import Structure
+from pymatgen.core import Structure, Composition
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
 
@@ -64,7 +64,7 @@ class TestCore(unittest.TestCase):
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
         else:
-            print('Did not detect any Ward2017 models to run')
+            raise ValueError('Did not detect any Ward2017 models to run')
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_KS2022(self):
@@ -79,7 +79,7 @@ class TestCore(unittest.TestCase):
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'KS2022')
         else:
-            print('Did not detect any KS2022 models to run')
+            raise ValueError('Did not detect any KS2022 models to run')
 
         with self.subTest(msg='Test Calculator printout after predictions'):
             printOut = str(self.c)
@@ -128,7 +128,26 @@ class TestCore(unittest.TestCase):
                 self.assertEqual(val1, val2)
 
         else:
-            print('Did not detect any KS2022 models to run')
+            raise ValueError('Did not detect any KS2022 models to run')
+
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    def testFromPrototypes_KS2022_randomSolution(self):
+        """Quick runtime test of the top level API for random solution structures. It does not test the accuracy, as
+        that is delegated elsewhere."""
+
+        self.c.updateModelAvailability()
+        toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
+        if toRun:
+            preds = self.c.runModels_randomSolutions(
+                descriptor='KS2022',
+                baseStructList='FCC',
+                compList='AuCu',
+                compositionConvergenceCriterion=0.05,
+                featureConvergenceCriterion=0.02,
+                minimumSitesPerExpansion=8,
+                mode='serial')
+        else:
+            raise ValueError('Did not detect any KS2022 models to run')
 
     def test_descriptorCalculate_Ward2017_serial(self):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in series. A separate test for
@@ -169,6 +188,63 @@ class TestCore(unittest.TestCase):
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             descList = self.c.calculate_KS2022(structList=testStructures, mode='parallel', max_workers=4)
             self.assertEqual(len(descList), len(testStructures))
+
+    def test_descriptorCalculate_KS2022_dilute_serial(self):
+        """Test succesful execution of the descriptorCalculate() method with KS2022_dilute in series based on an Al
+        prototype loaded from the default prototype library. A separate test for calculation accuracy is done in
+        test_KS2022.py"""
+        diluteStruct = self.c.prototypeLibrary['FCC']['structure'].copy()
+        diluteStruct.make_supercell([2, 2, 2])
+        diluteStruct.replace(0, 'Fe')
+        testStructures = [diluteStruct.copy()]*2
+        descList = self.c.calculate_KS2022_dilute(structList=testStructures, mode='serial')
+        self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+        for desc in descList:
+            self.assertListEqual(
+                desc.tolist(),
+                descList[0].tolist(),
+                "All descriptors should be equal for the same structure are the same."
+            )
+
+
+    def test_descriptorCalculate_KS2022_dilute_parallel(self):
+        """Test succesful execution of the descriptorCalculate() method with KS2022_dilute in parallel based on an Al
+        prototype loaded from the default prototype library. A separate test for calculation accuracy is done in
+        test_KS2022.py"""
+        with self.subTest(msg="Constructing dilute structures"):
+            diluteStruct = self.c.prototypeLibrary['FCC']['structure'].copy()
+            diluteStruct.make_supercell([2, 2, 2])
+            testStructures = []
+            for i in range(8):
+                tempStruct = diluteStruct.copy()
+                tempStruct.replace(i, 'Fe')
+                testStructures.append(tempStruct)
+
+        with self.subTest(msg="Running parallel calculation with default 'pure' base structure"):
+            descList = self.c.calculate_KS2022_dilute(structList=testStructures, mode='parallel', max_workers=4)
+            self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+
+        with self.subTest(msg="All descriptors should be equal for the same structure as sites are equivalent"):
+            temp0 = descList[0].tolist()
+            for desc in descList:
+                temp1 = desc.tolist()
+                for t0, t1 in zip(temp0, temp1):
+                    self.assertAlmostEqual(t0, t1, places=6)
+
+        with self.subTest(msg="Running parallel calculation with defined base structures"):
+            baseStructs = [diluteStruct.copy()]*8
+            descList = self.c.calculate_KS2022_dilute(
+                structList=testStructures,
+                baseStruct=baseStructs,
+                mode='parallel',
+                max_workers=4)
+            self.assertEqual(len(descList), len(testStructures), "Not all structures were processed.")
+
+        with self.subTest(msg="All descriptors should be equal for the same structure as sites are equivalent"):
+            for desc in descList:
+                temp1 = desc.tolist()
+                for t0, t1 in zip(temp0, temp1):
+                    self.assertAlmostEqual(t0, t1, places=6)
 
     def test_RunModels_Errors(self):
         '''Test that the runModels() and runModels_dilute() methods raise errors correctly when it is called with no
@@ -231,8 +307,104 @@ class TestCore(unittest.TestCase):
         '''
         printOut = str(self.c)
         self.assertIn('pySIPFENN Calculator Object', printOut)
-        self.assertIn('Models are located in', printOut)
+        self.assertIn('Models are located', printOut)
         self.assertIn('Loaded Networks', printOut)
+
+
+class TestCoreRSS(unittest.TestCase):
+    """Test the high-level API functionality of the Calculator object in regard to random solution structures (RSS). It
+    does not test the accuracy, just all runtime modes and known physicality of the results (e.g., FCC should have
+    coordination number of `12`).
+
+    Note:
+        The execution of the descriptorCalculate() method with KS2022_randomSolution is done under coarse settings
+        (for speed reasons) and should not be used for any accuracy tests. A separate testing for calculation accuracy
+        against consistency and reference values is done in `test_KS2022_randomSolutions.py`.
+    """
+    def setUp(self):
+        self.c = pysipfenn.Calculator()
+        self.assertIsNotNone(self.c)
+
+    def test_descriptorCalculate_KS2022_randomSolution_serial_pair(self):
+        """Test successful execution of a composition-structure pair in series"""
+
+        with self.subTest(msg="Running single composition-structure pair"):
+            d1 = self.c.calculate_KS2022_randomSolutions(
+                'BCC',
+                'FeNi',
+                minimumSitesPerExpansion=16,
+                featureConvergenceCriterion=0.02,
+                compositionConvergenceCriterion=0.05,
+                mode='serial')
+            self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
+            self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
+
+    def test_descriptorCalculate_KS2022_randomSolution_serial_multiple(self):
+        """Test successful execution (in series) of multiple compositions occupying the same FCC lattice."""
+        with self.subTest(msg="Running multiple compositions occupying the same FCC lattice"):
+            d2 = self.c.calculate_KS2022_randomSolutions(
+                'FCC',
+                ['FeNi', 'CrNi'],
+                minimumSitesPerExpansion=16,
+                featureConvergenceCriterion=0.02,
+                compositionConvergenceCriterion=0.05,
+                mode='serial')
+            self.assertEqual(len(d2), 2, "Two composition-structure pairs should be processed.")
+            self.assertEqual(len(d2[0]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertEqual(len(d2[1]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertAlmostEqual(
+                float(d2[0][0]),
+                float(d2[1][0])
+                , places=6, msg="Coordination number (KS2022[0]) should be the same (12) for both compositions.")
+            self.assertNotAlmostEqual(
+                float(d2[0][13]),
+                float(d2[1][13])
+                , places=6, msg="mean_NeighDiff_shell1_Number (KS2022[13]) should be different (1.0vs2.0)."
+            )
+
+    def test_descriptorCalculate_KS2022_randomSolution_parallel_pair(self):
+        """Test successful execution of a composition-structure pair in parallel mode. Just for the input passing
+        validation."""
+
+        with self.subTest(msg="Running single composition-structure pair"):
+            d1 = self.c.calculate_KS2022_randomSolutions(
+                'BCC',
+                'FeNi',
+                mode='parallel',
+                max_workers=1)
+            self.assertEqual(len(d1), 1, "Only one composition-structure pair should be processed.")
+            self.assertEqual(len(d1[0]), 256, "All 256 KS2022 features should be obtained.")
+
+    def test_descriptorCalculate_KS2022_randomSolution_parallel_multiple(self):
+        """Test successful execution of manu composition-structure pairs given in ordered lists of input."""
+        myBCC = self.c.prototypeLibrary['BCC']['structure']
+
+        with self.subTest(msg="Running multiple compositions occupying multiple prototypes"):
+            d2 = self.c.calculate_KS2022_randomSolutions(
+                ['FCC', myBCC, 'BCC', 'HCP'],
+                ['WMo', Composition('WMo'), 'FeNi', 'CrNi'],
+                mode='parallel',
+                max_workers=4)
+            self.assertEqual(len(d2), 4, "Four composition-structure pairs should be processed.")
+            for i in range(4):
+                self.assertEqual(len(d2[i]), 256, "All 256 KS2022 features should be obtained.")
+            self.assertNotAlmostEqual(
+                float(d2[0][0]),
+                float(d2[1][0]),
+                places=6, msg="Coordination number (KS2022[0]) should be different for BCC and FCC.")
+            self.assertAlmostEqual(
+                float(d2[1][0]),
+                float(d2[2][0]),
+                places=6, msg="Coordination number (KS2022[0]) should be the same for both BCCs.")
+
+        with self.subTest(msg='Verify that the metadata was correctly recorded.'):
+            assert len(self.c.metas['RSS']) == 4, "There should be 4 metadata records."
+            for meta in self.c.metas['RSS']:
+                self.assertIn('diffHistory', meta)
+                self.assertIn('propHistory', meta)
+                self.assertIn('finalAtomsN', meta)
+                self.assertIn('finalCompositionDistance', meta)
+                self.assertIn('finalComposition', meta)
 
 
 if __name__ == '__main__':
