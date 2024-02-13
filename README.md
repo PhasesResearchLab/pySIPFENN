@@ -26,13 +26,7 @@ package allowing efficient predictions of the energetics of
 atomic configurations. The underlying methodology and implementation
 is given in
 
-- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu,
-Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks,
-Computational Materials Science,
-Volume 208,
-2022,
-111254
-https://doi.org/10.1016/j.commatsci.2022.111254
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
 While functionalities are similar to the software released along the 
 paper, this package contains improved methods for featurizing atomic 
@@ -144,3 +138,13 @@ pip install -e ".[dev]"
 > Note: `pip install "pysipfenn[dev]"` will also work, but will be less conveninet for model modifications (which you likely want to do), as all persisted
 > files will be located outside your working directory. You can quickly find where, by calling `import pysipfenn; c = pysipfenn.Calculator(); print(c)` and
 > `Calculator` will tell you (amongst other things) where they are.
+
+## Cite
+
+If you use `pySIPFENN` software, please consider citing:
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
+
+If you are using predictions from pySIPFENN models accessed through `OPTIMADE` from `MPDD`, please additionally cite:
+
+- Matthew L. Evans, Johan Bergsma, ..., Adam M. Krajewski, ..., Zi-Kui Liu, ..., et al., _Developments and applications of the OPTIMADE API for materials discovery, design, and data exchange_, 2024, [arXiv:2402.00572](https://arxiv.org/abs/2402.00572)
