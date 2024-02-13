@@ -64,7 +64,7 @@ class TestCore(unittest.TestCase):
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
         else:
-            print('Did not detect any Ward2017 models to run')
+            raise ValueError('Did not detect any Ward2017 models to run')
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPOSCAR_KS2022(self):
@@ -79,7 +79,7 @@ class TestCore(unittest.TestCase):
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'KS2022')
         else:
-            print('Did not detect any KS2022 models to run')
+            raise ValueError('Did not detect any KS2022 models to run')
 
         with self.subTest(msg='Test Calculator printout after predictions'):
             printOut = str(self.c)

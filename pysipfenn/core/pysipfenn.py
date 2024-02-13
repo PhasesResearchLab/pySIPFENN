@@ -292,7 +292,13 @@ class Calculator:
                     'Network not available. Please check the network name for typos or run downloadModels() '
                     'to download the models. Currently available models are: ', self.network_list_available)
 
-    def loadModelCustom(self, networkName: str, modelName: str, descriptor: str, modelDirectory: str = '.') -> None:
+    def loadModelCustom(
+            self,
+            networkName: str,
+            modelName: str,
+            descriptor: str,
+            modelDirectory: str = '.'
+    ) -> None:
         """Load a custom ONNX model from a custom directory specified by the user. The primary use case for this
         function is to load models that are not included in the package and cannot be placed in the package
         directory because of write permissions (e.g. on restrictive HPC systems) or storage allocations.
@@ -340,10 +346,12 @@ class Calculator:
         return compatibleList
 
     # *******************************  DESCRIPTOR HANDLING (MID-LEVEL API) *******************************
-    def calculate_Ward2017(self,
-                           structList: List[Structure],
-                           mode: str = 'serial',
-                           max_workers: int = 4) -> list:
+    def calculate_Ward2017(
+            self,
+            structList: List[Structure],
+            mode: str = 'serial',
+            max_workers: int = 4
+    ) -> list:
         """Calculates ``Ward2017`` descriptors for a list of structures. The calculation can be done in serial or parallel
         mode. In parallel mode, the number of workers can be specified. The results are stored in the ``self.descriptorData``
         attribute. The function returns the list of descriptors as well.
@@ -370,10 +378,12 @@ class Calculator:
             self.descriptorData = descList
             return descList
 
-    def calculate_KS2022(self,
-                         structList: List[Structure],
-                         mode: str = 'serial',
-                         max_workers: int = 8) -> list:
+    def calculate_KS2022(
+            self,
+            structList: List[Structure],
+            mode: str = 'serial',
+            max_workers: int = 8
+    ) -> list:
         """Calculates ``KS2022`` descriptors for a list of structures. The calculation can be done in serial or parallel
         mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
         attribute. The function returns the list of descriptors as well.
@@ -400,11 +410,13 @@ class Calculator:
             self.descriptorData = descList
             return descList
 
-    def calculate_KS2022_dilute(self,
-                                structList: List[Structure],
-                                baseStruct: Union[str, List[Structure]] = 'pure',
-                                mode: str = 'serial',
-                                max_workers: int = 8) -> List[np.ndarray]:
+    def calculate_KS2022_dilute(
+            self,
+            structList: List[Structure],
+            baseStruct: Union[str, List[Structure]] = 'pure',
+            mode: str = 'serial',
+            max_workers: int = 8
+    ) -> List[np.ndarray]:
         """Calculates ``KS2022`` descriptors for a list of dilute structures (either based on pure elements and on custom
         base structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
         substantial compared to the ``KS2022`` descriptor, which is more general and can be used on any structure. The
@@ -474,7 +486,8 @@ class Calculator:
             plotParameters: bool = False,
             printProgress: bool = False,
             mode: str = 'serial',
-            max_workers: int = 8) -> List[np.ndarray]:
+            max_workers: int = 8
+    ) -> List[np.ndarray]:
         """Calculates ``KS2022`` descriptors corresponding to random solid solutions occupying base structure / lattice
         sites for a list of compositions through method described in ``descriptorDefinitions.KS2022_randomSolutions``
         submodule. The results are stored in the descriptorData attribute. The function returns the list of descriptors
@@ -604,10 +617,12 @@ class Calculator:
         return descList
 
     # *******************************  PREDICTION RUNNERS (MID-LEVEL API) *******************************
-    def makePredictions(self,
-                        models: Dict[str, torch.nn.Module],
-                        toRun: List[str],
-                        dataInList: List[Union[List[float], np.array]]) -> List[list]:
+    def makePredictions(
+            self,
+            models: Dict[str, torch.nn.Module],
+            toRun: List[str],
+            dataInList: List[Union[List[float], np.array]]
+    ) -> List[list]:
         """Makes predictions using PyTorch networks listed in toRun and provided in models dictionary. Shared among all
         "predict" functions.
 
@@ -623,7 +638,8 @@ class Calculator:
             predictions is the same as the order of the networks in ``toRun``.
         """
         dataOuts = []
-        print('Making predictions...')
+        if self.verbose:
+            print('Making predictions...')
         # Run for each network
         dataIn = torch.from_numpy(np.array(dataInList)).float()
         assert set(toRun).issubset(set(models.keys())), 'Some networks to run are not available in the models.'
@@ -637,8 +653,9 @@ class Calculator:
                 tempOut = model(dataIn)
             t1 = perf_counter()
             dataOuts.append(tempOut.cpu().detach().numpy())
-            print(f'Prediction rate: {round(len(tempOut) / (t1 - t0), 1)} pred/s')
-            print(f'Obtained {len(tempOut)} predictions from:  {net}')
+            if self.verbose:
+                print(f'Prediction rate: {round(len(tempOut) / (t1 - t0), 1)} pred/s')
+                print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
         # Transpose and round the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
@@ -646,11 +663,13 @@ class Calculator:
         return dataOuts
 
     # *******************************  TOP-LEVEL API  *******************************
-    def runModels(self,
-                  descriptor: str,
-                  structList: List[Structure],
-                  mode: str = 'serial',
-                  max_workers: int = 4) -> List[list]:
+    def runModels(
+            self,
+            descriptor: str,
+            structList: List[Structure],
+            mode: str = 'serial',
+            max_workers: int = 4
+    ) -> List[List[float]]:
         """Runs all loaded models on a list of Structures using specified descriptor. Supports serial and parallel
         computation modes. If parallel is selected, max_workers determines number of processes handling the
         featurization of structures (90-99+% of computational intensity) and models are then run in series.
@@ -684,29 +703,37 @@ class Calculator:
 
         print('Calculating descriptors...')
         if descriptor == 'Ward2017':
-            self.descriptorData = self.calculate_Ward2017(structList=structList,
-                                                          mode=mode,
-                                                          max_workers=max_workers)
+            self.descriptorData = self.calculate_Ward2017(
+                structList=structList,
+                mode=mode,
+                max_workers=max_workers
+            )
         elif descriptor == 'KS2022':
-            self.descriptorData = self.calculate_KS2022(structList=structList,
-                                                        mode=mode,
-                                                        max_workers=max_workers)
+            self.descriptorData = self.calculate_KS2022(
+                structList=structList,
+                mode=mode,
+                max_workers=max_workers
+            )
         else:
             print('Descriptor handing not implemented. Check spelling.')
             raise AssertionError
 
-        self.predictions = self.makePredictions(models=self.loadedModels,
-                                                toRun=self.toRun,
-                                                dataInList=self.descriptorData)
+        self.makePredictions(
+            models=self.loadedModels,
+            toRun=self.toRun,
+            dataInList=self.descriptorData
+        )
 
         return self.predictions
 
-    def runModels_dilute(self,
-                         descriptor: str,
-                         structList: List[Structure],
-                         baseStruct: Union[str, List[Structure]] = 'pure',
-                         mode: str = 'serial',
-                         max_workers: int = 4) -> List[list]:
+    def runModels_dilute(
+            self,
+            descriptor: str,
+            structList: List[Structure],
+            baseStruct: Union[str, List[Structure]] = 'pure',
+            mode: str = 'serial',
+            max_workers: int = 4
+    ) -> List[List[float]]:
         """Runs all loaded models on a list of Structures using specified descriptor. A critical difference
         from runModels() is that this function will call dilute-specific featurizer, e.g. ``KS2022_dilute`` when ``'KS2022'`` is
         provided as input, which can only be used on dilute structures (both based on pure elements and on custom base
@@ -750,17 +777,21 @@ class Calculator:
 
         print('Calculating descriptors...')
         if descriptor == 'KS2022':
-            self.descriptorData = self.calculate_KS2022_dilute(structList=structList,
-                                                               baseStruct=baseStruct,
-                                                               mode=mode,
-                                                               max_workers=max_workers)
+            self.descriptorData = self.calculate_KS2022_dilute(
+                structList=structList,
+                baseStruct=baseStruct,
+                mode=mode,
+                max_workers=max_workers
+            )
         else:
             print('Descriptor handing not implemented. Check spelling.')
             raise AssertionError
 
-        self.predictions = self.makePredictions(models=self.loadedModels,
-                                                toRun=self.toRun,
-                                                dataInList=self.descriptorData)
+        self.makePredictions(
+            models=self.loadedModels,
+            toRun=self.toRun,
+            dataInList=self.descriptorData
+        )
 
         return self.predictions
 
