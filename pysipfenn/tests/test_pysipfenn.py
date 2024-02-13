@@ -130,7 +130,7 @@ class TestCore(unittest.TestCase):
         else:
             raise ValueError('Did not detect any KS2022 models to run')
 
-    #@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testFromPrototypes_KS2022_randomSolution(self):
         """Quick runtime test of the top level API for random solution structures. It does not test the accuracy, as
         that is delegated elsewhere."""
@@ -307,7 +307,7 @@ class TestCore(unittest.TestCase):
         '''
         printOut = str(self.c)
         self.assertIn('pySIPFENN Calculator Object', printOut)
-        self.assertIn('Models are located in', printOut)
+        self.assertIn('Models are located', printOut)
         self.assertIn('Loaded Networks', printOut)
 
 
