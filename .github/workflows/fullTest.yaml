@@ -32,7 +32,13 @@ jobs:
           python -m pip install -e ".[dev]"
           
       - name: Download Models
+        id: DownloadModelsAttempt1
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
+        continue-on-error: true
+    
+      - name: Download Models Retry if failed the first time
+        if: failure()
+        run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
         run: pytest --durations=0 --cov=pysipfenn --cov-report=xml
@@ -61,8 +67,15 @@ jobs:
           python -m pip install --upgrade setuptools
           python -m pip install wheel flask pytest
           python -m pip install -e ".[dev]"
+      
       - name: Download Models
+        id: DownloadModelsAttempt1
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
+        continue-on-error: true
+    
+      - name: Download Models Retry if failed the first time
+        if: failure()
+        run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
         run: pytest --durations=0
@@ -88,8 +101,15 @@ jobs:
           python -m pip install --upgrade setuptools
           python -m pip install wheel flask pytest
           python -m pip install -e ".[dev]"
+      
       - name: Download Models
+        id: DownloadModelsAttempt1
         run: python -c "import pysipfenn; c = pysipfenn.Calculator(); c.downloadModels(); c.loadModels();"
+        continue-on-error: true
+    
+      - name: Download Models Retry if failed the first time
+        if: failure()
+        run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
         run: pytest --durations=0
