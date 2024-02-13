@@ -128,7 +128,26 @@ class TestCore(unittest.TestCase):
                 self.assertEqual(val1, val2)
 
         else:
-            print('Did not detect any KS2022 models to run')
+            raise ValueError('Did not detect any KS2022 models to run')
+
+    #@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
+    def testFromPrototypes_KS2022_randomSolution(self):
+        """Quick runtime test of the top level API for random solution structures. It does not test the accuracy, as
+        that is delegated elsewhere."""
+
+        self.c.updateModelAvailability()
+        toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
+        if toRun:
+            preds = self.c.runModels_randomSolutions(
+                descriptor='KS2022',
+                baseStructList='FCC',
+                compList='AuCu',
+                compositionConvergenceCriterion=0.05,
+                featureConvergenceCriterion=0.02,
+                minimumSitesPerExpansion=8,
+                mode='serial')
+        else:
+            raise ValueError('Did not detect any KS2022 models to run')
 
     def test_descriptorCalculate_Ward2017_serial(self):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in series. A separate test for
