@@ -3,6 +3,7 @@ name: Weekly Test Action (periodic verification everything works)
 on:
   schedule:
       - cron: '30 17 * * 1'
+  workflow_dispatch:
       
 jobs:
   coreTests:
