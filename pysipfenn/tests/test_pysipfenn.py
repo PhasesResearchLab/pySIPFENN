@@ -337,7 +337,7 @@ class TestCoreRSS(unittest.TestCase):
                 float(d2[0][0]),
                 float(d2[1][0])
                 , places=6, msg="Coordination number (KS2022[0]) should be the same (12) for both compositions.")
-            self.assertNotAlmostEquals(
+            self.assertNotAlmostEqual(
                 float(d2[0][13]),
                 float(d2[1][13])
                 , places=6, msg="mean_NeighDiff_shell1_Number (KS2022[13]) should be different (1.0vs2.0)."
@@ -369,7 +369,7 @@ class TestCoreRSS(unittest.TestCase):
             self.assertEqual(len(d2), 4, "Four composition-structure pairs should be processed.")
             for i in range(4):
                 self.assertEqual(len(d2[i]), 256, "All 256 KS2022 features should be obtained.")
-            self.assertNotAlmostEquals(
+            self.assertNotAlmostEqual(
                 float(d2[0][0]),
                 float(d2[1][0]),
                 places=6, msg="Coordination number (KS2022[0]) should be different for BCC and FCC.")

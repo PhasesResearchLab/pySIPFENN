@@ -63,7 +63,7 @@ class TestKS2022RandomSolutionProfiling(unittest.TestCase):
     structures.
     '''
     def test_serialInParallel(self):
-        '''Tests profiling a set of structures with perallel task execution.'''
+        '''Tests profiling a set of structures with parallel task execution.'''
         process_map(KS2022_randomSolutions.profile,
                     ['BCC', 'FCC', 'HCP'],
                     max_workers=3)
