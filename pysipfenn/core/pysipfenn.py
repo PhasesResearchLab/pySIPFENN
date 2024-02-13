@@ -37,7 +37,7 @@ __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'
 
-
+# *********************************  CALCULATION HIGH-LEVEL ENVIRONMENT  *********************************
 class Calculator:
     """pySIPFENN Calculator automatically initializes all functionalities including identification and loading
     of all available models defined statically in the ``models.json`` file. It exposes methods for calculating predefined
@@ -125,20 +125,7 @@ class Calculator:
             printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
         return printOut
 
-    def updateModelAvailability(self) -> None:
-        """Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
-        current ONNX model definitions."""
-        with resources.files('pysipfenn.modelsSIPFENN') as p:
-            all_files = os.listdir(p)
-        detectedNets = []
-        for net, netName in zip(self.network_list, self.network_list_names):
-            if all_files.__contains__(net + '.onnx'):
-                detectedNets.append(net)
-                print('✔ ' + netName)
-            else:
-                print('⨯ ' + netName)
-        self.network_list_available = detectedNets
-
+    # *********************************  PROTOTYPE HANDLING  *********************************
     def parsePrototypeLibrary(self,
                               customPath: str = "default",
                               verbose: bool = False,
@@ -207,6 +194,20 @@ class Calculator:
               f'Persisting them for future use.')
         overwritePrototypeLibrary(self.prototypeLibrary)
 
+    # *********************************  MODEL HANDLING  *********************************
+    def updateModelAvailability(self) -> None:
+        """Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
+        current ONNX model definitions."""
+        with resources.files('pysipfenn.modelsSIPFENN') as p:
+            all_files = os.listdir(p)
+        detectedNets = []
+        for net, netName in zip(self.network_list, self.network_list_names):
+            if all_files.__contains__(net + '.onnx'):
+                detectedNets.append(net)
+                print('✔ ' + netName)
+            else:
+                print('⨯ ' + netName)
+        self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
@@ -252,6 +253,93 @@ class Calculator:
                 print('Network name not recognized')
         self.updateModelAvailability()
 
+    def loadModels(self, network: str = 'all') -> None:
+        """Load model/models into memory of the ``Calculator`` class. The models are loaded from the ``modelsSIPFENN`` directory
+        inside the package. Its location can be seen by calling ``print()`` on the ``Calculator``. The models are stored in the
+        ``self.loadedModels`` attribute as a dictionary with the network string as key and the PyTorch model as value.
+
+         Note:
+            This function only works with models that are stored in the ``modelsSIPFENN`` directory inside the package,
+            are in ONNX format, and have corresponding entries in ``models.json``. For all others, you will need to use
+            ``loadModelCustom()``.
+
+        Args:
+            network: Default is ``'all'``, which loads all models detected as available. Alternatively, a specific model
+                can be loaded by its corresponding key in models.json. E.g. ``'SIPFENN_Krajewski2020_NN9'`` or
+                ``'SIPFENN_Krajewski2022_NN30'``. The key is the same as the network argument in ``downloadModels()``.
+
+        Raises:
+            ValueError: If the network name is not recognized or if the model is not available in the ``modelsSIPFENN``
+                directory.
+
+        Returns:
+            None. It updates the loadedModels attribute of the Calculatorclass.
+        """
+        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+            if network == 'all':
+                print('Loading models:')
+                for net in tqdm(self.network_list_available):
+                    self.loadedModels.update({
+                        net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
+                    })
+            elif network in self.network_list_available:
+                print('Loading model: ', network)
+                self.loadedModels.update({
+                    network: onnx2torch.convert(onnx.load(f'{modelPath}/{network}.onnx')).float()
+                })
+            else:
+                raise ValueError(
+                    'Network not available. Please check the network name for typos or run downloadModels() '
+                    'to download the models. Currently available models are: ', self.network_list_available)
+
+    def loadModelCustom(self, networkName: str, modelName: str, descriptor: str, modelDirectory: str = '.') -> None:
+        """Load a custom ONNX model from a custom directory specified by the user. The primary use case for this
+        function is to load models that are not included in the package and cannot be placed in the package
+        directory because of write permissions (e.g. on restrictive HPC systems) or storage allocations.
+
+        Args:
+            modelDirectory: Directory where the model is located. Defaults to the current directory.
+            networkName: Name of the network. This is the name used to refer to the ONNX network. It has to be
+                unique, not contain any spaces, and correspond to the name of the ONNX file (excluding the ``.onnx``
+                extension).
+            modelName: Name of the model. This is the name that will be displayed in the model selection menu. It
+                can be any string desired.
+            descriptor: Descriptor/feature vector used by the model. pySIPFENN currently supports the following
+                descriptors: ``'KS2022'``, and ``'Ward2017'``.
+        """
+
+        self.loadedModels.update({
+            networkName: onnx2torch.convert(onnx.load(f'{modelDirectory}/{networkName}.onnx')).float()
+        })
+        self.models.update({
+            networkName: {
+                'name': modelName,
+                'descriptor': descriptor
+            }})
+        self.network_list.append(networkName)
+        self.network_list_names.append(modelName)
+        self.network_list_available.append(networkName)
+        print(f'Loaded model {modelName} ({networkName}) from {modelDirectory}')
+
+    def findCompatibleModels(self, descriptor: str) -> List[str]:
+        """Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
+        ``models.json`` file.
+
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipfenn.descriptorDefinitions``
+                to see available modules or add yours. Available default descriptors are: ``'Ward2017'``, ``'KS2022'``.
+
+        Returns:
+            List of strings corresponding to compatible models.
+        """
+
+        compatibleList = []
+        for net in self.models:
+            if descriptor in self.models[net]['descriptor']:
+                compatibleList.append(net)
+        return compatibleList
+
+    # *******************************  DESCRIPTOR HANDLING (MID-LEVEL API) *******************************
     def calculate_Ward2017(self,
                            structList: List[Structure],
                            mode: str = 'serial',
@@ -515,74 +603,7 @@ class Calculator:
         self.metas['RSS'] = metaList
         return descList
 
-    def loadModels(self, network: str = 'all') -> None:
-        """Load model/models into memory of the ``Calculator`` class. The models are loaded from the ``modelsSIPFENN`` directory
-        inside the package. Its location can be seen by calling ``print()`` on the ``Calculator``. The models are stored in the
-        ``self.loadedModels`` attribute as a dictionary with the network string as key and the PyTorch model as value.
-
-         Note:
-            This function only works with models that are stored in the ``modelsSIPFENN`` directory inside the package,
-            are in ONNX format, and have corresponding entries in ``models.json``. For all others, you will need to use
-            ``loadModelCustom()``.
-
-        Args:
-            network: Default is ``'all'``, which loads all models detected as available. Alternatively, a specific model
-                can be loaded by its corresponding key in models.json. E.g. ``'SIPFENN_Krajewski2020_NN9'`` or
-                ``'SIPFENN_Krajewski2022_NN30'``. The key is the same as the network argument in ``downloadModels()``.
-
-        Raises:
-            ValueError: If the network name is not recognized or if the model is not available in the ``modelsSIPFENN``
-                directory.
-
-        Returns:
-            None. It updates the loadedModels attribute of the Calculatorclass.
-        """
-        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
-            if network == 'all':
-                print('Loading models:')
-                for net in tqdm(self.network_list_available):
-                    self.loadedModels.update({
-                        net: onnx2torch.convert(onnx.load(f'{modelPath}/{net}.onnx')).float()
-                    })
-            elif network in self.network_list_available:
-                print('Loading model: ', network)
-                self.loadedModels.update({
-                    network: onnx2torch.convert(onnx.load(f'{modelPath}/{network}.onnx')).float()
-                })
-            else:
-                raise ValueError(
-                    'Network not available. Please check the network name for typos or run downloadModels() '
-                    'to download the models. Currently available models are: ', self.network_list_available)
-
-    def loadModelCustom(self, networkName: str, modelName: str, descriptor: str, modelDirectory: str = '.') -> None:
-        """Load a custom ONNX model from a custom directory specified by the user. The primary use case for this
-        function is to load models that are not included in the package and cannot be placed in the package
-        directory because of write permissions (e.g. on restrictive HPC systems) or storage allocations.
-
-        Args:
-            modelDirectory: Directory where the model is located. Defaults to the current directory.
-            networkName: Name of the network. This is the name used to refer to the ONNX network. It has to be
-                unique, not contain any spaces, and correspond to the name of the ONNX file (excluding the ``.onnx``
-                extension).
-            modelName: Name of the model. This is the name that will be displayed in the model selection menu. It
-                can be any string desired.
-            descriptor: Descriptor/feature vector used by the model. pySIPFENN currently supports the following
-                descriptors: ``'KS2022'``, and ``'Ward2017'``.
-        """
-
-        self.loadedModels.update({
-            networkName: onnx2torch.convert(onnx.load(f'{modelDirectory}/{networkName}.onnx')).float()
-        })
-        self.models.update({
-            networkName: {
-                'name': modelName,
-                'descriptor': descriptor
-            }})
-        self.network_list.append(networkName)
-        self.network_list_names.append(modelName)
-        self.network_list_available.append(networkName)
-        print(f'Loaded model {modelName} ({networkName}) from {modelDirectory}')
-
+    # *******************************  PREDICTION RUNNERS (MID-LEVEL API) *******************************
     def makePredictions(self,
                         models: Dict[str, torch.nn.Module],
                         toRun: List[str],
@@ -624,24 +645,7 @@ class Calculator:
         self.predictions = dataOuts
         return dataOuts
 
-    def findCompatibleModels(self, descriptor: str) -> List[str]:
-        """Finds all models compatible with a given descriptor based on the descriptor definitions loaded from the
-        ``models.json`` file.
-
-        Args:
-            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipfenn.descriptorDefinitions``
-                to see available modules or add yours. Available default descriptors are: ``'Ward2017'``, ``'KS2022'``.
-
-        Returns:
-            List of strings corresponding to compatible models.
-        """
-
-        compatibleList = []
-        for net in self.models:
-            if descriptor in self.models[net]['descriptor']:
-                compatibleList.append(net)
-        return compatibleList
-
+    # *******************************  TOP-LEVEL API  *******************************
     def runModels(self,
                   descriptor: str,
                   structList: List[Structure],
@@ -760,34 +764,6 @@ class Calculator:
 
         return self.predictions
 
-    def get_resultDicts(self) -> List[dict]:
-        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
-        names of the networks. The order of the dictionaries is the same as the order of the input structures passed
-        through ``runModels()`` functions.
-
-        Returns:
-            List of dictionaries with the predictions.
-        """
-        return [dict(zip(self.toRun, pred)) for pred in self.predictions]
-
-    def get_resultDictsWithNames(self) -> List[dict]:
-        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
-        names of the networks and the names of the input structures. The order of the dictionaries is the same as the
-        order of the input structures passed through ``runModels()`` functions. Note that this function requires
-        ``self.inputFiles`` to be set, which is done automatically when using ``runFromDirectory()`` or
-        ``runFromDirectory_dilute()`` but not when using ``runModels()`` or ``runModels_dilute()``, as the input structures are
-        passed directly to the function and names have to be provided separately by assigning them to ``self.inputFiles``.
-
-        Returns:
-            List of dictionaries with the predictions.
-        """
-        assert self.inputFiles is not []
-        assert len(self.inputFiles) == len(self.predictions)
-        return [
-            dict(zip(['name'] + self.toRun, [name] + pred))
-            for name, pred in
-            zip(self.inputFiles, self.predictions)]
-
     def runFromDirectory(self,
                          directory: str,
                          descriptor: str,
@@ -881,6 +857,37 @@ class Calculator:
                               max_workers=max_workers)
         print('Done!')
 
+
+    # *******************************  POST-PROCESSING  *******************************
+    def get_resultDicts(self) -> List[dict]:
+        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        names of the networks. The order of the dictionaries is the same as the order of the input structures passed
+        through ``runModels()`` functions.
+
+        Returns:
+            List of dictionaries with the predictions.
+        """
+        return [dict(zip(self.toRun, pred)) for pred in self.predictions]
+
+    def get_resultDictsWithNames(self) -> List[dict]:
+        """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
+        names of the networks and the names of the input structures. The order of the dictionaries is the same as the
+        order of the input structures passed through ``runModels()`` functions. Note that this function requires
+        ``self.inputFiles`` to be set, which is done automatically when using ``runFromDirectory()`` or
+        ``runFromDirectory_dilute()`` but not when using ``runModels()`` or ``runModels_dilute()``, as the input structures are
+        passed directly to the function and names have to be provided separately by assigning them to ``self.inputFiles``.
+
+        Returns:
+            List of dictionaries with the predictions.
+        """
+        assert self.inputFiles is not []
+        assert len(self.inputFiles) == len(self.predictions)
+        return [
+            dict(zip(['name'] + self.toRun, [name] + pred))
+            for name, pred in
+            zip(self.inputFiles, self.predictions)]
+
+
     def writeResultsToCSV(self, file: str) -> None:
         """Writes the results to a CSV file. The first column is the name of the structure. If the ``self.inputFiles``
         attribute is populated automatically by ``runFromDirectory()`` or set manually, the names of the structures will
@@ -941,7 +948,7 @@ class Calculator:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i += 1
 
-# UTILS
+# ************************  SATELLITE FUNCTIONS  ************************
 def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
     """Converts a ``Ward2017`` descriptor to a ``KS2022`` descriptor (which is its subset).
 
