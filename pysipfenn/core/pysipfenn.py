@@ -1,10 +1,13 @@
 # Standard Library Imports
-import os
 import csv
 import json
 from time import perf_counter
 from typing import List, Union, Dict
 from importlib import resources
+import os
+import io
+import sys
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Helper Imports
 from tqdm import tqdm
