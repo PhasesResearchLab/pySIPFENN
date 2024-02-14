@@ -91,34 +91,36 @@ is given in
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks, Computational Materials Science, Volume 208, 2022, 111254 `(https://doi.org/10.1016/j.commatsci.2022.111254) <https://doi.org/10.1016/j.commatsci.2022.111254>`_
 
+While functionalities are similar to the software released along the 
+paper, this package contains improved methods for featurizing atomic 
+configurations. Notably, all of them are now written completely in 
+Python, removing reliance on Java and making extensions of the software
+much easier thanks to improved readability.
+
 News
 ----
--  **(v0.13.0)** Model exports are now effortless the new `pysipfenn.core.modelExporters` module, which also allows
-   users to reduce models to FP16 precision or simplify model structure. It supports ONNX, PyTorch, and CoreML formats. The
-   latter allows use of highly efficient Neural Engine on all modern Apple devices. Note that to use these features, you
-   need to install additional dependencies with `pip install pysipfenn[dev]`
--  **(v.12.2)** The license has been changed to LGPLv3 to allow for integration with proprietary software developed
-   by CALPHAD community, while supporting the development of new pySIPFENN features for all users. Many thanks to our colleagues from
-   `GTT-Technologies <https://gtt-technologies.de>`__ and
-   other participants of `50th CALPHAD 2023 conference in Boston <https://calphad.org/calphad-2023>`__ for fruitful discussions.
--  **(v.12.0)** Official Python 3.11 support.
--  **(v.12.0)** Automated matrix-testing on Linux / Mac / Windows with Python 3.9 / 3.10 / 3.11 through GitHub Actions CLI
-   and test coverage report through Codecov. Tests are also generally improved and more extensive.
--  **(v0.11.0)** Some common questions are now addressed in the
-   `documentation FAQ
-   section <https://pysipfenn.readthedocs.io/en/stable/faq.html>`__.
--  **(v0.11.0)** The model downloads from Zenodo are now multithreaded
-   and are 15 times faster.
--  **(March 2023 Workshop)** We would like to thank all of our amazing
-   attendees for making our workshop, co-organized with the `Materials
-   Genome Foundation <https://materialsgenomefoundation.org>`__, such a
-   success! Over 100 of you simultaneously followed all exercises and,
-   at the peak, we loaded over 1,200GB of models into the HPC’s RAM. At
-   this point, we would also like to acknowledge the generous support
-   from `IBM <https://www.ibm.com>`__ who funded the workshop. Please
-   stay tuned for next workshops planned online and in-person at
-   conferences. They will be announced both here and at the `Materials
-   Genome Foundation <https://materialsgenomefoundation.org>`__ website.
+
+- **(v0.15.0)** A new descriptor (feature vector) calculator ``descriptorDefinitions.KS2022_randomSolutions`` has been implemented. It is used 
+  for structure informed featurization of compositions randomly occupying a lattice, spiritually similar to SQS generation, but also taking into 
+  account (1) chemical differences between elements and (2) structural effects. A full description will be given in the upcoming manuscript.
+
+- **(v0.14.0)** Users can now take advantage of a **Prototype Library** to obtain common structures from any ``Calculator`` instance ``c`` with a 
+  simple ``c.prototypeLibrary['BCC']['structure']``. It can be easily 
+  `updated <https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.parsePrototypeLibrary>`__ 
+  or `appended <https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.appendPrototypeLibrary>`__ with high-level 
+  API or by manually modifyig its YAML `here <https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/misc/prototypeLibrary.yaml>`__.
+
+- **(v0.13.0)** Model exports (and more!) to PyTorch, CoreML, and ONNX are now effortless thanks to 
+  ``core.modelExporters`` module. Please note you need to install pySIPFENN with ``dev`` option (e.g., ``pip install "pysipfenn[dev]"``) to use it. 
+  See `docs here <https://pysipfenn.readthedocs.io/en/stable/source/pysipfenn.core.html#module-pysipfenn.core.modelExporters>`__.
+
+- **(v0.12.2)** Swith to LGPLv3 allowing for integration with proprietary software developed by CALPHAD community, while supporting the development 
+  of new pySIPFENN features for all. Many thanks to our colleagues from `GTT-Technologies <https://gtt-technologies.de>`__ 
+  and other participants of `CALPHAD 2023 <https://calphad.org/calphad-2023>`__` for fruitful discussions.
+
+- **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the
+  `Materials Genome Foundation <https://materialsgenomefoundation.org>`__, such a success! Over 100 of you simultaneously followed
+  all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. 
 
 .. note::
    This project is under active development. We recommend using released (stable) versions.
