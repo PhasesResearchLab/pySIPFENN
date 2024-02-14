@@ -82,6 +82,11 @@ class TestKS2022(unittest.TestCase):
                     with self.subTest(msg=f'{name:<16} diff in {l}'):
                         self.assertAlmostEqual(p_fo, p_trd, places=6)
 
+    def test_cite(self):
+        """Tests citation return."""
+        citation = KS2022.cite()
+        self.assertIn("Krajewski" in citation[0])
+
 class TestKS2022_diluteProfiling(unittest.TestCase):
     '''Test the dilute version of KS2022 descriptor generation by profiling the execution time of the descriptor generation function
     for one example dilute structure.

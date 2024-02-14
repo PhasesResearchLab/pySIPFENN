@@ -56,6 +56,11 @@ class TestKSRandomSolution2022(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             KS2022_randomSolutions.profile(test='CrazyStructure')
 
+    def test_cite(self):
+        """Tests citation return."""
+        citation = KS2022.cite()
+        self.assertIn("Krajewski" in citation[0])
+
 
 class TestKS2022RandomSolutionProfiling(unittest.TestCase):
     '''Test the KS2022 RS descriptor generation by profiling the execution time for example composition for each
