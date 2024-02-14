@@ -9,7 +9,7 @@ versions of Python (3.9+) is used and (b) there are no dependency conflicts. If 
 
 If you are managing a large set of dependencies in your project, you may consider using `mamba` in place of `conda`. It is a less mature, but much faster drop-in replacement compatible with existing environments. See [`micromamba` install instructions](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html).
 
-### Standard
+## Standard
 
 If your main goal is to run pySIPFENN models, provided by us or any other vendor, you need only a subset of the capabilities of our code, so
 you can follow with the following install. Simply install pySIPFENN:
@@ -41,7 +41,7 @@ you can follow with the following install. Simply install pySIPFENN:
     pip install -e .
     ``` 
 
-### Developer Install
+## Developer Install
 
 If you want to utilize pySIPFENN beyond its core functionalities, for instance, to train new models on custom datasets or to export models in different 
 formats or precisions, you need to install several other dependencies. This can be done by following the **from source** instructions above but appending
