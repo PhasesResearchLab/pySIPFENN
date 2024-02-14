@@ -50,8 +50,8 @@ class TestWard2017(unittest.TestCase):
     def test_cite(self):
         """Tests citation return."""
         citation = Ward2017.cite()
-        self.assertIn("Krajewski" in citation[0])
-        self.assertIn("Ward" in citation[1])
+        self.assertIn("Krajewski", citation[0])
+        self.assertIn("Ward", citation[1])
 
 
 class TestWard2017Profiling(unittest.TestCase):

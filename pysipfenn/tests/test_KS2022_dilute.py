@@ -85,7 +85,7 @@ class TestKS2022(unittest.TestCase):
     def test_cite(self):
         """Tests citation return."""
         citation = KS2022_dilute.cite()
-        self.assertIn("Krajewski" in citation[0])
+        self.assertIn("Krajewski", citation[0])
 
 class TestKS2022_diluteProfiling(unittest.TestCase):
     '''Test the dilute version of KS2022 descriptor generation by profiling the execution time of the descriptor generation function
