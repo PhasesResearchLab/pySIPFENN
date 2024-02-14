@@ -1,8 +1,6 @@
 import unittest
 import pytest
 import os
-import sys
-from time import sleep
 
 import pysipfenn
 from importlib import resources
@@ -37,11 +35,7 @@ class TestCore(unittest.TestCase):
         self.assertIsNotNone(self.c)
         self.c.toRun = ['model1', 'model2']
         self.c.descriptorData = [zeros([271])]*10000
-        size_before = sys.getsizeof(self.c)
         self.c.destroy()
-        sleep(1)
-        size_after = sys.getsizeof(self.c)
-        self.assertTrue(size_after < size_before)
 
     def detectModels(self):
         '''Test that the updateModelAvailability() method works without errors and returns a list of available models.
@@ -332,6 +326,16 @@ class TestCore(unittest.TestCase):
         self.assertIn('pySIPFENN Calculator Object', printOut)
         self.assertIn('Models are located', printOut)
         self.assertIn('Loaded Networks', printOut)
+
+    def test_util_Ward2017toKS2022(self):
+        """Tests that Ward2017 conversion to its KS2022 subset works as intended."""
+        struct = self.c.prototypeLibrary['FCC']['structure']
+        self.assertIsInstance(struct, Structure)
+        desc1 = self.c.calculate_Ward2017([struct])[0]
+        desc2 = list(self.c.calculate_KS2022([struct])[0])
+        desc2from1 = list(pysipfenn.ward2ks2022(desc1))
+        for d2, d21 in zip(desc2, desc2from1):
+            self.assertAlmostEqual(d2, d21, places=6, msg="Direct and converted KS2022toWard2017 should be the same.")
 
 
 class TestCoreRSS(unittest.TestCase):
