@@ -258,7 +258,12 @@ class TestCore(unittest.TestCase):
         with self.subTest(mgs='No models to run dilute'):
             with self.assertRaises(AssertionError):
                 self.c.network_list_available = []
-                self.c.runModels_dilute(descriptor='KS2022_dilute', structList=[])
+                self.c.runModels_dilute(descriptor='KS2022', structList=[])
+
+        with self.subTest(mgs='No models to run random solid solution'):
+            with self.assertRaises(AssertionError):
+                self.c.network_list_available = []
+                self.c.runModels_randomSolutions(descriptor='KS2022', structList=[])
 
         with self.subTest(mgs='Descriptor not implemented'):
             with self.assertRaises(AssertionError):
@@ -267,6 +272,10 @@ class TestCore(unittest.TestCase):
         with self.subTest(mgs='Dilute descriptor not implemented'):
             with self.assertRaises(AssertionError):
                 self.c.runModels_dilute(descriptor='jx9348ghfmx8345wgyf', structList=[])
+
+        with self.subTest(mgs='Dilute descriptor not implemented'):
+            with self.assertRaises(AssertionError):
+                self.c.runModels_randomSolutions(descriptor='jx9348ghfmx8345wgyf', structList=[])
 
     def test_WriteDescriptorDataToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
