@@ -1,10 +1,13 @@
 import unittest
 import pytest
 import os
+import sys
+from time import sleep
 
 import pysipfenn
 from importlib import resources
 from natsort import natsorted
+from numpy import zeros
 
 from pymatgen.core import Structure, Composition
 
@@ -28,6 +31,17 @@ class TestCore(unittest.TestCase):
         self.assertEqual(self.c.toRun, [])
         self.assertEqual(self.c.descriptorData, [])
         self.assertEqual(self.c.inputFiles, [])
+
+    def testDestroy(self):
+        """ Test that the Calculator can deallocate itself (incl. loaded models and its data)."""
+        self.assertIsNotNone(self.c)
+        self.c.toRun = ['model1', 'model2']
+        self.c.descriptorData = [zeros([271])]*10000
+        size_before = sys.getsizeof(self.c)
+        self.c.destroy()
+        sleep(1)
+        size_after = sys.getsizeof(self.c)
+        self.assertTrue(size_after < size_before)
 
     def detectModels(self):
         '''Test that the updateModelAvailability() method works without errors and returns a list of available models.
@@ -263,7 +277,7 @@ class TestCore(unittest.TestCase):
         with self.subTest(mgs='No models to run random solid solution'):
             with self.assertRaises(AssertionError):
                 self.c.network_list_available = []
-                self.c.runModels_randomSolutions(descriptor='KS2022', structList=[])
+                self.c.runModels_randomSolutions(descriptor='KS2022', baseStructList=[], compList=[])
 
         with self.subTest(mgs='Descriptor not implemented'):
             with self.assertRaises(AssertionError):
@@ -273,9 +287,9 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 self.c.runModels_dilute(descriptor='jx9348ghfmx8345wgyf', structList=[])
 
-        with self.subTest(mgs='Dilute descriptor not implemented'):
+        with self.subTest(mgs='Random solution descriptor not implemented'):
             with self.assertRaises(AssertionError):
-                self.c.runModels_randomSolutions(descriptor='jx9348ghfmx8345wgyf', structList=[])
+                self.c.runModels_randomSolutions(descriptor='jx9348ghfmx8345wgyf', baseStructList=[], compList=[])
 
     def test_WriteDescriptorDataToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
