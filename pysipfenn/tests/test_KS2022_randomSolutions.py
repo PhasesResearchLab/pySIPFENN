@@ -58,7 +58,7 @@ class TestKSRandomSolution2022(unittest.TestCase):
 
     def test_cite(self):
         """Tests citation return."""
-        citation = KS2022.cite()
+        citation = KS2022_randomSolutions.cite()
         self.assertIn("Krajewski" in citation[0])
 
 

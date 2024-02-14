@@ -49,7 +49,7 @@ class TestWard2017(unittest.TestCase):
     
     def test_cite(self):
         """Tests citation return."""
-        citation = KS2022.cite()
+        citation = Ward2017.cite()
         self.assertIn("Krajewski" in citation[0])
         self.assertIn("Ward" in citation[1])
 
