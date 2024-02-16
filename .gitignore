@@ -9,3 +9,6 @@ pysipfenn.egg-info
 
 # ONNX Models
 *.onnx
+
+# Test and temporary files
+**/*_TestResult.csv
