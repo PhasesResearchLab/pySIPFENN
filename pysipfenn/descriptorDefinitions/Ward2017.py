@@ -115,7 +115,14 @@ class LocalAttributeGenerator:
         self.element_dict = element_dict
 
     def generate_local_attributes(self, n: int):
-        """Generates the local environment attributes for a given site in the structure."""
+        """Generates the local environment attributes for a given site in the structure.
+        
+        Args:
+            n: the index of the site to consider
+
+        Returns:
+            The local environment around site n.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n], self.element_dict)
 
@@ -128,6 +135,8 @@ def generate_voronoi_attributes(struct: Structure, local_funct=local_env_functio
         struct: A pymatgen Structure object.
         local_funct: A function which computes the local environment attributes for a given site.
 
+    Returns:
+        A list of local attributes calculated using local_funct from the input structure.
     """
     # Collect stoichiometry of structure for use in WC parameter calculation.
     element_dict = {}
@@ -153,7 +162,9 @@ def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels) -> List[f
         strc: A pymatgen Structure object.
         neighbor_dict_raw: A dictionary of the neighbors of each site in the structure.
         levels: The number of shells to consider.
-
+        
+    Returns:
+        A list of the WC attributes computed from the given structure.
     """
     if len(strc.composition) == 1:
         return [0] * levels
@@ -215,7 +226,14 @@ def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels) -> List[f
 
 
 def magpie_mode(attribute_properties, axis=0):
-    """Calculates the attributes corresponding to the most common elements."""
+    """Calculates the attributes corresponding to the most common elements.
+
+    Args:
+        attribute_properties: A list of attribute properties calculated for all of the elements in the structure 
+
+    Returns:
+        The average of the attributes over all elements which occur most often.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
