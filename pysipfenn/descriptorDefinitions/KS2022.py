@@ -305,7 +305,6 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
 
     Returns:
         A ``103``-length numpy ``ndarray`` of the structure-dependent part of the KS2022 descriptor. 
-
     """
     assert isinstance(descriptor, np.ndarray)
     assert descriptor.shape == (256,)
