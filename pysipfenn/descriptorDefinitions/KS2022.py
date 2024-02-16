@@ -171,9 +171,30 @@ def most_common(
     return output / len(top_elements)
 
 
-def get_equivalentSitesMultiplicities(struct: Structure):
-    spgA = SpacegroupAnalyzer(struct, angle_tolerance=0.1, symprec=0.001)
-    return dict(Counter(list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
+def get_equivalentSitesMultiplicities(
+    struct: Structure,
+    angle_tolerance: float = 0.1, 
+    symprec: float = 0.001
+    ) -> Dict[int, int]:
+    """Takes a ``pymatgen`` ``Structure`` object, obtains an ``spglib`` symmetry dataset through the ``SpacegroupAnalyzer`` wrapper of 
+    ```pymatgen```, and returns a dictionary of the multiplicities of equivalent sites.```
+    
+    Args:
+        struct: A ``pymatgen`` ``Structure`` object.
+        angle_tolerance: The angle tolerance for the symmetry analysis. By default, this is ``0.1``.
+        symprec: The symmetry precision for the symmetry analysis. By default, this is ``0.001`` `when called from here`.
+        
+    Returns:
+        A dictionary of the multiplicities of equivalent sites. The keys are the indices of the sites in the structure, and the values 
+        are the integer multiplicities.
+    """
+    spgA = SpacegroupAnalyzer(
+        struct, 
+        angle_tolerance=angle_tolerance, 
+        symprec=symprec)
+    return dict(
+        Counter(
+            list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
 
 
 def generate_descriptor(struct: Structure) -> np.ndarray:
