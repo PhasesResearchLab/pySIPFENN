@@ -21,7 +21,7 @@ import math
 import time
 import json
 from collections import Counter
-from typing import List
+from typing import List, Union
 from importlib import resources
 
 # Third Party Dependencies
@@ -123,9 +123,28 @@ def findDilute(struct: Structure) -> int:
 
 def generate_voronoi_attributes(
         struct: Structure,
-        baseStruct: str = 'pure',
+        baseStruct: Union[str, Structure] = 'pure',
         local_funct=local_env_function
-) -> (np.ndarray, np.ndarray):
+) -> tuple[np.ndarray, np.ndarray]:
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator. **Note, this is not the same function
+    as the one in the base KS2022, but a much more elaborate one that takes an additional argument `baseStruct` which is critical in optimizing 
+    the process flow for dilute structures.**
+
+    Args:
+        struct: A pymatgen ``Structure`` object **with the defect** site at any position. It can be a a single defect in a pure elemental
+            solid, but it does not have to as long as the `baseStruct` without the defect is provided.
+        local_funct: A function which computes the local environment attributes for a given site. By default, this is
+            the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+            level, if you so desire (e.g. to use a compiled alternative you have written).
+        baseStruct: A pymatgen ``Structure`` object of **defect-free** version of the ``struct``. It can also be a magic string
+            ``'pure'`` which equates to assuming the base structure is a pure elemental solid. By default, this is ``'pure'`` as this
+            is the most common use case for people we work with, but we do test it with complex topologically close packed structures
+            too.
+            
+    Returns:
+        A tuple of two numpy arrays. Each contains concatenated outputs of respecive tuples from ``local_env_function``. Please note
+        that, at this stage, the order of rows `does not` have to correspond to the order of sites in the structure and usually does not.
+    """
 
     local_generator = LocalAttributeGenerator(struct, local_funct)
 
