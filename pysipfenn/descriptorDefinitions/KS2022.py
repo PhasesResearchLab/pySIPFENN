@@ -119,13 +119,19 @@ def generate_voronoi_attributes(
     struct: Structure, 
     local_funct=local_env_function
     ) -> tuple[np.ndarray, np.ndarray]:
-    """Generates the local environment attributes for a given structure using a VoronoiNN generator.
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator. **Critically, this 
+    implementation uses ``get_equivalentSitesMultiplicities`` to skip the expensive ``generate_local_attributes`` call when
+    it is not guaranteed to be needed based on the symmetry of the structure.**
 
-        Args:
-            struct: A pymatgen Structure object.
-            local_funct: A function which computes the local environment attributes for a given site. By default, this is
-                the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
-                level, if you so desire (e.g. to use a compiled alternative you have written).
+    Args:
+        struct: A pymatgen Structure object.
+        local_funct: A function which computes the local environment attributes for a given site. By default, this is
+            the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+            level, if you so desire (e.g. to use a compiled alternative you have written).
+            
+    Returns:
+        A tuple of two numpy arrays. Each contains concatenated outputs of respecive tuples from ``local_env_function``. Please note
+        that, at this stage, the order of rows `does not` have to correspond to the order of sites in the structure and usually does not.
     """
     local_generator = LocalAttributeGenerator(struct, local_funct)
     attribute_list = list()
