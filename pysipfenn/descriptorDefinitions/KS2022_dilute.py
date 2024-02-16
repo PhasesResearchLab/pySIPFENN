@@ -1,23 +1,28 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
+# Standard Library Imports
 import math
 import time
-import numpy as np
 import os
+import json
+from collections import Counter
+from typing import List
+from importlib import resources
+
+# Third Party Dependencies
+from tqdm import tqdm
+import numpy as np
 from pymatgen.core import Structure, Element, PeriodicSite
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-import json
-from tqdm import tqdm
-from collections import Counter
-from typing import List
 
+# Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).
 periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
 
 # A prototype function which computes a weighted average over neighbors,
