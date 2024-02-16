@@ -241,7 +241,14 @@ def generate_descriptor(struct: Structure,
         minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
-        plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
+        plotParameters: If True, the convergence history will be plotted using plotly and, by default, will display as an 
+            interactive plot in your default web browser, allowing you to zoom and pan. The figure below shows an example
+            of such plot for a complex BCC 6-component high entropy alloy. The default value is False.
+            
+            .. image:: https://raw.githubusercontent.com/PhasesResearchLab/pySIPFENN/main/pysipfenn/descriptorDefinitions/assets/KS2022_randomSolution_ConvergencePlot.png
+                :alt: KS2022_randomSolution_ConvergencePlot
+                :width: 600
+            
         printProgress: If True, the progress will be printed to the console. The default value is True.
         returnMeta: If True, a dictionary containing the convergence history will be returned in addition to the
             descriptor. The default value is False.
