@@ -198,13 +198,15 @@ def get_equivalentSitesMultiplicities(
 
 
 def generate_descriptor(struct: Structure) -> np.ndarray:
-    """Main functionality. Generates the KS2022 descriptor for a given structure.
+    """Main functionality sharing API with every other featurizer in ``pySIPEFNN``. Generates the KS2022 descriptor for a given structure.
+    As explained in the top-level documentation, this descriptor is very efficient for ordered structures, and is minimizes expensive 
+    computation by considering site equivalences due to symmetry.
 
     Args:
-        struct: A pymatgen Structure object.
-
+        struct: A pymatgen ``Structure`` object. It can be any ordered (e.g., crystal) or disordered (e.g., glass) structure with collapsed
+            (defined) occupancies.
     Returns:
-        A 271-lenght numpy array of the descriptor.
+        A 271-lenght numpy ``ndarray`` of the descriptor. See ``labels_KS2022.csv`` for the meaning of each element of the array.
     """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
