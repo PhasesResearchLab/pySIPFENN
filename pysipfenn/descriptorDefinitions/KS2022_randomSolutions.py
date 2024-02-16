@@ -23,19 +23,15 @@ import pysipfenn
 import random
 import math
 import time
-import os
-import json
 from collections import Counter
 from typing import List, Union, Tuple
 from importlib import resources
 
 # Third Party Dependencies
-from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 import numpy as np
 from pymatgen.core import Structure, Element, Composition, PeriodicSite
 from pymatgen.analysis.local_env import VoronoiNN
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 # Certain hard-coded basic elemental properties used in the featurization (attribute_matrix is compatible with Magpie references,
 # and maxFeaturesInOQMD is based on the 2017 snapshot of OQMD, which was current when we started and will be retained in KS2022, but
@@ -474,7 +470,7 @@ def profile(test: str = 'FCC',
             nIterations: int = 1,
             plotParameters: bool = False,
             returnDescriptorAndMeta: bool = False) -> Union[None, Tuple[np.ndarray, dict]]:
-    """Profiles the descriptor using one of the test structures.
+    """Profiles the descriptor in parallel using one of the test structures.
 
     Args:
         test: The test structure to use. Options are 'FCC', 'BCC', and 'HCP'.
@@ -528,8 +524,10 @@ def profile(test: str = 'FCC',
 if __name__ == "__main__":
     print('You are running the KS2022_randomSolutions.py file directly. It is intended to be used as a module. '
           'A profiling task will now commence, going over several cases. This will take a while.')
-
+    t0 = time.time()
     profile(test='FCC', plotParameters=True)
     profile(test='BCC', plotParameters=True)
     profile(test='HCP', plotParameters=True)
     profile(test='BCC', nIterations=6)
+    print(f"All profiling tasks completed in {time.time() - t0:.2f} seconds. The results have been saved to the current working directory.")
+    print(f"Average of {((time.time() - t0) / 4):.2f} seconds per task.")
