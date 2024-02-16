@@ -142,14 +142,23 @@ def generate_voronoi_attributes(
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
 
-def magpie_mode(attribute_properties, axis=0):
-    """Calculates the attributes corresponding to the most common elements."""
+def most_common(
+    attribute_properties: np.ndarray
+    ) -> np.ndarray:
+    """Calculates the attributes corresponding to the most common elements.
+    
+    Args:
+        attribute_properties: A numpy array of the local environment attributes generated from ``generate_voronoi_attributes``.
+        
+    Returns:
+        A numpy array of the attributes corresponding to the most common elements.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
     for score in scores:
         template = (attribute_properties[:, 0] == score)
-        count = np.expand_dims(np.sum(template, axis), axis)[0]
+        count = np.expand_dims(np.sum(template, 0), 0)[0]
         if count > max_occurrence:
             top_elements.clear()
             top_elements.append(score)
@@ -190,7 +199,7 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
               np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
               np.max(attribute_properties, axis=0),
               np.min(attribute_properties, axis=0),
-              magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+              most_common(attribute_properties)), axis=-1).reshape((-1))))
     # Normalize Bond Length properties.
     properties[6] /= properties[5]
     properties[7] /= properties[5]
