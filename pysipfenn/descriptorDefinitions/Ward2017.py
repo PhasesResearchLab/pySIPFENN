@@ -3,12 +3,17 @@
 
 """This feature calculator is original Python source code written by Jonathan Siegel and Adam M. Krajewski for the ``pySIPFENN`` 
 package. The feature vector it calculates is based on the past work by Ward from Wolverton group, hence the name ``Ward2017``. If
-you use this code, plese cite both us and the authors of the original approach:
+you use this code, plese cite both us and the authors of the original approach (as in ``Ward2017.cite()``):
 
-- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks, Computational Materials Science, Volume 208, 2022, 111254
-- L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7, 2017
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, "Extensible Structure-Informed Prediction of Formation Energy with 
+  improved accuracy and usability employing neural networks", Computational Materials Science, Volume 208, 2022, 111254
 
-You can also get these citations by using the ``Ward2017.cite()`` method of the feature calculator.
+- L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in 
+  machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7, 2017
+
+The core purpose of this module is to calculate numpy ``ndarray`` with 271 features constructed by considering all local chemical 
+environments existing in an atomic structure. Their list is available in the ``labels_Ward2017.csv`` and is discussed in our
+``SIPFENN`` paper cited above. 
 """
 
 # Standard Library Imports
@@ -310,7 +315,14 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
 
 def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citations
+    return [
+        'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+        'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+        'Materials Science, Volume 208, 2022, 111254',
+        'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal '
+        'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical '
+        'Review B, vol. 96, no. 2, 7 2017.',
+        ]
 
 
 def profile(test='JVASP-10001', nRuns=10):
