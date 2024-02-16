@@ -29,6 +29,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "pymatgen>=2023.10.3",
+    "spglib==2.0.2",
     "torch>=2.0",
     "onnx2torch>=1.5.2",
     "onnx>=1.13.0",
