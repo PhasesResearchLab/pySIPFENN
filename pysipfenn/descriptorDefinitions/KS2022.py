@@ -7,7 +7,7 @@ import time
 import os
 import json
 from collections import Counter
-from typing import List
+from typing import List, Dict
 from importlib import resources
 
 # Third Party Dependencies
@@ -206,7 +206,7 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
         struct: A pymatgen ``Structure`` object. It can be any ordered (e.g., crystal) or disordered (e.g., glass) structure with collapsed
             (defined) occupancies.
     Returns:
-        A 271-lenght numpy ``ndarray`` of the descriptor. See ``labels_KS2022.csv`` for the meaning of each element of the array.
+        A ``256``-length numpy ``ndarray`` of the descriptor. See ``labels_KS2022.csv`` for the meaning of each element of the array.
     """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
@@ -300,8 +300,20 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
     return ks2022_structural
 
 
-def profile(test='JVASP-10001', nRuns=10):
-    """Profiles the descriptor in series using one of the test structures."""
+def profile(
+    test: str = 'JVASP-10001', 
+    nRuns: int = 10,
+    persistResult: bool = True
+    ) -> None:
+    """Profiles the descriptor in `series` using one of the test structures.
+    
+    Args:
+        test: The name of the test structure. By default, this is ``'JVASP-10001'``. Currently implemented tests are: ``'JVASP-10001'`` and 
+            ``'diluteNiAlloy'``.
+        nRuns: The number of runs. By default, this is ``10``.
+        persistResult: Whether to persist the result to a file (``'KS2022_TestResult.csv'``) to allow for inspection. By default, this is
+            ``True``.
+    """
     if test == 'JVASP-10001':
         print(
             f'KS2022 profiling/testing task will calculate a descriptor for Li2 Zr1 Te1 O6 (JVASP-10001) {nRuns} times in series.')
@@ -313,16 +325,32 @@ def profile(test='JVASP-10001', nRuns=10):
     else:
         print('Unrecognized test name.')
         return None
+    t0 = time.time()
     structList = [Structure.from_dict(json.loads(matStr))] * nRuns
     for s in tqdm(structList):
         d = generate_descriptor(s)
-    with open('KS2022_TestResult.csv', 'w+') as f:
-        f.writelines([f'{v}\n' for v in d])
-    print('Done!')
+    if persistResult:
+        with open('KS2022_TestResult.csv', 'w+') as f:
+            f.writelines([f'{v}\n' for v in d])
+    print(f"Done in {time.time() - t0} seconds.")
+    print(f"Average time per run: {(time.time() - t0) / nRuns} seconds.")
+    return None
 
 
-def profileParallel(test='JVASP-10001', nRuns=1000):
-    """Profiles the descriptor in parallel using one of the test structures."""
+def profileParallel(
+    test: str = 'JVASP-10001', 
+    nRuns: int = 1000,
+    makeSupercell222: bool = False
+    ) -> None:
+    """Profiles the descriptor in `parallel` using one of the test structures.
+    
+    Args:
+        test: The name of the test structure. By default, this is ``'JVASP-10001'``. Currently implemented tests are: ``'JVASP-10001'`` and 
+            ``'diluteNiAlloy'``.
+        nRuns: The number of total runs done in parallel by 8 workers. By default, this is ``1000``.
+        makeSupercell222: Whether to make a 2x2x2 supercell of the structure before profiling, increasing the number of atoms by a factor
+            of 8, but should not increase time thanks to the symmetry consierations. By default, this is ``False``.
+    """
     from tqdm.contrib.concurrent import process_map
     if test == 'JVASP-10001':
         print(
@@ -335,11 +363,15 @@ def profileParallel(test='JVASP-10001', nRuns=1000):
     else:
         print('Unrecognized test name.')
         return None
+    t0 = time.time()
     s = Structure.from_dict(json.loads(matStr))
-    # s.make_supercell(scaling_matrix=[2,2,2])
+    if makeSupercell222:
+        s.make_supercell(scaling_matrix=[2,2,2])
     structList = [s] * nRuns
-    descList = process_map(generate_descriptor, structList, max_workers=8)
-    print('Done!')
+    process_map(generate_descriptor, structList, max_workers=8)
+    print(f"Done in {time.time() - t0} seconds.")
+    print(f"Average time per run: {(time.time() - t0) / nRuns} seconds.")
+    return None
 
 
 if __name__ == "__main__":
