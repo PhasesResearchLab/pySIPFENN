@@ -247,7 +247,7 @@ def generate_descriptor(struct: Structure,
             
             .. image:: https://raw.githubusercontent.com/PhasesResearchLab/pySIPFENN/main/pysipfenn/descriptorDefinitions/assets/KS2022_randomSolution_ConvergencePlot.png
                 :alt: KS2022_randomSolution_ConvergencePlot
-                :width: 600
+                :width: 800
             
         printProgress: If True, the progress will be printed to the console. The default value is True.
         returnMeta: If True, a dictionary containing the convergence history will be returned in addition to the
