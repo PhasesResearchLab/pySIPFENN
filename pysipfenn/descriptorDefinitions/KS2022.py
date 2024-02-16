@@ -25,17 +25,23 @@ attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
 
-def local_env_function(local_env, site):
-    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
-        between them.
+def local_env_function(
+    local_env: dict,
+    site: PeriodicSite
+) -> List[np.ndarray]:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
+    between them.This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
+    displacement.
 
         Args:
-            local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
-            site: The site number for which the local environment is being computed.
-            element_dict: A dictionary of the elements in the structure.
+            local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+                a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+            site: The ``Site`` number for which the local environment is being computed.
 
         Returns:
-            A list of the local environment attributes.
+            A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+            elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
     """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
