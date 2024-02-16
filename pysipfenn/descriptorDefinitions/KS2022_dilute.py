@@ -98,6 +98,16 @@ def local_env_function(
 
 
 def findDilute(struct: Structure) -> int:
+    """Function for automatically detecting the dilute site index in otherwise a pure/elemental atomic structure. It 
+    works for exactly one dilute species in a single component matrix. If the structure is multi-component, the user
+    must provide the base ``Structure`` object manually to the ``generate_descriptor`` function.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object following a set of rules described above.
+        
+    Returns:
+        The index of the dilute site in the structure.
+    """
     spoList = struct.species_and_occu
     spCount = dict(Counter(spoList))
     spDilute = [spoList.index(sp) for sp in spCount if spCount[sp] == 1]
