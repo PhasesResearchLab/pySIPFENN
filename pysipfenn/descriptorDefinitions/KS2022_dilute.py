@@ -1,7 +1,7 @@
 # This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
 # Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
-"""This ``KS2022`` feature vector calculator is a special-case optimized modification of our the base ``KS2022``. 
+"""This ``KS2022`` feature vector calculator is a **special-case optimized** modification of our the base ``KS2022``. 
 
 It generates exactly the same information as the base ``KS2022`` but **can be an order of magnitude faster for dilute structures**, where
 only a single atom is different from the base structure. Under the hood, it compares the structure in question with implicit ``'pure'``
