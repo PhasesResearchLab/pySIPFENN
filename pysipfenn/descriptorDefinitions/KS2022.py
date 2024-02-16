@@ -115,12 +115,17 @@ class LocalAttributeGenerator:
         return self.function(local_env, self.struct[n])
 
 
-def generate_voronoi_attributes(struct, local_funct=local_env_function):
+def generate_voronoi_attributes(
+    struct: Structure, 
+    local_funct=local_env_function
+    ) -> tuple[np.ndarray, np.ndarray]:
     """Generates the local environment attributes for a given structure using a VoronoiNN generator.
 
         Args:
             struct: A pymatgen Structure object.
-            local_funct: A function which computes the local environment attributes for a given site.
+            local_funct: A function which computes the local environment attributes for a given site. By default, this is
+                the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+                level, if you so desire (e.g. to use a compiled alternative you have written).
     """
     local_generator = LocalAttributeGenerator(struct, local_funct)
     attribute_list = list()
