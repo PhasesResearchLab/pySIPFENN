@@ -1,45 +1,51 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
-import math
-import numpy as np
-import os
-from pymatgen.core import Structure, Element, Composition
-from pymatgen.analysis.local_env import VoronoiNN
-from collections import Counter
-from typing import List, Union, Tuple
-import random
-from importlib import resources
-from tqdm.contrib.concurrent import process_map
+# pySIPFENN (for handling prototype library with high-level API at lower-level here)
 import pysipfenn
 
-periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
-attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[
-                   :, [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+# Standard Library Imports
+import random
+import math
+import time
+import os
+import json
+from collections import Counter
+from typing import List, Union, Tuple
+from importlib import resources
 
-maxFeaturesInOQMD = np.array(
-    [13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835,
-     0.671142, 0.648262, 0.74048, 89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0,
-     95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 3631.95, 1395.25, 3631.95,
-     3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
-     213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908,
-     2.0, 2.0, 2.0, 5.0, 1.80537, 5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0,
-     5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 1.0, 0.406792, 1.0, 1.0, 1.0,
-     5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
-     20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853,
-     2.78409, 7.853, 7.853, 7.853, 2.09127, 0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0,
-     1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 102.0, 102.0, 102.0,
-     244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0,
-     3823.0, 18.0, 17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0,
-     106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0,
-     2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 14.0, 7.0,
-     14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0,
-     5.0, 2.5, 5.0, 5.0, 5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0,
-     22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 55.0625, 115.765, 115.765, 115.765,
-     7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
-     2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
+# Third Party Dependencies
+from tqdm import tqdm
+from tqdm.contrib.concurrent import process_map
+import numpy as np
+from pymatgen.core import Structure, Element, Composition, PeriodicSite
+from pymatgen.analysis.local_env import VoronoiNN
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
+
+# Certain hard-coded basic elemental properties used in the featurization (attribute_matrix is compatible with Magpie references,
+# and maxFeaturesInOQMD is based on the 2017 snapshot of OQMD, which was current when we started and will be retained in KS2022, but
+# change in the future).
+periodic_table_size = 112
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
+attribute_matrix = np.nan_to_num(attribute_matrix)
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+maxFeaturesInOQMD = np.array([
+    13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835, 0.671142, 0.648262, 0.74048, 
+    89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0, 95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 
+    3631.95, 1395.25, 3631.95, 3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
+    213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908, 2.0, 2.0, 2.0, 5.0, 1.80537, 
+    5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0, 5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 
+    1.0, 0.406792, 1.0, 1.0, 1.0, 5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
+    20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853, 2.78409, 7.853, 7.853, 7.853, 2.09127, 
+    0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0, 1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 
+    102.0, 102.0, 102.0, 244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0, 3823.0, 18.0, 
+    17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0, 106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 
+    3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0, 2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 
+    14.0, 7.0, 14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0, 5.0, 2.5, 5.0, 5.0, 
+    5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0, 22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 
+    55.0625, 115.765, 115.765, 115.765, 7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
+    2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
 
 
 def local_env_function(local_env, site):
