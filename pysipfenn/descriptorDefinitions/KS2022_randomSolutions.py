@@ -63,16 +63,23 @@ maxFeaturesInOQMD = np.array([
     2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
 
 
-def local_env_function(local_env, site):
-    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
-        between them.
+def local_env_function(
+    local_env: dict,
+    site: PeriodicSite
+) -> List[np.ndarray]:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
+    between them.This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
+    displacement.
 
-        Args:
-            local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
-            site: The site number for which the local environment is being computed.
+    Args:
+        local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+            a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+        site: The ``Site`` number for which the local environment is being computed.
 
-        Returns:
-            A list of the local environment attributes.
+    Returns:
+        A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+        elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
     """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
@@ -109,41 +116,67 @@ def local_env_function(local_env, site):
     # Calculate Packing Efficiency info
     sphere_rad = min(neighbor_site['face_dist'] for neighbor_site in local_env.values())
     sphere_volume = (4.0 / 3.0) * math.pi * math.pow(sphere_rad, 3.0)
-    return [
-        np.concatenate(
-            (
-                [eff_coord_num, blen_average, blen_var, volume, sphere_volume],
-                elemental_properties_attributes[0]
-            )),
-        elemental_properties_attributes[1]
-    ]
+    return [np.concatenate(
+        ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
+        elemental_properties_attributes[1]]
 
 
 class LocalAttributeGenerator:
-    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
     a function which computes the local environment attributes.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_env_func: A function which computes the local environment attributes for a given site.
+        nn_generator: A ``VoronoiNN`` generator object.
     """
 
-    def __init__(self, struct, local_env_func,
-                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(
+        self, 
+        struct: Structure,
+        local_env_func,
+        nn_generator: VoronoiNN = VoronoiNN(
+            compute_adj_neighbors=False, 
+            extra_nn_info=False)
+        ):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
+        """Wrapper pointing to a given ``Site`` index.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of the local environment attributes for the site. The type will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
 
 
-def generate_voronoi_attributes(struct, local_funct=local_env_function):
+def generate_voronoi_attributes(
+    struct: Structure, 
+    local_funct=local_env_function
+    ) -> tuple[np.ndarray, np.ndarray]:
     """Generates the local environment attributes for a given structure using a VoronoiNN generator.
 
-        Args:
-            struct: A pymatgen Structure object.
-            local_funct: A function which computes the local environment attributes for a given site.
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_funct: A function which computes the local environment attributes for a given site. By default, this is
+            the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+            level, if you so desire (e.g. to use a compiled alternative you have written).
+            
+    Returns:
+        A tuple of two numpy arrays. Each contains concatenated outputs of respecive tuples from ``local_env_function``. Please note
+        that, at this stage, the order of rows `does not` have to correspond to the order of sites in the structure and usually does not.
     """
     local_generator = LocalAttributeGenerator(struct, local_funct)
-    attribute_list = list(map(local_generator.generate_local_attributes, range(len(struct.sites))))
+    attribute_list = list(
+        map(local_generator.generate_local_attributes, 
+            range(len(struct.sites))))
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
 

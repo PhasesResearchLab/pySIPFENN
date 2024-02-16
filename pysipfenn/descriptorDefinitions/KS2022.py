@@ -144,7 +144,7 @@ def generate_voronoi_attributes(
     it is not guaranteed to be needed based on the symmetry of the structure.**
 
     Args:
-        struct: A pymatgen Structure object.
+        struct: A pymatgen ``Structure`` object.
         local_funct: A function which computes the local environment attributes for a given site. By default, this is
             the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
             level, if you so desire (e.g. to use a compiled alternative you have written).
