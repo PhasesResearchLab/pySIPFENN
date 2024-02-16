@@ -36,7 +36,7 @@ from pysipfenn.descriptorDefinitions import (
 
 # - add new ones here if extending the code
 
-__version__ = '0.13.1'
+__version__ = '0.15.0'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'

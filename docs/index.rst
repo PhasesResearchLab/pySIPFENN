@@ -9,7 +9,7 @@ pySIPFENN
 
 |GitHub top language| |PyPI - Python Version| |GitHub license| |PyPI Version| |PyPI Downloads|
 
-|GitHub last commit| |GitHub last release| |GitHub commits since tagged version| |GitHub issues|
+|GitHub last commit| |GitHub last release| |GitHub issues| |GitHub commits since previous| |GitHub commits since last| 
 
 |Full| |Linux| |MacM1| |MacIntel| |Windows| |Coverage Status|
 
@@ -67,9 +67,13 @@ pySIPFENN
     :alt: GitHub Release Date - Published_At
     :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
 
-.. |GitHub commits since tagged version| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.13.0?color=g
-    :alt: GitHub commits since tagged version
-    :target: https://codecov.io/gh/PhasesResearchLab/pySIPFENN
+.. |GitHub commits since previous| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.13.0?color=g
+    :alt: GitHub commits since previous
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
+
+.. |GitHub commits since last| image:: https://img.shields.io/github/commits-since/PhasesResearchLab/pysipfenn/v0.15.0?color=g
+    :alt: GitHub commits since last
+    :target: https://github.com/PhasesResearchLab/pySIPFENN/releases
 
 .. |GitHub issues| image:: https://img.shields.io/github/issues/PhasesResearchLab/pySIPFENN
     :alt: GitHub issues
