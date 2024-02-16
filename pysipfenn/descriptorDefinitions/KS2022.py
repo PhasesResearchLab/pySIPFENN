@@ -50,14 +50,14 @@ def local_env_function(
     Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
     displacement.
 
-        Args:
-            local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
-                a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
-            site: The ``Site`` number for which the local environment is being computed.
+    Args:
+        local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+            a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+        site: The ``Site`` number for which the local environment is being computed.
 
-        Returns:
-            A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
-            elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
+    Returns:
+        A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+        elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
     """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
@@ -126,6 +126,10 @@ class LocalAttributeGenerator:
         
         Args:
             n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of the local environment attributes for the site. The type will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``.
         """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
