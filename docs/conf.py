@@ -27,6 +27,7 @@ extensions = ['sphinx.ext.linkcode',
               'sphinx_autodoc_typehints',
               'myst_nb',
               'sphinx_github_changelog',
+              'sphinx_rtd_size'
               ]
 
 # Jupyter Notebook configuration
@@ -51,6 +52,8 @@ napoleon_use_param = True
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
+sphinx_rtd_size_width = "80%"
+
 
 html_context = {
     "display_github": True,
