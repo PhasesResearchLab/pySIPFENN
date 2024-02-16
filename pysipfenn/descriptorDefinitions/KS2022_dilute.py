@@ -305,8 +305,22 @@ def most_common(
 
 def generate_descriptor(
         struct: Structure,
-        baseStruct='pure'
+        baseStruct: Union[str, Structure] = 'pure'
 ) -> np.ndarray:
+    """Main functionality sharing API with every other featurizer in ``pySIPEFNN``. Generates the KS2022 descriptor for a given **dilute** structure.
+    As explained in the top-level documentation, this descriptor requires additional input of reference structure corresponding to the
+    ``Structure`` the calculation is being performed for. This is a special-case optimized modification of the base ``KS2022``. 
+
+    Args:
+        struct: A pymatgen ``Structure`` object. It can be any ordered (e.g., crystal) or disordered (e.g., glass) structure with collapsed
+            (defined) occupancies and exactly one dilute site different from the ``baseStruct`` ``Structure`` or be a pure elemental solid
+            with a single dilute site if the ``baseStruct`` is provided as a magic string ``'pure'``.
+        baseStruct: A pymatgen ``Structure`` object of **defect-free** version of the ``struct``. It can also be a magic string ``'pure'`` which
+            equates to assuming the base structure is a pure elemental solid. By default, this is ``'pure'`` as this is the most common use case
+            for people we work with, but we do test it with complex topologically close packed structures too.
+    Returns:
+        A ``256``-length numpy ``ndarray`` of the descriptor. See ``labels_KS2022.csv`` for the meaning of each element of the array.
+    """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct, baseStruct=baseStruct)
     properties = np.concatenate(
         (np.stack(
