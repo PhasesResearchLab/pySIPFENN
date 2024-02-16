@@ -84,17 +84,33 @@ def local_env_function(
 
 
 class LocalAttributeGenerator:
-    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
     a function which computes the local environment attributes.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_env_func: A function which computes the local environment attributes for a given site.
+        nn_generator: A ``VoronoiNN`` generator object.
     """
 
-    def __init__(self, struct, local_env_func,
-                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(
+        self, 
+        struct: Structure,
+        local_env_func,
+        nn_generator: VoronoiNN = VoronoiNN(
+            compute_adj_neighbors=False, 
+            extra_nn_info=False)
+        ):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
+        """Wrapper pointing to a given ``Site`` index.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
 
