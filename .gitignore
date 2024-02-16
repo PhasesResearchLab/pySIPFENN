@@ -12,3 +12,4 @@ pysipfenn.egg-info
 
 # Test and temporary files
 **/*_TestResult.csv
+**/TestResult_*.csv
