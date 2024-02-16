@@ -1,36 +1,35 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
-#
-# Calculates the descriptor / feature vector first introduced by Ward and Wolverton.
-#
-# In addition to pySIPFENN please cite:
-# L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
-# “Including crystal structure attributes in machine learning models of formation energies
-# via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Jonathan Siegel, Adam M. Krajewski
 
+"""This feature calculator is original Python source code written by Jonathan Siegel and Adam M. Krajewski for the ``pySIPFENN`` 
+package. The feature vector it calculates is based on the past work by Ward from Wolverton group, hence the name ``Ward2017``. If
+you use this code, plese cite both us and the authors of the original approach:
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks, Computational Materials Science, Volume 208, 2022, 111254
+- L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7, 2017
+
+You can also get these citations by using the ``Ward2017.cite()`` method of the feature calculator.
+"""
+
+# Standard Library Imports
 import math
-import json
-import numpy as np
 import os
-from pymatgen.core import Structure, Element
-from pymatgen.analysis.local_env import VoronoiNN
-from tqdm import tqdm
+import json
 from typing import List
+from importlib import resources
 
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254',
-    'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal '
-    'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical '
-    'Review B, vol. 96, no. 2, 7 2017.',
-    ]
+# Third Party Dependencies
+from tqdm import tqdm
+import numpy as np
+from pymatgen.core import Structure, Element, PeriodicSite
+from pymatgen.analysis.local_env import VoronoiNN
 
+# Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).
 periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
 
 
 def local_env_function(local_env, site, element_dict) -> list:
