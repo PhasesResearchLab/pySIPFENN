@@ -1,6 +1,21 @@
 # This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
 # Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
+"""This ``KS2022`` feature vector calculator is a special-case optimized modification of our the base ``KS2022``. 
+
+It generates exactly the same information as the base ``KS2022`` but **can be an order of magnitude faster for dilute structures**, where
+only a single atom is different from the base structure. Under the hood, it compares the structure in question with implicit ``'pure'``
+or explicity given base structure (for multi-component cases) to determine which of the local chemical environments that `may` be 
+equivalent but `do not have to be` equivalent are actually equivalent. If you use this code, plese cite (as in ``KS2022.cite()``):
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, "Extensible Structure-Informed Prediction of Formation Energy with 
+  improved accuracy and usability employing neural networks", Computational Materials Science, Volume 208, 2022, 111254
+
+The core purpose of this module is to calculate numpy ``ndarray`` with ``256`` features constructed by considering all local chemical 
+environments existing in an atomic structure. Their list is available in the ``labels_KS2022.csv`` and will be discussed in our upcoming
+publication (Spring 2024).
+"""
+
 # Standard Library Imports
 import math
 import time

@@ -1,8 +1,10 @@
 # This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
 # Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
-"""This ``KS2022`` feature vector calculator is a highly optimized modification of our previous work calculating ``Ward2017`` features. It is improved both
-in terms of features and speed. Most critically, it uses symmetry analysis to avoid redundant calculations of chemically equivalent atoms,
+"""This ``KS2022`` feature vector calculator is a highly optimized modification of our previous work calculating ``Ward2017`` features. It 
+is **improved in terms of both feature selection and speed**. 
+
+Most critically, it uses symmetry analysis to avoid redundant calculations of chemically equivalent atoms,
 typically speeding up the calculation by a factor of 3 to 10 for ordered structures. Feature-optimization was also carried out to remove
 several unphysical features or representations, such as space group being represented as a real number, rather than category. If
 you use this code, plese cite (as in ``KS2022.cite()``):
