@@ -209,7 +209,9 @@ def generate_voronoi_attributes(
 
 class LocalAttributeGenerator:
     """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
-    a function which computes the local environment attributes.
+    a function which computes the local environment attributes. **Note, unlike other ``KS2022`` calculators, this one has 
+    two ways of wrapping the calculation**. One is the standard, but the other one has different output and collects a set
+    of information critical to validating of proper equivalency of local chemical environments in a dilute structure.
     
     Args:
         struct: A pymatgen ``Structure`` object.
@@ -229,7 +231,7 @@ class LocalAttributeGenerator:
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n: int):
+    def generate_local_attributes(self, n: int) -> List[np.ndarray]:
         """Wrapper pointing to a given ``Site`` index.
         
         Args:
@@ -242,7 +244,22 @@ class LocalAttributeGenerator:
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
 
-    def generate_local_attributes_diluteSite(self, n: int):
+    def generate_local_attributes_diluteSite(
+        self, 
+        n: int
+    ) -> List[Union[np.ndarray, dict]]:
+        """This function is a special-case wrapper needed for certain sites to determine the equivalency of possibly equivalent
+        local chemical environments in a dilute structure. It performs the same function as ``generate_local_attributes`` but
+        also collects a set of critical information, which it returns as ``dict`` in the output list.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of (a) the local environment attributes for the site and (b) a dictionary of the local chemical environment characteristics
+            of the neighbors of the dilute site. The type of the first two elements will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``. 
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         local_env_result = self.function(local_env, self.struct[n])
 

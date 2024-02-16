@@ -52,7 +52,7 @@ napoleon_use_param = True
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ['_static']
-sphinx_rtd_size_width = "80%"
+sphinx_rtd_size_width = "70%"
 
 
 html_context = {
