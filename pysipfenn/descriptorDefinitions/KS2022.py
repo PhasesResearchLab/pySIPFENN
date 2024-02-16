@@ -45,7 +45,7 @@ def local_env_function(
     site: PeriodicSite
 ) -> List[np.ndarray]:
     """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
-    between them.This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    between them. This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
     Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
     displacement.
 
@@ -64,7 +64,7 @@ def local_env_function(
     diff_attributes = np.zeros(attribute_matrix.shape[1])
     total_weight = 0
     volume = 0
-    for ind, neighbor_site in local_env.items():
+    for _, neighbor_site in local_env.items():
         neighbor_attributes = np.zeros(attribute_matrix.shape[1])
         for key, value in neighbor_site['site'].species.get_el_amt_dict().items():
             neighbor_attributes += value * attribute_matrix[Element(key).Z - 1, :]

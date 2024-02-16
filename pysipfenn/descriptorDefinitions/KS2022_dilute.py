@@ -19,7 +19,6 @@ publication (Spring 2024).
 # Standard Library Imports
 import math
 import time
-import os
 import json
 from collections import Counter
 from typing import List
@@ -40,20 +39,31 @@ attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
 
-# A prototype function which computes a weighted average over neighbors,
-# weighted by the area of the voronoi cell between them.
 def local_env_function(
-        local_env: dict,
-        site: PeriodicSite,
-        struct: Structure,
+    local_env: dict,
+    site: PeriodicSite
 ) -> List[np.ndarray]:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
+    between them. This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
+    displacement.
+
+    Args:
+        local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+            a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+        site: The ``Site`` number for which the local environment is being computed.
+
+    Returns:
+        A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+        elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
+    """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
         local_attributes += value * attribute_matrix[Element(key).Z - 1, :]
     diff_attributes = np.zeros(attribute_matrix.shape[1])
     total_weight = 0
     volume = 0
-    for ind, neighbor_site in local_env.items():
+    for _, neighbor_site in local_env.items():
         neighbor_attributes = np.zeros(attribute_matrix.shape[1])
         for key, value in neighbor_site['site'].species.get_el_amt_dict().items():
             neighbor_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -168,25 +178,44 @@ def generate_voronoi_attributes(
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
 
-# A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
-# a function which computes the local environment attributes.
 class LocalAttributeGenerator:
+    """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
+    a function which computes the local environment attributes.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_env_func: A function which computes the local environment attributes for a given site.
+        nn_generator: A ``VoronoiNN`` generator object.
+    """
+
     def __init__(
-            self,
-            struct: Structure,
-            local_env_func,
-            nn_generator: VoronoiNN = VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+        self, 
+        struct: Structure,
+        local_env_func,
+        nn_generator: VoronoiNN = VoronoiNN(
+            compute_adj_neighbors=False, 
+            extra_nn_info=False)
+        ):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
     def generate_local_attributes(self, n: int):
+        """Wrapper pointing to a given ``Site`` index.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of the local environment attributes for the site. The type will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
-        return self.function(local_env, self.struct[n], self.struct)
+        return self.function(local_env, self.struct[n])
 
     def generate_local_attributes_diluteSite(self, n: int):
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
-        local_env_result = self.function(local_env, self.struct[n], self.struct)
+        local_env_result = self.function(local_env, self.struct[n])
 
         neighbor_dict = {value['site'].index:
                              [str(value['site'].species),
@@ -199,18 +228,23 @@ class LocalAttributeGenerator:
 
         return local_env_result
 
-
-# Calculates the attributes corresponding to the most common elements.
-def magpie_mode(
-        attribute_properties,
-        axis: int = 0
-) -> np.ndarray:
+def most_common(
+    attribute_properties: np.ndarray
+    ) -> np.ndarray:
+    """Calculates the attributes corresponding to the most common elements.
+    
+    Args:
+        attribute_properties: A numpy array of the local environment attributes generated from ``generate_voronoi_attributes``.
+        
+    Returns:
+        A numpy array of the attributes corresponding to the most common elements.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
     for score in scores:
         template = (attribute_properties[:, 0] == score)
-        count = np.expand_dims(np.sum(template, axis), axis)[0]
+        count = np.expand_dims(np.sum(template, 0), 0)[0]
         if count > max_occurrence:
             top_elements.clear()
             top_elements.append(score)
