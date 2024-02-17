@@ -207,7 +207,7 @@ class Calculator:
                 detectedNets.append(net)
                 print('✔ ' + netName)
             else:
-                print('⨯ ' + netName)
+                print('x ' + netName)
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
