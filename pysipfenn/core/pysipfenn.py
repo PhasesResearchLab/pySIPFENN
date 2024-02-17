@@ -223,6 +223,7 @@ class Calculator:
             # Fetch all
             if network == 'all':
                 print('Fetching all networks!')
+                downloadableNets = [net for net in self.network_list if 'URL_ONNX' in self.models[net]]
                 for net in self.network_list:
                     if net not in self.network_list_available:
                         if 'URL_ONNX' in self.models[net]:
@@ -236,8 +237,8 @@ class Calculator:
                             print(f'{net} not detected on disk and ONNX URL has not been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
-                if self.network_list == self.network_list_available:
-                    print('All networks available!')
+                if downloadableNets == self.network_list_available:                
+                    print('All downloadable networks are now available!')
                 else:
                     print('Problem occurred.')
 
