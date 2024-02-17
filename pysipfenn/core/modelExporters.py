@@ -4,18 +4,12 @@ import onnx
 import io
 from tqdm import tqdm
 
-try:
-    import coremltools as ct
-    from onnxconverter_common import float16
-    from onnxsim import simplify
-except ModuleNotFoundError as e:
-    print('Note: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
-          '"dev" mode like: pip install -e "pysipfenn[dev]", or like pip install -e ".[dev]" (see pysipfenn.org)')
-
-
 class ONNXExporter:
     """Export models to the ONNX format (what they ship in by default) to allow (1) exporting modified pySIPFENN models,
     (2) simplify the models using ONNX optimizer, and (3) convert them to `FP16` precision, cutting the size in half.
+    
+    Note: Some of the dependencies (``onnxconverter_common`` and ``onnxsim``) are not installed by default. If you need them, 
+    you have to install pySIPFENN in `dev` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
 
     Args:
         calculator: A ``Calculator`` object with loaded models that has loaded PyTorch models (happens automatically
@@ -28,9 +22,16 @@ class ONNXExporter:
         simplifiedDict: A boolean dictionary of models that have been simplified.
         fp16Dict: A boolean dictionary of models that have been converted to FP16.
     """
-
+    
     def __init__(self, calculator: Calculator):
         """Initialize the ``ONNXExporter`` using a calculator object."""
+        try:
+            from onnxconverter_common import float16
+            from onnxsim import simplify
+        except ModuleNotFoundError as e:
+            raise Exception(str(e) + '\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install '
+                            'pySIPFENN in `dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
+            
         self.simplifiedDict = {model: False for model in calculator.loadedModels.keys()}
         self.fp16Dict = {model: False for model in calculator.loadedModels.keys()}
         self.calculator = calculator
@@ -167,6 +168,7 @@ class TorchExporter:
     Attributes:
         calculator: A ``Calculator`` object with loaded models.
     """
+        
     def __init__(self, calculator: Calculator):
         """Initialize the TorchExporter with a calculator object that has loaded models."""
         self.calculator = calculator
@@ -225,6 +227,9 @@ class CoreMLExporter:
     """Export models to the ``CoreML`` format to allow for easy loading and inference in ``CoreML`` in other projects,
     particularly valuable for Apple devices, as pySIPFENN models can be run using the Neural Engine accelerator
     with minimal power consumption and neat optimizations.
+    
+    Note: Some of the dependencies (``coremltools``) are not installed by default. If you need them, 
+    you have to install pySIPFENN in `dev` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
 
     Args:
         calculator: A ``Calculator`` object with loaded models.
@@ -232,7 +237,15 @@ class CoreMLExporter:
     Attributes:
         calculator: A ``Calculator`` object with loaded models.
     """
+
     def __init__(self, calculator: Calculator):
+        try:
+            import coremltools as ct
+        except ModuleNotFoundError as e:
+            raise Exception(str(e) + '\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install '
+                            'pySIPFENN in `dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
+
+
         self.calculator = calculator
         assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')

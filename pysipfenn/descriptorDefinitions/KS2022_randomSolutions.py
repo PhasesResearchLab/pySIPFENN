@@ -410,7 +410,7 @@ def generate_descriptor(struct: Structure,
         diffArray = np.array(diffHistory)
 
         # Plot the parameters as lines. Add hover text to show the parameter name based on the labels_KS2022.csv file.
-        with resources.files('pysipfenn').joinpath('descriptorDefinitions/labels_KS2022.csv').open() as f:
+        with resources.files('pysipfenn.descriptorDefinitions').joinpath('labels_KS2022.csv').open() as f:
             labels = f.readlines()
         fig = px.line(pd.DataFrame(diffArray, columns=labels), title='KS2022 Descriptor Parameters',
                       range_y=[-0.5, 0.5])
