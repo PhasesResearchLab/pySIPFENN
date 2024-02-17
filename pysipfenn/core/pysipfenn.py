@@ -1,9 +1,6 @@
 # Standard Library Imports
 import os
 import gc
-import io
-import sys
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 import csv
 import json
 from time import perf_counter
