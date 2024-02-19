@@ -4,10 +4,11 @@ on:
   push:
     tags:
       - '**'
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: macos-14
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
