@@ -11,7 +11,7 @@ from importlib import resources
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 import natsort
-from pySmartDL import SmartDL
+from pysmartdl2 import SmartDL
 
 # Scientific Computing Imports
 import numpy as np
