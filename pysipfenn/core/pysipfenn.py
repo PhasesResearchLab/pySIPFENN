@@ -12,6 +12,7 @@ from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 import natsort
 from pysmartdl2 import SmartDL
+from colorama import Fore, Style
 
 # Scientific Computing Imports
 import numpy as np
@@ -71,17 +72,17 @@ class Calculator:
                  verbose: bool = True):
         """Initializes the pySIPFENN Calculator object."""
         if verbose:
-            print('*********  Initializing pySIPFENN Calculator  **********')
-        self.verbose = verbose
+            print('\n*********  Initializing pySIPFENN Calculator  **********')
+            self.verbose = verbose
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
-                print(f'Loading model definitions from: {f.name}')
+                print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
         if verbose:
-            print(f'Found {len(self.network_list)} network definitions in models.json')
+            print(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
         # network names
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
@@ -89,10 +90,10 @@ class Calculator:
 
         self.loadedModels = {}
         if autoLoad:
-            print(f'Loading all available models (autoLoad=True)')
+            print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
             self.loadModels()
         else:
-            print(f'Skipping model loading (autoLoad=False)')
+            print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
 
         self.prototypeLibrary = {}
         self.parsePrototypeLibrary(verbose=verbose)
@@ -105,7 +106,7 @@ class Calculator:
         }
         self.inputFiles = []
         if verbose:
-            print(f'*********  pySIPFENN Successfully Initialized  **********')
+            print(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
 
     def __str__(self):
         """Prints the status of the ``Calculator`` object."""
@@ -175,7 +176,12 @@ class Calculator:
                 }
             })
         if verbose:
-            print(f'{len(self.prototypeLibrary)} prototype structures present into the prototype library.')
+            protoLen = len(self.prototypeLibrary)
+            if protoLen == 0:
+                print(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+            else:
+                print(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
+            
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
         """Parses a custom prototype library YAML file and permanently appends it into the internal prototypeLibrary
@@ -205,9 +211,9 @@ class Calculator:
         for net, netName in zip(self.network_list, self.network_list_names):
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
-                print('✔ ' + netName)
+                print(f"{Fore.GREEN}✔ {netName}{Style.RESET_ALL}")
             else:
-                print('x ' + netName)
+                print(f"{Style.DIM}x {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:

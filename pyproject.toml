@@ -39,7 +39,8 @@ dependencies = [
     "pymongo>=4.4",
     "pysmartdl2>=2.0.0",
     "dnspython",
-    "ruamel.yaml"
+    "ruamel.yaml",
+    "colorama"
 ]
 
 [project.optional-dependencies]
