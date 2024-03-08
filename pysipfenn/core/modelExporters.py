@@ -24,14 +24,7 @@ class ONNXExporter:
     """
     
     def __init__(self, calculator: Calculator):
-        """Initialize the ``ONNXExporter`` using a calculator object."""
-        try:
-            from onnxconverter_common import float16
-            from onnxsim import simplify
-        except ModuleNotFoundError as e:
-            print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
-                  '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
-            
+        """Initialize the ``ONNXExporter`` using a calculator object."""    
         self.simplifiedDict = {model: False for model in calculator.loadedModels.keys()}
         self.fp16Dict = {model: False for model in calculator.loadedModels.keys()}
         self.calculator = calculator
@@ -86,6 +79,11 @@ class ONNXExporter:
         Returns:
             None
         """
+        try:
+            from onnxsim import simplify
+        except ModuleNotFoundError as e:
+            print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
+                  '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
         print(f'Simplifying {model}')
         assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to simplify.'
         loadedModel = self.calculator.loadedModels[model]
@@ -110,6 +108,11 @@ class ONNXExporter:
         Returns:
             None
         """
+        try:
+            from onnxconverter_common import float16
+        except ModuleNotFoundError as e:
+            print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
+                  '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
         print(f'Converting {model} to FP16')
         assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to convert to FP16.'
         loadedModel = self.calculator.loadedModels[model]
@@ -239,12 +242,6 @@ class CoreMLExporter:
     """
 
     def __init__(self, calculator: Calculator):
-        try:
-            import coremltools as ct
-        except ModuleNotFoundError as e:
-            print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
-                  '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
-
         self.calculator = calculator
         assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')
@@ -265,6 +262,12 @@ class CoreMLExporter:
         Returns:
             None
         """
+        try:
+            import coremltools as ct
+        except ModuleNotFoundError as e:
+            print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
+                  '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
+            
         print(f'Exporting {model} to CoreML')
         assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
         loadedModel = self.calculator.loadedModels[model]
