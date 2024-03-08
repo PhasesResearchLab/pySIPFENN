@@ -35,7 +35,7 @@ jobs:
           
   testFullPython310:
     needs: coreTests
-    runs-on: ubuntu-22.04
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
       
