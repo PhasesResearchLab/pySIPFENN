@@ -76,6 +76,3 @@ class TestKS2022RandomSolutionProfiling(unittest.TestCase):
     def test_singleInParallel(self):
         '''Tests parallel execution profiling works.'''
         KS2022_randomSolutions.profile(test='BCC', nIterations=2)
-
-if __name__ == '__main__':
-    unittest.main()

@@ -99,7 +99,3 @@ class TestKS2022_diluteProfiling(unittest.TestCase):
         workers to speed up the execution.
         '''
         KS2022_dilute.profileParallel(test='diluteNiAlloy', nRuns=64)
-
-
-if __name__ == '__main__':
-    unittest.main()

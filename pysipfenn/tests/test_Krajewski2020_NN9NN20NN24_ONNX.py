@@ -35,6 +35,4 @@ class TestKrajewski2020ModelsFromONNX(unittest.TestCase):
         for p, name, ref_mxnet in zip(c.predictions[0], toTest, referenceEnergies_MxNet):
             with self.subTest(msg=f'Predicting vs MxNet with {name:<16}'):
                 self.assertAlmostEqual(p, ref_mxnet, places=6)
-
-if __name__ == '__main__':
-    unittest.main()
+                

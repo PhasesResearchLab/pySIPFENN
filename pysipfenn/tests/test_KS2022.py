@@ -84,7 +84,3 @@ class TestKS2022Profiling(unittest.TestCase):
         '''
         KS2022.profileParallel(test='JVASP-10001', nRuns=24)
         KS2022.profileParallel(test='diluteNiAlloy', nRuns=24)
-
-
-if __name__ == '__main__':
-    unittest.main()

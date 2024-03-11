@@ -432,7 +432,3 @@ class TestCoreRSS(unittest.TestCase):
                 self.assertIn('finalAtomsN', meta)
                 self.assertIn('finalCompositionDistance', meta)
                 self.assertIn('finalComposition', meta)
-
-
-if __name__ == '__main__':
-    unittest.main()

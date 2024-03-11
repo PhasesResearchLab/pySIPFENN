@@ -91,8 +91,3 @@ class TestPL(unittest.TestCase):
 
         with self.subTest(msg="Restore the original prototype library"):
             pysipfenn.overwritePrototypeLibrary(backup)
-
-
-
-
-

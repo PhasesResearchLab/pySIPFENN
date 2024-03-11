@@ -69,7 +69,3 @@ class TestWard2017Profiling(unittest.TestCase):
         '''
         Ward2017.profileParallel(test='JVASP-10001', nRuns=24)
         Ward2017.profileParallel(test='diluteNiAlloy', nRuns=24)
-
-
-if __name__ == '__main__':
-    unittest.main()
