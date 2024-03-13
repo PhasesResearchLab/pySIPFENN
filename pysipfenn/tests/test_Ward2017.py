@@ -46,6 +46,12 @@ class TestWard2017(unittest.TestCase):
                 if l not in self.skipLabels:
                     with self.subTest(msg=f'Testing {l} calculated for {name}'):
                         self.assertAlmostEqual(p_fo, p_trd, places=6)
+    
+    def test_cite(self):
+        """Tests citation return."""
+        citation = Ward2017.cite()
+        self.assertIn("Krajewski", citation[0])
+        self.assertIn("Ward", citation[1])
 
 
 class TestWard2017Profiling(unittest.TestCase):
@@ -63,7 +69,3 @@ class TestWard2017Profiling(unittest.TestCase):
         '''
         Ward2017.profileParallel(test='JVASP-10001', nRuns=24)
         Ward2017.profileParallel(test='diluteNiAlloy', nRuns=24)
-
-
-if __name__ == '__main__':
-    unittest.main()

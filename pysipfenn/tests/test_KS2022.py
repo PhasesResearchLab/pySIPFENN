@@ -64,6 +64,11 @@ class TestKS2022(unittest.TestCase):
                     with self.subTest(msg=f'{name:<16} diff in {l}'):
                         self.assertAlmostEqual(p_fo, p_trd, places=6)
 
+    def test_cite(self):
+        """Tests citation return."""
+        citation = KS2022.cite()
+        self.assertIn("Krajewski", citation[0])
+
 class TestKS2022Profiling(unittest.TestCase):
     '''Test the KS2022 descriptor generation by profiling the execution time of the descriptor generation function
     for two example structures (JVASP-10001 and diluteNiAlloy).
@@ -79,7 +84,3 @@ class TestKS2022Profiling(unittest.TestCase):
         '''
         KS2022.profileParallel(test='JVASP-10001', nRuns=24)
         KS2022.profileParallel(test='diluteNiAlloy', nRuns=24)
-
-
-if __name__ == '__main__':
-    unittest.main()

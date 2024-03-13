@@ -1,36 +1,40 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
-#
-# Calculates the descriptor / feature vector first introduced by Ward and Wolverton.
-#
-# In addition to pySIPFENN please cite:
-# L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton,
-# “Including crystal structure attributes in machine learning models of formation energies
-# via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7 2017.
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Jonathan Siegel, Adam M. Krajewski
 
+"""This feature calculator is original Python source code written by Jonathan Siegel and Adam M. Krajewski for the ``pySIPFENN`` 
+package. The feature vector it calculates is based on the past work by Ward from Wolverton group, hence the name ``Ward2017``. If
+you use this code, plese cite both us and the authors of the original approach (as in ``Ward2017.cite()``):
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, "Extensible Structure-Informed Prediction of Formation Energy with 
+  improved accuracy and usability employing neural networks", Computational Materials Science, Volume 208, 2022, 111254
+
+- L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal structure attributes in 
+  machine learning models of formation energies via Voronoi tessellations,” Physical Review B, vol. 96, no. 2, 7, 2017
+
+The core purpose of this module is to calculate numpy ``ndarray`` with 271 features constructed by considering all local chemical 
+environments existing in an atomic structure. Their list is available in the ``labels_Ward2017.csv`` and is discussed in our
+``SIPFENN`` paper cited above. 
+"""
+
+# Standard Library Imports
 import math
-import json
-import numpy as np
 import os
-from pymatgen.core import Structure, Element
-from pymatgen.analysis.local_env import VoronoiNN
-from tqdm import tqdm
+import json
 from typing import List
+from importlib import resources
 
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254',
-    'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal '
-    'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical '
-    'Review B, vol. 96, no. 2, 7 2017.',
-    ]
+# Third Party Dependencies
+from tqdm import tqdm
+import numpy as np
+from pymatgen.core import Structure, Element, PeriodicSite
+from pymatgen.analysis.local_env import VoronoiNN
 
+# Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).
 periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17, 50]]
 
 
 def local_env_function(local_env, site, element_dict) -> list:
@@ -111,7 +115,14 @@ class LocalAttributeGenerator:
         self.element_dict = element_dict
 
     def generate_local_attributes(self, n: int):
-        """Generates the local environment attributes for a given site in the structure."""
+        """Generates the local environment attributes for a given site in the structure.
+        
+        Args:
+            n: the index of the site to consider
+
+        Returns:
+            The local environment around site n.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n], self.element_dict)
 
@@ -124,6 +135,8 @@ def generate_voronoi_attributes(struct: Structure, local_funct=local_env_functio
         struct: A pymatgen Structure object.
         local_funct: A function which computes the local environment attributes for a given site.
 
+    Returns:
+        A list of local attributes calculated using local_funct from the input structure.
     """
     # Collect stoichiometry of structure for use in WC parameter calculation.
     element_dict = {}
@@ -149,7 +162,9 @@ def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels) -> List[f
         strc: A pymatgen Structure object.
         neighbor_dict_raw: A dictionary of the neighbors of each site in the structure.
         levels: The number of shells to consider.
-
+        
+    Returns:
+        A list of the WC attributes computed from the given structure.
     """
     if len(strc.composition) == 1:
         return [0] * levels
@@ -211,7 +226,14 @@ def generate_WC_attributes(strc: Structure, neighbor_dict_raw, levels) -> List[f
 
 
 def magpie_mode(attribute_properties, axis=0):
-    """Calculates the attributes corresponding to the most common elements."""
+    """Calculates the attributes corresponding to the most common elements.
+
+    Args:
+        attribute_properties: A list of attribute properties calculated for all of the elements in the structure 
+
+    Returns:
+        The average of the attributes over all elements which occur most often.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
@@ -311,7 +333,14 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
 
 def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citations
+    return [
+        'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+        'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+        'Materials Science, Volume 208, 2022, 111254',
+        'L. Ward, R. Liu, A. Krishna, V. I. Hegde, A. Agrawal, A. Choudhary, and C. Wolverton, “Including crystal '
+        'structure attributes in machine learning models of formation energies via Voronoi tessellations,” Physical '
+        'Review B, vol. 96, no. 2, 7 2017.',
+        ]
 
 
 def profile(test='JVASP-10001', nRuns=10):

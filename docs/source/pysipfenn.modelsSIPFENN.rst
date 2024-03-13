@@ -25,7 +25,7 @@ additionally, the `models.json` file can contain the following optional fields:
           training data information, model training hyperparameters, and key information about the model predictions
           including property/properties predicted, units, and range of applicability.
 
-As of pySIPFENN v0.13.0, the `models.json` file contains the following models:
+As of pySIPFENN v0.15.0, the `models.json` file contains the following models:
 
 .. code-block:: JSON
 

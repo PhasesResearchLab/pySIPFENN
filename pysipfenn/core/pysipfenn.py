@@ -1,9 +1,6 @@
 # Standard Library Imports
 import os
 import gc
-import io
-import sys
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 import csv
 import json
 from time import perf_counter
@@ -14,7 +11,8 @@ from importlib import resources
 from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 import natsort
-from pySmartDL import SmartDL
+from pysmartdl2 import SmartDL
+from colorama import Fore, Style
 
 # Scientific Computing Imports
 import numpy as np
@@ -36,7 +34,7 @@ from pysipfenn.descriptorDefinitions import (
 
 # - add new ones here if extending the code
 
-__version__ = '0.13.1'
+__version__ = '0.15.0'
 __authors__ = [["Adam Krajewski", "ak@psu.edu"],
                ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
 __name__ = 'pysipfenn'
@@ -74,17 +72,17 @@ class Calculator:
                  verbose: bool = True):
         """Initializes the pySIPFENN Calculator object."""
         if verbose:
-            print('*********  Initializing pySIPFENN Calculator  **********')
+            print('\n*********  Initializing pySIPFENN Calculator  **********')
             self.verbose = verbose
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
-                print(f'Loading model definitions from: {f.name}')
+                print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
         if verbose:
-            print(f'Found {len(self.network_list)} network definitions in models.json')
+            print(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
         # network names
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
@@ -92,10 +90,10 @@ class Calculator:
 
         self.loadedModels = {}
         if autoLoad:
-            print(f'Loading all available models (autoLoad=True)')
+            print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
             self.loadModels()
         else:
-            print(f'Skipping model loading (autoLoad=False)')
+            print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
 
         self.prototypeLibrary = {}
         self.parsePrototypeLibrary(verbose=verbose)
@@ -108,7 +106,7 @@ class Calculator:
         }
         self.inputFiles = []
         if verbose:
-            print(f'*********  pySIPFENN Successfully Initialized  **********')
+            print(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
 
     def __str__(self):
         """Prints the status of the ``Calculator`` object."""
@@ -178,7 +176,12 @@ class Calculator:
                 }
             })
         if verbose:
-            print(f'{len(self.prototypeLibrary)} prototype structures present into the prototype library.')
+            protoLen = len(self.prototypeLibrary)
+            if protoLen == 0:
+                print(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+            else:
+                print(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
+            
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
         """Parses a custom prototype library YAML file and permanently appends it into the internal prototypeLibrary
@@ -208,9 +211,9 @@ class Calculator:
         for net, netName in zip(self.network_list, self.network_list_names):
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
-                print('✔ ' + netName)
+                print(f"{Fore.GREEN}✔ {netName}{Style.RESET_ALL}")
             else:
-                print('⨯ ' + netName)
+                print(f"{Style.DIM}x {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
@@ -226,6 +229,7 @@ class Calculator:
             # Fetch all
             if network == 'all':
                 print('Fetching all networks!')
+                downloadableNets = [net for net in self.network_list if 'URL_ONNX' in self.models[net]]
                 for net in self.network_list:
                     if net not in self.network_list_available:
                         if 'URL_ONNX' in self.models[net]:
@@ -239,8 +243,8 @@ class Calculator:
                             print(f'{net} not detected on disk and ONNX URL has not been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
-                if self.network_list == self.network_list_available:
-                    print('All networks available!')
+                if downloadableNets == self.network_list_available:                
+                    print('All downloadable networks are now available!')
                 else:
                     print('Problem occurred.')
 

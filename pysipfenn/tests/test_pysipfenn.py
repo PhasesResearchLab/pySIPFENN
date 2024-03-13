@@ -5,6 +5,7 @@ import os
 import pysipfenn
 from importlib import resources
 from natsort import natsorted
+from numpy import zeros
 
 from pymatgen.core import Structure, Composition
 
@@ -28,6 +29,13 @@ class TestCore(unittest.TestCase):
         self.assertEqual(self.c.toRun, [])
         self.assertEqual(self.c.descriptorData, [])
         self.assertEqual(self.c.inputFiles, [])
+
+    def testDestroy(self):
+        """ Test that the Calculator can deallocate itself (incl. loaded models and its data)."""
+        self.assertIsNotNone(self.c)
+        self.c.toRun = ['model1', 'model2']
+        self.c.descriptorData = [zeros([271])]*10000
+        self.c.destroy()
 
     def detectModels(self):
         '''Test that the updateModelAvailability() method works without errors and returns a list of available models.
@@ -258,7 +266,12 @@ class TestCore(unittest.TestCase):
         with self.subTest(mgs='No models to run dilute'):
             with self.assertRaises(AssertionError):
                 self.c.network_list_available = []
-                self.c.runModels_dilute(descriptor='KS2022_dilute', structList=[])
+                self.c.runModels_dilute(descriptor='KS2022', structList=[])
+
+        with self.subTest(mgs='No models to run random solid solution'):
+            with self.assertRaises(AssertionError):
+                self.c.network_list_available = []
+                self.c.runModels_randomSolutions(descriptor='KS2022', baseStructList=[], compList=[])
 
         with self.subTest(mgs='Descriptor not implemented'):
             with self.assertRaises(AssertionError):
@@ -267,6 +280,10 @@ class TestCore(unittest.TestCase):
         with self.subTest(mgs='Dilute descriptor not implemented'):
             with self.assertRaises(AssertionError):
                 self.c.runModels_dilute(descriptor='jx9348ghfmx8345wgyf', structList=[])
+
+        with self.subTest(mgs='Random solution descriptor not implemented'):
+            with self.assertRaises(AssertionError):
+                self.c.runModels_randomSolutions(descriptor='jx9348ghfmx8345wgyf', baseStructList=[], compList=[])
 
     def test_WriteDescriptorDataToCSV(self):
         '''Test that the writeDescriptorsToCSV() method writes the correct data to a CSV file and that the file is
@@ -309,6 +326,16 @@ class TestCore(unittest.TestCase):
         self.assertIn('pySIPFENN Calculator Object', printOut)
         self.assertIn('Models are located', printOut)
         self.assertIn('Loaded Networks', printOut)
+
+    def test_util_Ward2017toKS2022(self):
+        """Tests that Ward2017 conversion to its KS2022 subset works as intended."""
+        struct = self.c.prototypeLibrary['FCC']['structure']
+        self.assertIsInstance(struct, Structure)
+        desc1 = self.c.calculate_Ward2017([struct])[0]
+        desc2 = list(self.c.calculate_KS2022([struct])[0])
+        desc2from1 = list(pysipfenn.ward2ks2022(desc1))
+        for d2, d21 in zip(desc2, desc2from1):
+            self.assertAlmostEqual(d2, d21, places=6, msg="Direct and converted KS2022toWard2017 should be the same.")
 
 
 class TestCoreRSS(unittest.TestCase):
@@ -405,7 +432,3 @@ class TestCoreRSS(unittest.TestCase):
                 self.assertIn('finalAtomsN', meta)
                 self.assertIn('finalCompositionDistance', meta)
                 self.assertIn('finalComposition', meta)
-
-
-if __name__ == '__main__':
-    unittest.main()

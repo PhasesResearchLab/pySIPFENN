@@ -19,6 +19,4 @@ class TestAllCompatibleONNX_Ward2017(unittest.TestCase):
             c.runFromDirectory(directory=exampleInputsDir, descriptor='Ward2017')
         print(c.get_resultDicts())
         c.writeResultsToCSV('Ward2017-ONNX_testResults.csv')
-
-if __name__ == '__main__':
-    unittest.main()
+        

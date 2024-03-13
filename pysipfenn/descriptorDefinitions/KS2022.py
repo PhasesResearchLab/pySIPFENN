@@ -1,44 +1,62 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
-#
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
+"""This ``KS2022`` feature vector calculator is a highly optimized modification of our previous work calculating ``Ward2017`` features. It 
+is **improved in terms of both feature selection and speed**. 
 
+Most critically, it uses symmetry analysis to avoid redundant calculations of chemically equivalent atoms,
+typically speeding up the calculation by a factor of 3 to 10 for ordered structures. Feature-optimization was also carried out to remove
+several unphysical features or representations, such as space group being represented as a real number, rather than category. If
+you use this code, plese cite (as in ``KS2022.cite()``):
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, "Extensible Structure-Informed Prediction of Formation Energy with 
+  improved accuracy and usability employing neural networks", Computational Materials Science, Volume 208, 2022, 111254
+
+The core purpose of this module is to calculate numpy ``ndarray`` with ``256`` features constructed by considering all local chemical 
+environments existing in an atomic structure. Their list is available in the ``labels_KS2022.csv`` and will be discussed in our upcoming
+publication (Spring 2024).
+"""
+
+# Standard Library Imports
 import math
 import time
+import json
+from collections import Counter
+from typing import List, Dict
+from importlib import resources
+
+# Third Party Dependencies
+from tqdm import tqdm
 import numpy as np
-import os
-from pymatgen.core import Structure, Element
+from pymatgen.core import Structure, Element, PeriodicSite
 from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-import json
-from tqdm import tqdm
-from collections import Counter
-from typing import List
 
-citations = [
-    'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
-    'Formation Energy with improved accuracy and usability employing neural networks, Computational '
-    'Materials Science, Volume 208, 2022, 111254'
-    ]
-
+# Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).
 periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[:,
-                   [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
 
 
-def local_env_function(local_env, site):
-    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
-        between them.
+def local_env_function(
+    local_env: dict,
+    site: PeriodicSite
+) -> List[np.ndarray]:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
+    between them. This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
+    displacement.
 
-        Args:
-            local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
-            site: The site number for which the local environment is being computed.
-            element_dict: A dictionary of the elements in the structure.
+    Args:
+        local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+            a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+        site: The ``Site`` number for which the local environment is being computed.
 
-        Returns:
-            A list of the local environment attributes.
+    Returns:
+        A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+        elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
     """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
@@ -46,7 +64,7 @@ def local_env_function(local_env, site):
     diff_attributes = np.zeros(attribute_matrix.shape[1])
     total_weight = 0
     volume = 0
-    for ind, neighbor_site in local_env.items():
+    for _, neighbor_site in local_env.items():
         neighbor_attributes = np.zeros(attribute_matrix.shape[1])
         for key, value in neighbor_site['site'].species.get_el_amt_dict().items():
             neighbor_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -81,27 +99,58 @@ def local_env_function(local_env, site):
 
 
 class LocalAttributeGenerator:
-    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
     a function which computes the local environment attributes.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_env_func: A function which computes the local environment attributes for a given site.
+        nn_generator: A ``VoronoiNN`` generator object.
     """
 
-    def __init__(self, struct, local_env_func,
-                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(
+        self, 
+        struct: Structure,
+        local_env_func,
+        nn_generator: VoronoiNN = VoronoiNN(
+            compute_adj_neighbors=False, 
+            extra_nn_info=False)
+        ):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
+        """Wrapper pointing to a given ``Site`` index.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of the local environment attributes for the site. The type will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
 
 
-def generate_voronoi_attributes(struct, local_funct=local_env_function):
-    """Generates the local environment attributes for a given structure using a VoronoiNN generator.
+def generate_voronoi_attributes(
+    struct: Structure, 
+    local_funct=local_env_function
+    ) -> tuple[np.ndarray, np.ndarray]:
+    """Generates the local environment attributes for a given structure using a VoronoiNN generator. **Critically, this 
+    implementation uses ``get_equivalentSitesMultiplicities`` to skip the expensive ``generate_local_attributes`` call when
+    it is not guaranteed to be needed based on the symmetry of the structure.**
 
-        Args:
-            struct: A pymatgen Structure object.
-            local_funct: A function which computes the local environment attributes for a given site.
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_funct: A function which computes the local environment attributes for a given site. By default, this is
+            the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+            level, if you so desire (e.g. to use a compiled alternative you have written).
+            
+    Returns:
+        A tuple of two numpy arrays. Each contains concatenated outputs of respecive tuples from ``local_env_function``. Please note
+        that, at this stage, the order of rows `does not` have to correspond to the order of sites in the structure and usually does not.
     """
     local_generator = LocalAttributeGenerator(struct, local_funct)
     attribute_list = list()
@@ -112,14 +161,23 @@ def generate_voronoi_attributes(struct, local_funct=local_env_function):
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
 
-def magpie_mode(attribute_properties, axis=0):
-    """Calculates the attributes corresponding to the most common elements."""
+def most_common(
+    attribute_properties: np.ndarray
+    ) -> np.ndarray:
+    """Calculates the attributes corresponding to the most common elements.
+    
+    Args:
+        attribute_properties: A numpy array of the local environment attributes generated from ``generate_voronoi_attributes``.
+        
+    Returns:
+        A numpy array of the attributes corresponding to the most common elements.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
     for score in scores:
         template = (attribute_properties[:, 0] == score)
-        count = np.expand_dims(np.sum(template, axis), axis)[0]
+        count = np.expand_dims(np.sum(template, 0), 0)[0]
         if count > max_occurrence:
             top_elements.clear()
             top_elements.append(score)
@@ -132,19 +190,42 @@ def magpie_mode(attribute_properties, axis=0):
     return output / len(top_elements)
 
 
-def get_equivalentSitesMultiplicities(struct: Structure):
-    spgA = SpacegroupAnalyzer(struct, angle_tolerance=0.1, symprec=0.001)
-    return dict(Counter(list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
+def get_equivalentSitesMultiplicities(
+    struct: Structure,
+    angle_tolerance: float = 0.1, 
+    symprec: float = 0.001
+    ) -> Dict[int, int]:
+    """Takes a ``pymatgen`` ``Structure`` object, obtains an ``spglib`` symmetry dataset through the ``SpacegroupAnalyzer`` wrapper of 
+    ```pymatgen```, and returns a dictionary of the multiplicities of equivalent sites.```
+    
+    Args:
+        struct: A ``pymatgen`` ``Structure`` object.
+        angle_tolerance: The angle tolerance for the symmetry analysis. By default, this is ``0.1``.
+        symprec: The symmetry precision for the symmetry analysis. By default, this is ``0.001`` `when called from here`.
+        
+    Returns:
+        A dictionary of the multiplicities of equivalent sites. The keys are the indices of the sites in the structure, and the values 
+        are the integer multiplicities.
+    """
+    spgA = SpacegroupAnalyzer(
+        struct, 
+        angle_tolerance=angle_tolerance, 
+        symprec=symprec)
+    return dict(
+        Counter(
+            list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
 
 
 def generate_descriptor(struct: Structure) -> np.ndarray:
-    """Main functionality. Generates the KS2022 descriptor for a given structure.
+    """Main functionality sharing API with every other featurizer in ``pySIPEFNN``. Generates the KS2022 descriptor for a given structure.
+    As explained in the top-level documentation, this descriptor is very efficient for ordered structures, and is minimizes expensive 
+    computation by considering site equivalences due to symmetry.
 
     Args:
-        struct: A pymatgen Structure object.
-
+        struct: A pymatgen ``Structure`` object. It can be any ordered (e.g., crystal) or disordered (e.g., glass) structure with collapsed
+            (defined) occupancies.
     Returns:
-        A 271-lenght numpy array of the descriptor.
+        A ``256``-length numpy ``ndarray`` of the descriptor. See ``labels_KS2022.csv`` for the meaning of each element of the array.
     """
     diff_properties, attribute_properties = generate_voronoi_attributes(struct)
     properties = np.concatenate(
@@ -160,7 +241,7 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
               np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
               np.max(attribute_properties, axis=0),
               np.min(attribute_properties, axis=0),
-              magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+              most_common(attribute_properties)), axis=-1).reshape((-1))))
     # Normalize Bond Length properties.
     properties[6] /= properties[5]
     properties[7] /= properties[5]
@@ -206,19 +287,23 @@ def generate_descriptor(struct: Structure) -> np.ndarray:
 
 def cite() -> List[str]:
     """Citation/s for the descriptor."""
-    return citations
+    return [
+        'Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, Extensible Structure-Informed Prediction of '
+        'Formation Energy with improved accuracy and usability employing neural networks, Computational '
+        'Materials Science, Volume 208, 2022, 111254'
+        ]
 
 
 def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
-    """Returns the structure-dependent part of the KS2022descriptor.
+    """Returns only the **part of the KS2022 descriptor that has to depend on structure**, useful in cases where the descriptor is used 
+    as a fingerprint to compare polymorphs of the same compound. **Please note, this does not mean it selects all structure-dependent 
+    features which span nearly entire descriptor, but only the part of the descriptor which is explicitly structure-dependent.** 
 
     Args:
-        descriptor: A 256-length numpy array of the KS2022 descriptor.
+        descriptor: A ``256``-length numpy ``ndarray`` of the KS2022 descriptor. Generated by the ``generate_descriptor`` function.
 
     Returns:
-        A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
-        descriptor is used as a fingerprint to compare polymorphs of the same compound.
-
+        A ``103``-length numpy ``ndarray`` of the structure-dependent part of the KS2022 descriptor. 
     """
     assert isinstance(descriptor, np.ndarray)
     assert descriptor.shape == (256,)
@@ -233,8 +318,20 @@ def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
     return ks2022_structural
 
 
-def profile(test='JVASP-10001', nRuns=10):
-    """Profiles the descriptor in series using one of the test structures."""
+def profile(
+    test: str = 'JVASP-10001', 
+    nRuns: int = 10,
+    persistResult: bool = True
+    ) -> None:
+    """Profiles the descriptor in `series` using one of the test structures.
+    
+    Args:
+        test: The name of the test structure. By default, this is ``'JVASP-10001'``. Currently implemented tests are: ``'JVASP-10001'`` and 
+            ``'diluteNiAlloy'``.
+        nRuns: The number of runs. By default, this is ``10``.
+        persistResult: Whether to persist the result to a file (``'KS2022_TestResult.csv'``) to allow for inspection. By default, this is
+            ``True``.
+    """
     if test == 'JVASP-10001':
         print(
             f'KS2022 profiling/testing task will calculate a descriptor for Li2 Zr1 Te1 O6 (JVASP-10001) {nRuns} times in series.')
@@ -246,16 +343,32 @@ def profile(test='JVASP-10001', nRuns=10):
     else:
         print('Unrecognized test name.')
         return None
+    t0 = time.time()
     structList = [Structure.from_dict(json.loads(matStr))] * nRuns
     for s in tqdm(structList):
         d = generate_descriptor(s)
-    with open('KS2022_TestResult.csv', 'w+') as f:
-        f.writelines([f'{v}\n' for v in d])
-    print('Done!')
+    if persistResult:
+        with open('KS2022_TestResult.csv', 'w+') as f:
+            f.writelines([f'{v}\n' for v in d])
+    print(f"Done in {time.time() - t0} seconds.")
+    print(f"Average time per run: {(time.time() - t0) / nRuns} seconds.")
+    return None
 
 
-def profileParallel(test='JVASP-10001', nRuns=1000):
-    """Profiles the descriptor in parallel using one of the test structures."""
+def profileParallel(
+    test: str = 'JVASP-10001', 
+    nRuns: int = 1000,
+    makeSupercell222: bool = False
+    ) -> None:
+    """Profiles the descriptor in `parallel` using one of the test structures.
+    
+    Args:
+        test: The name of the test structure. By default, this is ``'JVASP-10001'``. Currently implemented tests are: ``'JVASP-10001'`` and 
+            ``'diluteNiAlloy'``.
+        nRuns: The number of total runs done in parallel by 8 workers. By default, this is ``1000``.
+        makeSupercell222: Whether to make a 2x2x2 supercell of the structure before profiling, increasing the number of atoms by a factor
+            of 8, but should not increase time thanks to the symmetry consierations. By default, this is ``False``.
+    """
     from tqdm.contrib.concurrent import process_map
     if test == 'JVASP-10001':
         print(
@@ -268,11 +381,15 @@ def profileParallel(test='JVASP-10001', nRuns=1000):
     else:
         print('Unrecognized test name.')
         return None
+    t0 = time.time()
     s = Structure.from_dict(json.loads(matStr))
-    # s.make_supercell(scaling_matrix=[2,2,2])
+    if makeSupercell222:
+        s.make_supercell(scaling_matrix=[2,2,2])
     structList = [s] * nRuns
-    descList = process_map(generate_descriptor, structList, max_workers=8)
-    print('Done!')
+    process_map(generate_descriptor, structList, max_workers=8)
+    print(f"Done in {time.time() - t0} seconds.")
+    print(f"Average time per run: {(time.time() - t0) / nRuns} seconds.")
+    return None
 
 
 if __name__ == "__main__":
