@@ -1,6 +1,7 @@
 import unittest
 import pytest
 import os
+import numpy as np
 
 import pysipfenn
 from importlib import resources
@@ -300,6 +301,30 @@ class TestCore(unittest.TestCase):
                                                                                                    ) as f2:
                 for line1, line2 in zip(f1, f2):
                     self.assertEqual(line1, line2)
+
+    def test_WriteDescriptorDataToNPY(self):
+        '''Test that the writeDescriptorsToNPY() method writes the correct data to a NPY file and that the file is
+        consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
+        structures based on the c.inputFileNames list.
+        '''
+        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+            exampleInputFiles = natsorted(os.listdir(exampleInputsDir))[:4]
+            testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
+            self.c.calculate_KS2022(structList=testStructures, mode='serial')
+
+        self.c.writeDescriptorsToNPY(descriptor='KS2022',
+                                    file='TestFile_DescriptorData_4_KS2022_labeled_enumerated.npy')
+
+        loaded_data = np.load('TestFile_DescriptorData_4_KS2022_labeled_enumerated.npy')
+        np.testing.assert_array_equal(loaded_data, self.c.descriptorData)
+
+        self.c.inputFiles = ['myStructure1.POSCAR', 'myStructure2.POSCAR', 'myStructure3.POSCAR', 'myStructure4.POSCAR']
+
+        self.c.writeDescriptorsToNPY(descriptor='KS2022',
+                                    file='TestFile_DescriptorData_4_KS2022_labeled_named.npy')
+
+        loaded_data = np.load('TestFile_DescriptorData_4_KS2022_labeled_named.npy')
+        np.testing.assert_array_equal(loaded_data, self.c.descriptorData)
 
     def test_CalculatorPrint(self):
         '''Test that the Calculator.__str__() method returns the correctly formatted string after being initialized
