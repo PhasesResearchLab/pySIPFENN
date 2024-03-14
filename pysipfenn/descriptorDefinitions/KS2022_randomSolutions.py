@@ -1,57 +1,81 @@
-# Authors: Jonathan Siegel, Adam M. Krajewski
+# This file is part of pySIPFENN and is licensed under the terms of the LGPLv3 or later.
+# Copyright (C) 2023 Adam M. Krajewski, Jonathan Siegel
 
-import math
-import numpy as np
-import os
-from pymatgen.core import Structure, Element, Composition
-from pymatgen.analysis.local_env import VoronoiNN
-from collections import Counter
-from typing import List, Union, Tuple
-import random
-from importlib import resources
-from tqdm.contrib.concurrent import process_map
+"""This ``KS2022`` feature vector calculator is a **special-input converter** modification of our the base ``KS2022``. Unlike the
+``KS2022_dilute`` which reduces the computation, this one is designed to take an anonymous ``Structure`` and ``Composition`` pair and 
+obtain vales of the ``KS2022`` features at infinite random supercell size.
+
+It does that by expanding the ensamble of local chemical environments by iteratively adding supercells of the structure until the
+features and composition converge. If you use this code, plese cite (as in ``KS2022.cite()``):
+
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, "Extensible Structure-Informed Prediction of Formation Energy with 
+  improved accuracy and usability employing neural networks", Computational Materials Science, Volume 208, 2022, 111254
+
+The core purpose of this module is to calculate numpy ``ndarray`` with ``256`` features constructed by considering all local chemical 
+environments existing in an atomic structure. Their list is available in the ``labels_KS2022.csv`` and will be discussed in our upcoming
+publication (Spring 2024).
+"""
+
+# pySIPFENN (for handling prototype library with high-level API at lower-level here)
 import pysipfenn
 
+# Standard Library Imports
+import random
+import math
+import time
+from collections import Counter
+from typing import List, Union, Tuple
+from importlib import resources
+
+# Third Party Dependencies
+from tqdm.contrib.concurrent import process_map
+import numpy as np
+from pymatgen.core import Structure, Element, Composition, PeriodicSite
+from pymatgen.analysis.local_env import VoronoiNN
+
+# Certain hard-coded basic elemental properties used in the featurization (attribute_matrix is compatible with Magpie references,
+# and maxFeaturesInOQMD is based on the 2017 snapshot of OQMD, which was current when we started and will be retained in KS2022, but
+# change in the future).
 periodic_table_size = 112
-attribute_matrix = np.loadtxt(os.path.join(os.path.dirname(__file__), 'Magpie_element_properties.csv'), delimiter=',')
+f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
-# Only select attributes actually used in Magpie.
-attribute_matrix = attribute_matrix[
-                   :, [45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
-
-maxFeaturesInOQMD = np.array(
-    [13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835,
-     0.671142, 0.648262, 0.74048, 89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0,
-     95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 3631.95, 1395.25, 3631.95,
-     3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
-     213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908,
-     2.0, 2.0, 2.0, 5.0, 1.80537, 5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0,
-     5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 1.0, 0.406792, 1.0, 1.0, 1.0,
-     5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
-     20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853,
-     2.78409, 7.853, 7.853, 7.853, 2.09127, 0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0,
-     1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 102.0, 102.0, 102.0,
-     244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0,
-     3823.0, 18.0, 17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0,
-     106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0,
-     2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 14.0, 7.0,
-     14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0,
-     5.0, 2.5, 5.0, 5.0, 5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0,
-     22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 55.0625, 115.765, 115.765, 115.765,
-     7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
-     2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
+attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
+maxFeaturesInOQMD = np.array([
+    13.1239, 5.01819, 12.0, 35.9918, 0.305284, 1.0, 1.89776, 0.61604, 0.251582, 0.505835, 0.671142, 0.648262, 0.74048, 
+    89.0, 26.4054, 89.0, 93.0, 90.2828, 95.0, 30.0847, 95.0, 95.0, 90.6205, 233.189, 68.4697, 233.189, 242.992, 235.263, 
+    3631.95, 1395.25, 3631.95, 3808.99, 3785.18, 16.0, 5.77718, 16.0, 16.0, 16.0, 5.99048, 1.66782, 5.99048, 6.0, 5.8207,
+    213.0, 56.9856, 213.0, 213.0, 194.519, 3.19, 0.971532, 3.19, 3.19, 3.01435, 2.0, 0.749908, 2.0, 2.0, 2.0, 5.0, 1.80537, 
+    5.0, 5.25839, 5.0, 10.0, 3.85266, 10.0, 10.0, 10.0, 14.0, 5.61254, 14.0, 14.0, 14.0, 26.0, 8.0159, 26.0, 28.0, 27.0, 
+    1.0, 0.406792, 1.0, 1.0, 1.0, 5.0, 1.56393, 5.0, 5.0, 5.0, 9.0, 3.49493, 9.0, 9.0, 9.0, 13.0, 4.6277, 13.0, 13.0, 13.0,
+    20.0, 6.30236, 20.0, 22.0, 22.0, 109.15, 36.0677, 109.15, 110.125, 108.956, 7.853, 2.78409, 7.853, 7.853, 7.853, 2.09127, 
+    0.82173, 2.09127, 2.11066, 2.11066, 7.0, 1.0, 1.0, 1.0, 1.0, 1.0, 94.0, 93.0, 46.5, 94.0, 94.0, 94.0, 102.0, 97.0, 47.5, 
+    102.0, 102.0, 102.0, 244.0, 242.992, 121.496, 244.0, 244.0, 244.0, 3823.0, 3808.99, 1904.5, 3823.0, 3823.0, 3823.0, 18.0, 
+    17.0, 8.0, 18.0, 18.0, 18.0, 7.0, 6.0, 3.0, 7.0, 7.0, 7.0, 244.0, 213.0, 106.5, 244.0, 244.0, 244.0, 3.98, 3.19, 1.595, 
+    3.98, 3.98, 3.98, 2.0, 2.0, 1.0, 2.0, 2.0, 2.0, 6.0, 6.0, 2.5, 6.0, 6.0, 6.0, 10.0, 10.0, 5.0, 10.0, 10.0, 10.0, 14.0, 
+    14.0, 7.0, 14.0, 14.0, 14.0, 29.0, 28.0, 14.0, 29.0, 29.0, 29.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 5.0, 5.0, 2.5, 5.0, 5.0, 
+    5.0, 9.0, 9.0, 4.5, 9.0, 9.0, 9.0, 13.0, 13.0, 6.5, 13.0, 13.0, 13.0, 22.0, 22.0, 11.0, 22.0, 22.0, 22.0, 115.765, 110.125, 
+    55.0625, 115.765, 115.765, 115.765, 7.853, 7.853, 3.9265, 7.853, 7.853, 7.853, 2.11066, 2.11066, 1.05533, 2.11066, 2.11066,
+    2.11066, 1.0, 0.714286, 1.0, 0.875, 0.92145, 0.460725])
 
 
-def local_env_function(local_env, site):
-    """A prototype function which computes a weighted average over neighbors, weighted by the area of the voronoi cell
-        between them.
+def local_env_function(
+    local_env: dict,
+    site: PeriodicSite
+) -> List[np.ndarray]:
+    """A prototype function which computes a weighted average over neighbors, weighted by the area of the Voronoi cell
+    between them. This allows concurrently capturing impact of neighbor-neighbor interactions and geometric effects. 
+    Critically, in contrast to cut-off based methods, the interaction is `guaranteed` to be continous as a function of 
+    displacement.
 
-        Args:
-            local_env: A dictionary of the local environment of a site, as returned by a VoronoiNN generator.
-            site: The site number for which the local environment is being computed.
+    Args:
+        local_env: A dictionary of the local environment of a site, as returned by a ``VoronoiNN`` generator. Contains 
+            a number of critical geometric attributes like face distances, face areas, and corresponding face-bound volumes.
+        site: The ``Site`` number for which the local environment is being computed.
 
-        Returns:
-            A list of the local environment attributes.
+    Returns:
+        A nested list of ``np.ndarray``s. Contains several geometric attributes concatenated with gometry weighted neighbor-neighbor
+        elemental attributes, and (2) a list of ``np.ndarray`` of geometry independent elemental attributes of the site.
     """
     local_attributes = np.zeros(attribute_matrix.shape[1])
     for key, value in site.species.get_el_amt_dict().items():
@@ -59,7 +83,7 @@ def local_env_function(local_env, site):
     diff_attributes = np.zeros(attribute_matrix.shape[1])
     total_weight = 0
     volume = 0
-    for ind, neighbor_site in local_env.items():
+    for _, neighbor_site in local_env.items():
         neighbor_attributes = np.zeros(attribute_matrix.shape[1])
         for key, value in neighbor_site['site'].species.get_el_amt_dict().items():
             neighbor_attributes += value * attribute_matrix[Element(key).Z - 1, :]
@@ -88,52 +112,87 @@ def local_env_function(local_env, site):
     # Calculate Packing Efficiency info
     sphere_rad = min(neighbor_site['face_dist'] for neighbor_site in local_env.values())
     sphere_volume = (4.0 / 3.0) * math.pi * math.pow(sphere_rad, 3.0)
-    return [
-        np.concatenate(
-            (
-                [eff_coord_num, blen_average, blen_var, volume, sphere_volume],
-                elemental_properties_attributes[0]
-            )),
-        elemental_properties_attributes[1]
-    ]
+    return [np.concatenate(
+        ([eff_coord_num, blen_average, blen_var, volume, sphere_volume], elemental_properties_attributes[0])),
+        elemental_properties_attributes[1]]
 
 
 class LocalAttributeGenerator:
-    """A wrapper class which contains an instance of an NN generator (the default is a VoronoiNN), a structure, and
+    """A wrapper class which contains an instance of an NN generator (the default is a ``VoronoiNN``), a structure, and
     a function which computes the local environment attributes.
+    
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_env_func: A function which computes the local environment attributes for a given site.
+        nn_generator: A ``VoronoiNN`` generator object.
     """
 
-    def __init__(self, struct, local_env_func,
-                 nn_generator=VoronoiNN(compute_adj_neighbors=False, extra_nn_info=False)):
+    def __init__(
+        self, 
+        struct: Structure,
+        local_env_func,
+        nn_generator: VoronoiNN = VoronoiNN(
+            compute_adj_neighbors=False, 
+            extra_nn_info=False)
+        ):
         self.generator = nn_generator
         self.struct = struct
         self.function = local_env_func
 
-    def generate_local_attributes(self, n):
+    def generate_local_attributes(self, n: int):
+        """Wrapper pointing to a given ``Site`` index.
+        
+        Args:
+            n: The index of the site for which the local environment attributes are being computed.
+            
+        Returns:
+            A list of the local environment attributes for the site. The type will depend on the function used to compute the
+            attributes. By default, this is a list of two numpy arrays computed by ``local_env_function``.
+        """
         local_env = self.generator.get_voronoi_polyhedra(self.struct, n)
         return self.function(local_env, self.struct[n])
 
 
-def generate_voronoi_attributes(struct, local_funct=local_env_function):
+def generate_voronoi_attributes(
+    struct: Structure, 
+    local_funct=local_env_function
+    ) -> tuple[np.ndarray, np.ndarray]:
     """Generates the local environment attributes for a given structure using a VoronoiNN generator.
 
-        Args:
-            struct: A pymatgen Structure object.
-            local_funct: A function which computes the local environment attributes for a given site.
+    Args:
+        struct: A pymatgen ``Structure`` object.
+        local_funct: A function which computes the local environment attributes for a given site. By default, this is
+            the prototype function ``local_env_function``, but you can neatly customize this to your own needs at this 
+            level, if you so desire (e.g. to use a compiled alternative you have written).
+            
+    Returns:
+        A tuple of two numpy arrays. Each contains concatenated outputs of respecive tuples from ``local_env_function``. Please note
+        that, at this stage, the order of rows `does not` have to correspond to the order of sites in the structure and usually does not.
     """
     local_generator = LocalAttributeGenerator(struct, local_funct)
-    attribute_list = list(map(local_generator.generate_local_attributes, range(len(struct.sites))))
+    attribute_list = list(
+        map(local_generator.generate_local_attributes, 
+            range(len(struct.sites))))
     return np.array([value[0] for value in attribute_list]), np.array([value[1] for value in attribute_list])
 
 
-def magpie_mode(attribute_properties, axis=0):
-    """Calculates the attributes corresponding to the most common elements."""
+def most_common(
+    attribute_properties: np.ndarray
+    ) -> np.ndarray:
+    """Calculates the attributes corresponding to the most common elements.
+    
+    Args:
+        attribute_properties: A numpy array of the local environment attributes generated from ``generate_voronoi_attributes``.
+        
+    Returns:
+        A numpy array of the attributes corresponding to the most common elements.
+    """
     scores = np.unique(np.ravel(attribute_properties[:, 0]))  # get all unique atomic numbers
     max_occurrence = 0
     top_elements = []
     for score in scores:
         template = (attribute_properties[:, 0] == score)
-        count = np.expand_dims(np.sum(template, axis), axis)[0]
+        count = np.expand_dims(np.sum(template, 0), 0)[0]
         if count > max_occurrence:
             top_elements.clear()
             top_elements.append(score)
@@ -182,7 +241,14 @@ def generate_descriptor(struct: Structure,
         minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it is
             considered converged. This is to prevent the algorithm from converging before very dilute elements have
             had a chance to occur. The default value is 10.
-        plotParameters: If True, the convergence history will be plotted using plotly. The default value is False.
+        plotParameters: If True, the convergence history will be plotted using plotly and, by default, will display as an 
+            interactive plot in your default web browser, allowing you to zoom and pan. The figure below shows an example
+            of such plot for a complex BCC 6-component high entropy alloy. The default value is False.
+            
+            .. image:: https://raw.githubusercontent.com/PhasesResearchLab/pySIPFENN/main/pysipfenn/descriptorDefinitions/assets/KS2022_randomSolution_ConvergencePlot.png
+                :alt: KS2022_randomSolution_ConvergencePlot
+                :width: 800
+            
         printProgress: If True, the progress will be printed to the console. The default value is True.
         returnMeta: If True, a dictionary containing the convergence history will be returned in addition to the
             descriptor. The default value is False.
@@ -268,7 +334,7 @@ def generate_descriptor(struct: Structure,
                   np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
                   np.max(attribute_properties, axis=0),
                   np.min(attribute_properties, axis=0),
-                  magpie_mode(attribute_properties)), axis=-1).reshape((-1))))
+                  most_common(attribute_properties)), axis=-1).reshape((-1))))
         # Normalize Bond Length properties.
         properties[6] /= properties[5]
         properties[7] /= properties[5]
@@ -344,7 +410,7 @@ def generate_descriptor(struct: Structure,
         diffArray = np.array(diffHistory)
 
         # Plot the parameters as lines. Add hover text to show the parameter name based on the labels_KS2022.csv file.
-        with resources.files('pysipfenn').joinpath('descriptorDefinitions/labels_KS2022.csv').open() as f:
+        with resources.files('pysipfenn.descriptorDefinitions').joinpath('labels_KS2022.csv').open() as f:
             labels = f.readlines()
         fig = px.line(pd.DataFrame(diffArray, columns=labels), title='KS2022 Descriptor Parameters',
                       range_y=[-0.5, 0.5])
@@ -383,16 +449,16 @@ def cite() -> List[str]:
 
 
 def onlyStructural(descriptor: np.ndarray) -> np.ndarray:
-    """Returns the structure-dependent part of the KS2022descriptor.
+    """Returns only the **part of the KS2022 descriptor that has to depend on structure**, useful in cases where the descriptor is used 
+    as a fingerprint to compare polymorphs of the same compound. **Please note, this does not mean it selects all structure-dependent 
+    features which span nearly entire descriptor, but only the part of the descriptor which is explicitly structure-dependent.** 
 
     Args:
-        descriptor: A 256-length numpy array of the KS2022 descriptor.
+        descriptor: A ``256``-length numpy ``ndarray`` of the KS2022 descriptor. Generated by the ``generate_descriptor`` function.
 
     Returns:
-        A 103-length numpy array of the structure-dependent part of the KS2022 descriptor. Useful in cases where the
-        descriptor is used as a fingerprint to compare polymorphs of the same compound.
+        A ``103``-length numpy ``ndarray`` of the structure-dependent part of the KS2022 descriptor. 
     """
-
     assert isinstance(descriptor, np.ndarray)
     assert descriptor.shape == (256,)
     descriptorSplit = np.split(descriptor, [68, 73, 93, 98, 113])
@@ -411,7 +477,7 @@ def profile(test: str = 'FCC',
             nIterations: int = 1,
             plotParameters: bool = False,
             returnDescriptorAndMeta: bool = False) -> Union[None, Tuple[np.ndarray, dict]]:
-    """Profiles the descriptor using one of the test structures.
+    """Profiles the descriptor in parallel using one of the test structures.
 
     Args:
         test: The test structure to use. Options are 'FCC', 'BCC', and 'HCP'.
@@ -465,8 +531,10 @@ def profile(test: str = 'FCC',
 if __name__ == "__main__":
     print('You are running the KS2022_randomSolutions.py file directly. It is intended to be used as a module. '
           'A profiling task will now commence, going over several cases. This will take a while.')
-
+    t0 = time.time()
     profile(test='FCC', plotParameters=True)
     profile(test='BCC', plotParameters=True)
     profile(test='HCP', plotParameters=True)
     profile(test='BCC', nIterations=6)
+    print(f"All profiling tasks completed in {time.time() - t0:.2f} seconds. The results have been saved to the current working directory.")
+    print(f"Average of {((time.time() - t0) / 4):.2f} seconds per task.")

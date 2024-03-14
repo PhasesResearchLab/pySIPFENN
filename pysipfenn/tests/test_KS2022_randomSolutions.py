@@ -56,6 +56,11 @@ class TestKSRandomSolution2022(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             KS2022_randomSolutions.profile(test='CrazyStructure')
 
+    def test_cite(self):
+        """Tests citation return."""
+        citation = KS2022_randomSolutions.cite()
+        self.assertIn("Krajewski", citation[0])
+
 
 class TestKS2022RandomSolutionProfiling(unittest.TestCase):
     '''Test the KS2022 RS descriptor generation by profiling the execution time for example composition for each
@@ -71,6 +76,3 @@ class TestKS2022RandomSolutionProfiling(unittest.TestCase):
     def test_singleInParallel(self):
         '''Tests parallel execution profiling works.'''
         KS2022_randomSolutions.profile(test='BCC', nIterations=2)
-
-if __name__ == '__main__':
-    unittest.main()

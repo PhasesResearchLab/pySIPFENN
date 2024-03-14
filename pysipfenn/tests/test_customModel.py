@@ -52,7 +52,3 @@ class TestCustomModel(unittest.TestCase):
         print('\nTearing down')
         os.remove('MyFunNet.onnx')
         print('Removed MyFunNet')
-
-
-if __name__ == '__main__':
-    unittest.main()
