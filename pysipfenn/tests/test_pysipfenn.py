@@ -337,11 +337,15 @@ class TestCore(unittest.TestCase):
 
         self.c.inputFiles = ['myStructure1.POSCAR', 'myStructure2.POSCAR', 'myStructure3.POSCAR', 'myStructure4.POSCAR']
 
-        self.c.writeDescriptorsToNPY(descriptor='KS2022',
-                                    file='TestFile_DescriptorData_4_KS2022_labeled_named.npy')
+        for file in ['TestFile_DescriptorData_4_KS2022_labeled_named.npy', 'descriptorData.npy']:
+            self.c.writeDescriptorsToNPY(descriptor='KS2022', file=file)
 
-        loaded_data = np.load('TestFile_DescriptorData_4_KS2022_labeled_named.npy')
-        np.testing.assert_array_equal(loaded_data, self.c.descriptorData)
+            if file == 'descriptorData.npy':
+                loaded_data = np.load('KS2022_' + file)
+            else:
+                loaded_data = np.load(file)
+
+            np.testing.assert_array_equal(loaded_data, self.c.descriptorData)
 
     def test_CalculatorPrint(self):
         '''Test that the Calculator.__str__() method returns the correctly formatted string after being initialized
