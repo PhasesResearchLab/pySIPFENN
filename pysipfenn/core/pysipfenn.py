@@ -1038,7 +1038,7 @@ class Calculator:
         definition file.
 
         Args:
-            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipgenn.descriptorDefinitions``
+            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipfenn.descriptorDefinitions``
                 for a list of available descriptors, such as ``'KS2022'`` and ``'Ward2017'``. It provides the labels for the
                 descriptor values.
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
@@ -1064,6 +1064,28 @@ class Calculator:
                 for dd in self.descriptorData:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i += 1
+
+    def writeDescriptorsToNPY(self, descriptor: str, file: str = 'descriptorData.npy') -> None:
+        """Writes the descriptor data to a numpy file (.NPY). The order of the columns in the numpy array corresponds 
+        to the order of the labels in the descriptor definition files at ``descriptorDefinitions`` directory. To match the 
+        data with the labels, load the labels from the descriptor definition file and use the same index to access the 
+        corresponding data in the numpy array. The order of the rows corresponds to the last run input structures.
+
+        Args:
+            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipfenn.descriptorDefinitions``
+                for a list of available descriptors, such as ``'KS2022'`` and ``'Ward2017'``.
+            file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
+                file does not exist, it will be created. The file must have a ``'.npy'`` extension to be recognized
+                correctly. Default is ``'descriptorData.npy'``.
+        """
+
+        # Write descriptor data
+        if file == 'descriptorData.npy':
+            print(f"Writing descriptor data to {descriptor}_{file}...")
+            np.save(f'{descriptor}_descriptorData.npy', self.descriptorData)
+        else:
+            print(f"Writing descriptor data to {file}...")
+            np.save(file, self.descriptorData)
 
     def destroy(self) -> None:
             """Deallocates all loaded models and clears all data from the Calculator object."""
