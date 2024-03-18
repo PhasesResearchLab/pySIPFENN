@@ -1102,7 +1102,11 @@ class Calculator:
 # ************************  SATELLITE FUNCTIONS  ************************
             
 def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
-    """Converts a ``Ward2017`` descriptor to a ``KS2022`` descriptor (which is its subset).
+    """Converts a ``Ward2017`` descriptor to a ``KS2022`` descriptor (which is its subset). It removes: `mean_WCMagnitude_Shell1`, `mean_WCMagnitude_Shell2`, 
+    `mean_WCMagnitude_Shell3`, `mean_NeighDiff_shell1_SpaceGroupNumber`, `var_NeighDiff_shell1_SpaceGroupNumber`, `min_NeighDiff_shell1_SpaceGroupNumber`, 
+    `max_NeighDiff_shell1_SpaceGroupNumber`, `range_NeighDiff_shell1_SpaceGroupNumber`, `mean_SpaceGroupNumber`, `maxdiff_SpaceGroupNumber`, 
+    `dev_SpaceGroupNumber`, `max_SpaceGroupNumber`, `min_SpaceGroupNumber`, `most_SpaceGroupNumber`, and `CanFormIonic`, for physicality and performance 
+    improvements.
 
     Args:
         ward2017: ``Ward2017`` descriptor. Must be a 1D ``np.ndarray`` of length ``271``.
