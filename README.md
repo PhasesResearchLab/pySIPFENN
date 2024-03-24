@@ -14,6 +14,9 @@
 
 [![stable](https://img.shields.io/badge/Read%20The%20Docs-Stable-green)](https://pysipfenn.readthedocs.io/en/stable/) 
 [![latest](https://img.shields.io/badge/Read%20The%20Docs-Latest-green)](https://pysipfenn.readthedocs.io/en/latest/)
+[![Static Badge](https://img.shields.io/badge/First%20MGF%20Workshop%20Video%20-%20March%202023%20(v0.10.3)-rev?logo=YouTube&color=green)](https://youtube.com/watch?v=OHgkRuE0UQM)
+
+
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg)](https://doi.org/10.5281/zenodo.7373089)
 
