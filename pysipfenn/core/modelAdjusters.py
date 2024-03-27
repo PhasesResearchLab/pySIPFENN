@@ -1,5 +1,5 @@
 import os
-from typing import Union, Literal
+from typing import Union, Literal, Tuple, List
 from copy import deepcopy
 
 import numpy as np
@@ -153,7 +153,7 @@ class LocalAdjuster:
             weightDecay: float = 1e-5,
             lossFunction: Literal["MSE", "MAE"] = "MAE",
             verbose: bool = True
-    ) -> None:
+    ) -> Tuple[torch.nn.Module, List[float], List[float]]:
         """
         Takes the original model, copies it, and adjusts the model on the provided data. The adjusted model is stored in
         the ``adjustedModel`` attribute of the class and can be then persisted to the original ``Calculator`` or used
@@ -182,7 +182,8 @@ class LocalAdjuster:
             verbose: Whether to print information, such as loss, during the training. Default is ``True``.
 
         Returns:
-            None. The adjusted model is stored in the ``adjustedModel`` attribute of the class.
+            A tuple with 3 elements: (1) the adjusted model, (2) training loss list of floats, and (3) validation loss
+            list of floats. The adjusted model is also stored in the ``adjustedModel`` attribute of the class.
         """
 
         if verbose:
@@ -294,6 +295,11 @@ class LocalAdjuster:
         model.eval()
         self.adjustedModel = model
         print("All done!")
+
+        return model, transferLosses, validationLosses
+
+
+
 
 
 class OPTIMADEAdjuster(LocalAdjuster):
