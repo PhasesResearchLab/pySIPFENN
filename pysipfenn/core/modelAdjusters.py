@@ -1,8 +1,10 @@
 import os
 from typing import Union, Literal
+from copy import deepcopy
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader, TensorDataset
 import plotly.express as px
 from pysipfenn.core.pysipfenn import Calculator
 
@@ -28,6 +30,8 @@ class LocalAdjuster:
             ``"mps"``. Default is ``"cpu"``.
         descriptor: Name of the feature vector provided in the descriptorData. It can be optionally provided to
             check if the descriptor data is compatible.
+        useClearML: Whether to use the ClearML platform for logging the training process. Default is ``False``.
+        taskName: Name of the task to be used. Default is ``"LocalFineTuning"``.
 
     Attributes:
         calculator: Instance of the ``Calculator`` class being operated on.
@@ -44,9 +48,13 @@ class LocalAdjuster:
             targetData: Union[str, np.ndarray],
             descriptorData: Union[None, str, np.ndarray] = None,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
-            descriptor: Literal["Ward2017", "KS2022"] = None
+            descriptor: Literal["Ward2017", "KS2022"] = None,
+            useClearML: bool = False,
+            taskName: str = "LocalFineTuning"
     ) -> None:
         self.adjustedModel = None
+        self.useClearML = useClearML
+        self.taskName = taskName
 
         assert isinstance(calculator, Calculator), "The calculator must be an instance of the Calculator class."
         self.calculator = calculator
@@ -56,6 +64,7 @@ class LocalAdjuster:
         assert isinstance(model, str), "The model must be a string pointing to the model to be adjusted in the Calculator."
         assert model in self.calculator.models, "The model must be one of the models in the Calculator."
         assert model in self.calculator.loadedModels, "The model must be loaded in the Calculator."
+        self.modelName = model
         self.model = self.calculator.loadedModels[model]
         self.model = self.model.to(device=self.device)
 
@@ -103,7 +112,7 @@ class LocalAdjuster:
 
     def plotStarting(self) -> None:
         """
-        Plot the starting model (before adjustment) on the target data.
+        Plot the starting model (before adjustment) on the target data. By default, it will plot in your browser.
         """
         self.model.eval()
         with torch.no_grad():
@@ -119,7 +128,7 @@ class LocalAdjuster:
 
     def plotAdjusted(self) -> None:
         """
-        Plot the adjusted model on the target data.
+        Plot the adjusted model on the target data. By default, it will plot in your browser.
         """
         assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
         self.adjustedModel.eval()
@@ -133,6 +142,158 @@ class LocalAdjuster:
                 "x": "Target Data", "y": "Predictions"},
             title="Adjusted Model Predictions")
         fig.show()
+
+    def adjust(
+            self,
+            validation: float = 0.2,
+            learningRate: float = 1e-5,
+            epochs: int = 50,
+            batchSize: int = 32,
+            optimizer: Literal["Adam", "AdamW", "Adamax", "RMSprop"] = "Adam",
+            weightDecay: float = 1e-5,
+            lossFunction: Literal["MSE", "MAE"] = "MAE",
+            verbose: bool = True
+    ) -> None:
+        """
+        Takes the original model, copies it, and adjusts the model on the provided data. The adjusted model is stored in
+        the ``adjustedModel`` attribute of the class and can be then persisted to the original ``Calculator`` or used
+        for plotting. The default hyperparameters are selected for fine-tuning the model rather than retraining it, as
+        to slowly adjust it (1% of the typical learning rate) and not overfit it (50 epochs).
+
+        Args:
+            learningRate: The learning rate to be used for the adjustment. Default is ``1e-5`` that is 1% of a typical
+                learning rate of ``Adam`` optimizer.
+            epochs: The number of times to iterate over the data, i.e. how many times the model will see the data.
+                Default is ``50``, which is on the higher side for fine-tuning. If the model does not retrain fast enough
+                but already converged, consider lowering this number to reduce the time and possibly overfitting to the
+                training data.
+            batchSize: The number of points passed to the model at once. Default is ``32``, which is a typical batch size for
+                smaller datasets. If the dataset is large, consider increasing this number to speed up the training.
+            optimizer: Algorithm to be used for optimization. Default is ``Adam``, which is a good choice for most models
+                and one of the most popular optimizers. Other options are
+            lossFunction: Loss function to be used for optimization. Default is ``MAE`` (Mean Absolute Error / L1) that is
+                more robust to outliers than ``MSE`` (Mean Squared Error).
+            validation: Fraction of the data to be used for validation. Default is the common ``0.2`` (20% of the data).
+                If set to ``0``, the model will be trained on the whole dataset without validation and you will not be able
+                to check for overfitting or gauge the model's performance on unseen data.
+            weightDecay: Weight decay to be used for optimization. Default is ``1e-5`` that should work well if data is
+                plaintiful enough relative to the model complexity. If the model is overfitting, consider increasing this
+                number to regularize the model more.
+            verbose: Whether to print information, such as loss, during the training. Default is ``True``.
+
+        Returns:
+            None. The adjusted model is stored in the ``adjustedModel`` attribute of the class.
+        """
+
+        if verbose:
+            print("Loading the data...")
+        ddTensor = torch.from_numpy(self.descriptorData).float().to(device=self.device)
+        tdTensor = torch.from_numpy(self.targetData).float().to(device=self.device)
+        if validation > 0:
+            split = int(len(ddTensor) * (1 - validation))
+            ddTrain, ddVal = ddTensor[:split], ddTensor[split:]
+            tdTrain, tdVal = tdTensor[:split], tdTensor[split:]
+        else:
+            ddTrain, ddVal = ddTensor, None
+            tdTrain, tdVal = tdTensor, None
+
+        datasetTrain = TensorDataset(ddTrain, tdTrain)
+        dataloaderTrain = DataLoader(datasetTrain, batch_size=batchSize, shuffle=True)
+
+        if verbose:
+            print(f'LR: {learningRate} |  Optimizer: {optimizer}  |  Weight Decay: {weightDecay} |  Loss: {lossFunction}')
+        # Training a logging platform. Completely optional and does not affect the training.
+        if self.useClearML:
+            if verbose:
+                print("Using ClearML for logging. Make sure to have (1) their Python package installed and (2) the API key"
+                      " set up according to their documentation. Otherwise you will get an error.")
+            from clearml import Task
+            task = Task.create(project_name=self.taskName,
+                               task_name=f'LR:{learningRate} OPT:{optimizer} WD:{weightDecay} LS:{lossFunction}')
+            task.set_parameters({'lr': learningRate,
+                                 'epochs': epochs,
+                                 'batch_size': batchSize,
+                                 'weight_decay': weightDecay,
+                                 'loss': lossFunction,
+                                 'optimizer': optimizer,
+                                 'model': self.modelName})
+        if verbose:
+            print("Copying and initializing the model...")
+        model = deepcopy(self.model)
+        model.train()
+        if verbose:
+            print("Setting up the training...")
+        if optimizer == "Adam":
+            optimizerClass = torch.optim.Adam
+        elif optimizer == "AdamW":
+            optimizerClass = torch.optim.AdamW
+        elif optimizer == "Adamax":
+            optimizerClass = torch.optim.Adamax
+        elif optimizer == "RMSprop":
+            optimizerClass = torch.optim.RMSprop
+        else:
+            raise NotImplementedError("The optimizer must be one of the following: 'Adam', 'AdamW', 'Adamax', 'RMSprop'.")
+        optimizerInstance = optimizerClass(model.parameters(), lr=learningRate, weight_decay=weightDecay)
+
+        if lossFunction == "MSE":
+            loss = torch.nn.MSELoss()
+        elif lossFunction == "MAE":
+            loss = torch.nn.L1Loss()
+        else:
+            raise NotImplementedError("The loss function must be one of the following: 'MSE', 'MAE'.")
+
+        transferLosses = [float(loss(model(ddTrain, None), tdTrain))]
+        if validation > 0:
+            validationLosses = [float(loss(model(ddVal, None), tdVal))]
+            if verbose:
+                print(
+                    f'Train: {transferLosses[-1]:.4f} | Validation: {validationLosses[-1]:.4f} | Epoch: 0/{epochs}')
+        else:
+            validationLosses = []
+            if verbose:
+                print(f'Train: {transferLosses[-1]:.4f} | Epoch: 0/{epochs}')
+
+
+        for epoch in range(epochs):
+            model.train()
+            for data, target in dataloaderTrain:
+                optimizerInstance.zero_grad()
+                output = model(data, None)
+                lossValue = loss(output, target)
+                lossValue.backward()
+                optimizerInstance.step()
+            transferLosses.append(float(loss(model(ddTrain, None), tdTrain)))
+
+            if validation > 0:
+                model.eval()
+                validationLosses.append(float(loss(model(ddVal, None), tdVal)))
+                model.train()
+                if self.useClearML:
+                    task.get_logger().report_scalar(
+                        title='Loss',
+                        series='Validation',
+                        value=validationLosses[-1],
+                        iteration=epoch+1)
+                if verbose:
+                    print(
+                        f'Train: {transferLosses[-1]:.4f} | Validation: {validationLosses[-1]:.4f} | Epoch: {epoch + 1}/{epochs}')
+            else:
+                if verbose:
+                    print(f'Train: {transferLosses[-1]:.4f} | Epoch: {epoch + 1}/{epochs}')
+
+            if self.useClearML:
+                task.get_logger().report_scalar(
+                    title='Loss',
+                    series='Training',
+                    value=transferLosses[-1],
+                    iteration=epoch+1)
+
+        print("Training finished!")
+        if self.useClearML:
+            task.close()
+        model.eval()
+        self.adjustedModel = model
+        print("All done!")
 
 
 class OPTIMADEAdjuster(LocalAdjuster):
