@@ -1,9 +1,10 @@
 import os
 from typing import Union, Literal
 
-from pysipfenn.core.pysipfenn import Calculator
 import numpy as np
-
+import torch
+import plotly.express as px
+from pysipfenn.core.pysipfenn import Calculator
 
 class LocalAdjuster:
     """
@@ -25,6 +26,8 @@ class LocalAdjuster:
             ``None``.
         device: Device to be used for training the model. It Has to be one of the following: ``"cpu"``, ``"cuda"``, or
             ``"mps"``. Default is ``"cpu"``.
+        descriptor: Name of the feature vector provided in the descriptorData. It can be optionally provided to
+            check if the descriptor data is compatible.
 
     Attributes:
         calculator: Instance of the ``Calculator`` class being operated on.
@@ -41,17 +44,20 @@ class LocalAdjuster:
             targetData: Union[str, np.ndarray],
             descriptorData: Union[None, str, np.ndarray] = None,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
+            descriptor: Literal["Ward2017", "KS2022"] = None
     ) -> None:
         self.adjustedModel = None
 
         assert isinstance(calculator, Calculator), "The calculator must be an instance of the Calculator class."
         self.calculator = calculator
 
+        self.device = torch.device(device)
+
         assert isinstance(model, str), "The model must be a string pointing to the model to be adjusted in the Calculator."
         assert model in self.calculator.models, "The model must be one of the models in the Calculator."
         assert model in self.calculator.loadedModels, "The model must be loaded in the Calculator."
         self.model = self.calculator.loadedModels[model]
-        self.model = self.model.to(device=device)
+        self.model = self.model.to(device=self.device)
 
         if descriptorData is None:
             assert self.calculator.descriptorData is not None, "The descriptor data can be inferred from the data in the Calculator, but no data is present."
@@ -86,6 +92,47 @@ class LocalAdjuster:
             raise ValueError("The target data must be either a path to a npy/NPY file or a path to a csv/CSV file.")
 
         assert len(self.descriptorData) == len(self.targetData), "The descriptor and target data must have the same length."
+
+        if descriptor is not None:
+            if descriptor == "Ward2017":
+                assert self.descriptorData.shape[1] == 271, "The descriptor must have 271 features for the Ward2017 descriptor."
+            elif descriptor == "KS2022":
+                assert self.descriptorData.shape[1] == 256, "The descriptor must have 256 features for the KS2022 descriptor."
+            else:
+                raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
+
+    def plotStarting(self) -> None:
+        """
+        Plot the starting model (before adjustment) on the target data.
+        """
+        self.model.eval()
+        with torch.no_grad():
+            dataIn = torch.from_numpy(np.array(self.descriptorData)).to(device=self.device).float()
+            predictions = self.model(dataIn, None).detach().cpu().numpy().flatten()
+        fig = px.scatter(
+            x=self.targetData.flatten(),
+            y=predictions,
+            labels={
+                "x": "Target Data", "y": "Predictions"},
+            title="Starting (Unadjusted) Model Predictions")
+        fig.show()
+
+    def plotAdjusted(self) -> None:
+        """
+        Plot the adjusted model on the target data.
+        """
+        assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
+        self.adjustedModel.eval()
+        with torch.no_grad():
+            dataIn = torch.from_numpy(np.array(self.descriptorData)).to(device=self.device).float()
+            predictions = self.adjustedModel(dataIn, None).detach().cpu().numpy().flatten()
+        fig = px.scatter(
+            x=self.targetData.flatten(),
+            y=predictions,
+            labels={
+                "x": "Target Data", "y": "Predictions"},
+            title="Adjusted Model Predictions")
+        fig.show()
 
 
 class OPTIMADEAdjuster(LocalAdjuster):
