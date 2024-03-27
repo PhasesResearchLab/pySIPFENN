@@ -54,6 +54,7 @@ class LocalAdjuster:
     ) -> None:
         self.adjustedModel = None
         self.useClearML = useClearML
+        self.useClearMLMessageDisplayed = False
         self.taskName = taskName
 
         assert isinstance(calculator, Calculator), "The calculator must be an instance of the Calculator class."
@@ -205,9 +206,10 @@ class LocalAdjuster:
             print(f'LR: {learningRate} |  Optimizer: {optimizer}  |  Weight Decay: {weightDecay} |  Loss: {lossFunction}')
         # Training a logging platform. Completely optional and does not affect the training.
         if self.useClearML:
-            if verbose:
+            if verbose and not self.useClearMLMessageDisplayed:
                 print("Using ClearML for logging. Make sure to have (1) their Python package installed and (2) the API key"
                       " set up according to their documentation. Otherwise you will get an error.")
+                self.useClearMLMessageDisplayed = True
             from clearml import Task
             task = Task.create(project_name=self.taskName,
                                task_name=f'LR:{learningRate} OPT:{optimizer} WD:{weightDecay} LS:{lossFunction}')
