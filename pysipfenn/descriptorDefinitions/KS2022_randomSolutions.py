@@ -291,115 +291,131 @@ def generate_descriptor(struct: Structure,
         raise AssertionError('Invalid convergence criteria (compositionDistance > compositionConvergenceCriterion).')
     if minOccupationCount > minimumElementOccurrences:
         raise AssertionError('Invalid convergence criteria (minOccupationCount > minimumElementOccurrences).')
+    try:
+        while maxDiff > featureConvergenceCriterion \
+                or compositionDistance > compositionConvergenceCriterion \
+                or minOccupationCount < minimumElementOccurrences:
+            # Choose random structure occupation
+            randomOccupation = random.choices(list(elementalFrequencies.keys()),
+                                              weights=elementalFrequencies.values(),
+                                              k=adjustedStruct.num_sites)
+            allOccupations += randomOccupation
+            occupationCount = dict(Counter(allOccupations))
+            minOccupationCount = min(occupationCount.values())
+            currentComposition = Composition.from_dict(occupationCount)
+            # Adjust current elemental frequencies to push the current composition towards the target composition
 
-    while maxDiff > featureConvergenceCriterion \
-            or compositionDistance > compositionConvergenceCriterion \
-            or minOccupationCount < minimumElementOccurrences:
-        # Choose random structure occupation
-        randomOccupation = random.choices(list(elementalFrequencies.keys()),
-                                          weights=elementalFrequencies.values(),
-                                          k=adjustedStruct.num_sites)
-        allOccupations += randomOccupation
-        occupationCount = dict(Counter(allOccupations))
-        minOccupationCount = min(occupationCount.values())
-        currentComposition = Composition.from_dict(occupationCount)
-        # Adjust current elemental frequencies to push the current composition towards the target composition
+            compositionDistance = 0
+            for element in elementalFrequencies.keys():
+                difference = currentComposition.fractional_composition.get_atomic_fraction(element) \
+                             - comp.fractional_composition.get_atomic_fraction(element)
+                compositionDistance += abs(difference)
+                elementalFrequencies[element] -= difference * 0.1
+            compositionDistance /= len(elementalFrequencies.keys())
 
-        compositionDistance = 0
-        for element in elementalFrequencies.keys():
-            difference = currentComposition.fractional_composition.get_atomic_fraction(element) \
-                         - comp.fractional_composition.get_atomic_fraction(element)
-            compositionDistance += abs(difference)
-            elementalFrequencies[element] -= difference * 0.1
-        compositionDistance /= len(elementalFrequencies.keys())
+            for site, occupation in zip(adjustedStruct.sites, randomOccupation):
+                site.species = occupation
 
-        for site, occupation in zip(adjustedStruct.sites, randomOccupation):
-            site.species = occupation
+            diff_properties_instance, attribute_properties_instance = generate_voronoi_attributes(struct=adjustedStruct)
 
-        diff_properties_instance, attribute_properties_instance = generate_voronoi_attributes(struct=adjustedStruct)
+            diff_properties = np.concatenate((diff_properties, diff_properties_instance), axis=0)
+            attribute_properties = np.concatenate((attribute_properties, attribute_properties_instance), axis=0)
 
-        diff_properties = np.concatenate((diff_properties, diff_properties_instance), axis=0)
-        attribute_properties = np.concatenate((attribute_properties, attribute_properties_instance), axis=0)
+            properties = np.concatenate(
+                (np.stack(
+                    (np.mean(diff_properties, axis=0),
+                     np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
+                     np.min(diff_properties, axis=0),
+                     np.max(diff_properties, axis=0),
+                     np.max(diff_properties, axis=0) - np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
+                 np.stack(
+                     (np.mean(attribute_properties, axis=0),
+                      np.max(attribute_properties, axis=0) - np.min(attribute_properties, axis=0),
+                      np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
+                      np.max(attribute_properties, axis=0),
+                      np.min(attribute_properties, axis=0),
+                      most_common(attribute_properties)), axis=-1).reshape((-1))))
+            # Normalize Bond Length properties.
+            properties[6] /= properties[5]
+            properties[7] /= properties[5]
+            properties[8] /= properties[5]
+            # Normalize the Cell Volume Deviation.
+            properties[16] /= properties[15]
+            # Remove properties not in magpie.
+            properties = np.delete(properties, [4, 5, 9, 14, 15, 17, 18, 19, 21, 22, 23, 24])
+            # Renormalize the packing efficiency.
+            properties[12] *= adjustedStruct.num_sites / adjustedStruct.volume
+            # Calculate and insert stoichiometry attributes.
+            element_dict = currentComposition.fractional_composition.as_dict()
+            position = 118
+            for p in [10, 7, 5, 3, 2]:
+                properties = np.insert(properties, position,
+                                       math.pow(sum(math.pow(value, p) for value in element_dict.values()), 1.0 / p))
+            properties = np.insert(properties, position, len(element_dict))
+            # Calculate Valence Electron Statistics
+            electron_occupation_dict = {'s': 0, 'p': 0, 'd': 0, 'f': 0}
+            for key, value in element_dict.items():
+                electron_occupation_dict['s'] += value * attribute_matrix[Element(key).Z - 1][8]
+                electron_occupation_dict['p'] += value * attribute_matrix[Element(key).Z - 1][9]
+                electron_occupation_dict['d'] += value * attribute_matrix[Element(key).Z - 1][10]
+                electron_occupation_dict['f'] += value * attribute_matrix[Element(key).Z - 1][11]
+            total_valence_factor = sum([val for (key, val) in electron_occupation_dict.items()])
+            for orb in ['s', 'p', 'd', 'f']:
+                properties = np.append(properties, electron_occupation_dict[orb] / total_valence_factor)
+            # Calculate ionic compound attributes.
+            max_ionic_char = 0
+            av_ionic_char = 0
+            for key1, value1 in element_dict.items():
+                for key2, value2 in element_dict.items():
+                    ionic_char = 1.0 - math.exp(-0.25 * (Element(key1).X - Element(key2).X) ** 2)
+                    if ionic_char > max_ionic_char:
+                        max_ionic_char = ionic_char
+                    av_ionic_char += ionic_char * value1 * value2
+            properties = np.append(properties, max_ionic_char)
+            properties = np.append(properties, av_ionic_char)
+            properties = properties.astype(np.float32)
 
-        properties = np.concatenate(
-            (np.stack(
-                (np.mean(diff_properties, axis=0),
-                 np.mean(np.abs(diff_properties - np.mean(diff_properties, axis=0)), axis=0),
-                 np.min(diff_properties, axis=0),
-                 np.max(diff_properties, axis=0),
-                 np.max(diff_properties, axis=0) - np.min(diff_properties, axis=0)), axis=-1).reshape((-1)),
-             np.stack(
-                 (np.mean(attribute_properties, axis=0),
-                  np.max(attribute_properties, axis=0) - np.min(attribute_properties, axis=0),
-                  np.mean(np.abs(attribute_properties - np.mean(attribute_properties, axis=0)), axis=0),
-                  np.max(attribute_properties, axis=0),
-                  np.min(attribute_properties, axis=0),
-                  most_common(attribute_properties)), axis=-1).reshape((-1))))
-        # Normalize Bond Length properties.
-        properties[6] /= properties[5]
-        properties[7] /= properties[5]
-        properties[8] /= properties[5]
-        # Normalize the Cell Volume Deviation.
-        properties[16] /= properties[15]
-        # Remove properties not in magpie.
-        properties = np.delete(properties, [4, 5, 9, 14, 15, 17, 18, 19, 21, 22, 23, 24])
-        # Renormalize the packing efficiency.
-        properties[12] *= adjustedStruct.num_sites / adjustedStruct.volume
-        # Calculate and insert stoichiometry attributes.
-        element_dict = currentComposition.fractional_composition.as_dict()
-        position = 118
-        for p in [10, 7, 5, 3, 2]:
-            properties = np.insert(properties, position,
-                                   math.pow(sum(math.pow(value, p) for value in element_dict.values()), 1.0 / p))
-        properties = np.insert(properties, position, len(element_dict))
-        # Calculate Valence Electron Statistics
-        electron_occupation_dict = {'s': 0, 'p': 0, 'd': 0, 'f': 0}
-        for key, value in element_dict.items():
-            electron_occupation_dict['s'] += value * attribute_matrix[Element(key).Z - 1][8]
-            electron_occupation_dict['p'] += value * attribute_matrix[Element(key).Z - 1][9]
-            electron_occupation_dict['d'] += value * attribute_matrix[Element(key).Z - 1][10]
-            electron_occupation_dict['f'] += value * attribute_matrix[Element(key).Z - 1][11]
-        total_valence_factor = sum([val for (key, val) in electron_occupation_dict.items()])
-        for orb in ['s', 'p', 'd', 'f']:
-            properties = np.append(properties, electron_occupation_dict[orb] / total_valence_factor)
-        # Calculate ionic compound attributes.
-        max_ionic_char = 0
-        av_ionic_char = 0
-        for key1, value1 in element_dict.items():
-            for key2, value2 in element_dict.items():
-                ionic_char = 1.0 - math.exp(-0.25 * (Element(key1).X - Element(key2).X) ** 2)
-                if ionic_char > max_ionic_char:
-                    max_ionic_char = ionic_char
-                av_ionic_char += ionic_char * value1 * value2
-        properties = np.append(properties, max_ionic_char)
-        properties = np.append(properties, av_ionic_char)
-        properties = properties.astype(np.float32)
-
-        propHistory.append(properties)
-        # Calculate the difference between the current step and the previous step and divide it by maximum value of
-        # each feature found in OQMD to normalize the difference.
-        if len(propHistory) > 2:
-            # Current iteration diff
-            diff = np.subtract(properties, propHistory[-2])
-            diff /= maxFeaturesInOQMD
-            diffHistory.append(diff)
-            # Calculate the additional diff to one level older iteration
-            diff2 = np.subtract(properties, propHistory[-3])
-            diff2 /= maxFeaturesInOQMD
-            # Calculate the maximum difference across both differences
-            maxDiff = max(np.concatenate((diff, diff2), axis=0))
-            if printProgress:
-                print(f'{attribute_properties.shape[0]:^6} | '
-                      f'{compositionDistance: 18.6f} | '
-                      f'{maxDiff: 21.6f} | '
-                      f'{minOccupationCount:^4}')
+            propHistory.append(properties)
+            # Calculate the difference between the current step and the previous step and divide it by maximum value of
+            # each feature found in OQMD to normalize the difference.
+            if len(propHistory) > 2:
+                # Current iteration diff
+                diff = np.subtract(properties, propHistory[-2])
+                diff /= maxFeaturesInOQMD
+                diffHistory.append(diff)
+                # Calculate the additional diff to one level older iteration
+                diff2 = np.subtract(properties, propHistory[-3])
+                diff2 /= maxFeaturesInOQMD
+                # Calculate the maximum difference across both differences
+                maxDiff = max(np.concatenate((diff, diff2), axis=0))
+                if printProgress:
+                    print(f'{attribute_properties.shape[0]:^6} | '
+                          f'{compositionDistance: 18.6f} | '
+                          f'{maxDiff: 21.6f} | '
+                          f'{minOccupationCount:^4}')
+            else:
+                if printProgress:
+                    print(f'{attribute_properties.shape[0]:^6} | '
+                          f'{compositionDistance: 18.6f} | '
+                          f'{"(init)":^21} | '
+                          f'{minOccupationCount:^4}')
+        # ^^^ End of the long while-loop above
+    except KeyboardInterrupt:
+        if len(propHistory) == 0:
+            raise KeyboardInterrupt(
+                'KS2022_randomSolution descriptor calculation was interrupted before it managed to complete the '
+                'first iteration.')
         else:
-            if printProgress:
-                print(f'{attribute_properties.shape[0]:^6} | '
-                      f'{compositionDistance: 18.6f} | '
-                      f'{"(init)":^21} | '
-                      f'{minOccupationCount:^4}')
-    # ^^^ End of the long while-loop above
+            if len(diffHistory) == 0:
+                print(
+                    'Warning: The feature calculation was interrupted before it managed to begin convergence process. '
+                    'The first one or two iterations was completed and partial results are available but there was not '
+                    'enough data to calculate the convergence level.')
+            else:
+                print(
+                    'The feature calculation was interrupted before it managed to converge. Partial results  are '
+                    'available, including the level of convergence achieved before the interruption.')
+            pass
 
     if plotParameters:
         import plotly.express as px
