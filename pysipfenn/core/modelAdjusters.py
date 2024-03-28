@@ -577,6 +577,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         self.targetData: np.ndarray = np.empty((0, targetSize))
 
+        self.names: List[str] = []
+
 
         print("Initialized Adjuster instance!\n")
 
@@ -595,6 +597,14 @@ class OPTIMADEAdjuster(LocalAdjuster):
             print(f"Obtained {len(data)} structures from the OPTIMADE API.")
             print("Converting to pymatgen structures...")
 
+        for datapoint in data:
+            # OPTIMADE Standard Data
+            self.names.append(datapoint['attributes']['chemical_formula_reduced'] + '-' + datapoint['id'])
+
+            # Database-specific payload existing at a specific target path (e.g., formation energy per atom in MP)
+
+
+        # Featurization of the received data
         structs = [pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)) for datapoint in data]
 
         if verbose:
