@@ -3,12 +3,15 @@ import os
 from typing import Union, Literal, Tuple, List, Dict
 from copy import deepcopy
 import gc
+from functools import reduce
+import operator
 
 # Default 3rd party imports
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from pysipfenn.core.pysipfenn import Calculator
+from pymatgen.core import Structure
 
 # DEV requirements. Not installed by default.
 import plotly.express as px
@@ -603,19 +606,36 @@ class OPTIMADEAdjuster(LocalAdjuster):
         respondingProviderURL = list(providerResponse.keys())[0]
         data = providerResponse[respondingProviderURL]['data']
 
+        targetDataStage: List[List[float]] = []
+        structs: List[Structure] = []
+        missing: List[str] = []
+
         if verbose:
             print(f"Obtained {len(data)} structures from the OPTIMADE API.")
-            print("Converting to pymatgen structures...")
+            print("Extracting the data...")
 
         for datapoint in data:
             # OPTIMADE Standard Data
-            self.names.append(datapoint['attributes']['chemical_formula_reduced'] + '-' + datapoint['id'])
+            name = datapoint['attributes']['chemical_formula_reduced'] + '-' + datapoint['id']
 
             # Database-specific payload existing at a specific target path (e.g., formation energy per atom in MP)
+            try:
+                targetDataStage.append([reduce(operator.getitem, self.targetPath, datapoint)])
+            except KeyError:
+                missing.append(name)
+                continue
 
+            self.names.append(name)
+            # Stage for featurization of the received data
+            structs.append(pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)))
 
-        # Featurization of the received data
-        structs = [pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)) for datapoint in data]
+        if missing:
+            print(f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
+                  f"structures:\n{missing}\n")
+
+        print(f"Extracted {len(targetDataStage)} datapoints (composition+structure+target) from the OPTIMADE API.")
+        targetDataStage = np.array(targetDataStage)
+        self.targetData = np.concatenate((self.targetData, targetDataStage), axis=0)
 
         if verbose:
             print("Featurizing the structures...")
@@ -633,6 +653,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         if verbose:
             print("Featurization complete!")
+            print(f"Current dataset size: {len(self.names)} with {len(set(self.names))} unique IDs.\n")
+
 
 
 if __name__ == '__main__':
