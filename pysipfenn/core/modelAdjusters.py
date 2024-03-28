@@ -124,6 +124,10 @@ class LocalAdjuster:
             else:
                 raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
 
+        self.validationLabels: List[str] = []
+
+        print("Initialized Adjuster instance!\n")
+
     def plotStarting(self) -> None:
         """
         Plot the starting model (before adjustment) on the target data. By default, it will plot in your browser.
@@ -138,6 +142,17 @@ class LocalAdjuster:
             labels={
                 "x": "Target Data", "y": "Predictions"},
             title="Starting (Unadjusted) Model Predictions")
+        # If the validation labels are set, color the points as blue for training, green for validation, and red for
+        # any other label, just in case advanced users want to use this method for other purposes.
+        if self.validationLabels:
+            fig.update_traces(
+                marker=dict(
+                    color=[(
+                            "blue" if label == "Training" else
+                            "green" if label == "Validation" else
+                            "red"
+                    ) for label in self.validationLabels])
+            )
         fig.show()
 
     def plotAdjusted(self) -> None:
@@ -155,6 +170,17 @@ class LocalAdjuster:
             labels={
                 "x": "Target Data", "y": "Predictions"},
             title="Adjusted Model Predictions")
+        # If the validation labels are set, color the points as blue for training, green for validation, and red for
+        # any other label, just in case advanced users want to use this method for other purposes.
+        if self.validationLabels:
+            fig.update_traces(
+                marker=dict(
+                    color=[(
+                        "blue" if label == "Training" else
+                        "green" if label == "Validation" else
+                        "red"
+                    ) for label in self.validationLabels])
+            )
         fig.show()
 
     def adjust(
@@ -206,6 +232,7 @@ class LocalAdjuster:
         tdTensor = torch.from_numpy(self.targetData).float().to(device=self.device)
         if validation > 0:
             split = int(len(ddTensor) * (1 - validation))
+            self.validationLabels = ["Training"]*split + ["Validation"]*(len(ddTensor)-split)
             ddTrain, ddVal = ddTensor[:split], ddTensor[split:]
             tdTrain, tdVal = tdTensor[:split], tdTensor[split:]
         else:
