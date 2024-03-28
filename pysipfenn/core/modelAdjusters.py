@@ -303,7 +303,6 @@ class LocalAdjuster:
         gc.collect()
         print("All done!")
 
-        return model, transferLosses, validationLosses
         return self.adjustedModel, transferLosses, validationLosses
 
 
