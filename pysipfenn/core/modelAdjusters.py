@@ -124,6 +124,7 @@ class LocalAdjuster:
             else:
                 raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
 
+        self.names: List[str] = []
         self.validationLabels: List[str] = []
 
         print("Initialized Adjuster instance!\n")
@@ -133,6 +134,7 @@ class LocalAdjuster:
         Plot the starting model (before adjustment) on the target data. By default, it will plot in your browser.
         """
         self.model.eval()
+        print("Running the STARTING model on the data and plotting the results...")
         with torch.no_grad():
             dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
             predictions = self.model(dataIn, None).detach().cpu().numpy().flatten()
@@ -145,6 +147,7 @@ class LocalAdjuster:
         # If the validation labels are set, color the points as blue for training, green for validation, and red for
         # any other label, just in case advanced users want to use this method for other purposes.
         if self.validationLabels:
+            print("Overlaying the training and validation labels on the plot.")
             fig.update_traces(
                 marker=dict(
                     color=[(
@@ -152,6 +155,12 @@ class LocalAdjuster:
                             "green" if label == "Validation" else
                             "red"
                     ) for label in self.validationLabels])
+            )
+        # If the names are set, add them to the plot.
+        if self.names:
+            print("Adding the names as hover data to the plot.")
+            fig.update_traces(
+                hovertext=self.names
             )
         fig.show()
 
@@ -161,6 +170,7 @@ class LocalAdjuster:
         """
         assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
         self.adjustedModel.eval()
+        print("Running the ADJUSTED model on the data and plotting the results...")
         with torch.no_grad():
             dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
             predictions = self.adjustedModel(dataIn, None).detach().cpu().numpy().flatten()
@@ -173,6 +183,7 @@ class LocalAdjuster:
         # If the validation labels are set, color the points as blue for training, green for validation, and red for
         # any other label, just in case advanced users want to use this method for other purposes.
         if self.validationLabels:
+            print("Overlaying the training and validation labels on the plot.")
             fig.update_traces(
                 marker=dict(
                     color=[(
@@ -181,6 +192,12 @@ class LocalAdjuster:
                         "red"
                     ) for label in self.validationLabels])
             )
+        # If the names are set, add them to the plot.
+        if self.names:
+            print("Adding the names as hover data to the plot.")
+            fig.update_traces(
+                   hovertext=self.names
+                )
         fig.show()
 
     def adjust(
@@ -448,9 +465,9 @@ class LocalAdjuster:
             print(f"\n\nBest model found with LR: {bestHyperparameters['learningRate']}, OPT: {bestHyperparameters['optimizer']}, "
                   f"WD: {bestHyperparameters['weightDecay']}, Epoch: {bestHyperparameters['epochs']}")
             if validation > 0:
-                print(f"Train: {bestTrainingLoss:.4f} | Validation: {bestValidationLoss:.4f}")
+                print(f"Train: {bestTrainingLoss:.4f} | Validation: {bestValidationLoss:.4f}\n")
             else:
-                print(f"Train: {bestTrainingLoss:.4f}")
+                print(f"Train: {bestTrainingLoss:.4f}\n")
         assert bestModel is not None, "The best model was not found. Something went wrong during the hyperparameter search."
         self.adjustedModel = bestModel
         del bestModel
@@ -616,9 +633,6 @@ class OPTIMADEAdjuster(LocalAdjuster):
             raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
 
         self.targetData: np.ndarray = np.empty((0, targetSize))
-
-        self.names: List[str] = []
-
 
         print("Initialized Adjuster instance!\n")
 
