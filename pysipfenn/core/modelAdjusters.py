@@ -1,14 +1,22 @@
+# Standard library imports
 import os
 from typing import Union, Literal, Tuple, List, Dict
 from copy import deepcopy
 import gc
 
+# Default 3rd party imports
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from pysipfenn.core.pysipfenn import Calculator
+
+# DEV requirements. Not installed by default.
 import plotly.express as px
 import plotly.graph_objects as go
-from pysipfenn.core.pysipfenn import Calculator
+from optimade.client import OptimadeClient
+from optimade.adapters.structures import pymatgen as pymatgen_adapter
+from optimade.models import StructureResource
+
 
 class LocalAdjuster:
     """
@@ -166,7 +174,7 @@ class LocalAdjuster:
         Args:
             learningRate: The learning rate to be used for the adjustment. Default is ``1e-5`` that is 1% of a typical
                 learning rate of ``Adam`` optimizer.
-            epochs: The number of times to iterate over the data, i.e. how many times the model will see the data.
+            epochs: The number of times to iterate over the data, i.e., how many times the model will see the data.
                 Default is ``50``, which is on the higher side for fine-tuning. If the model does not retrain fast enough
                 but already converged, consider lowering this number to reduce the time and possibly overfitting to the
                 training data.
@@ -177,10 +185,10 @@ class LocalAdjuster:
             lossFunction: Loss function to be used for optimization. Default is ``MAE`` (Mean Absolute Error / L1) that is
                 more robust to outliers than ``MSE`` (Mean Squared Error).
             validation: Fraction of the data to be used for validation. Default is the common ``0.2`` (20% of the data).
-                If set to ``0``, the model will be trained on the whole dataset without validation and you will not be able
+                If set to ``0``, the model will be trained on the whole dataset without validation, and you will not be able
                 to check for overfitting or gauge the model's performance on unseen data.
             weightDecay: Weight decay to be used for optimization. Default is ``1e-5`` that should work well if data is
-                plaintiful enough relative to the model complexity. If the model is overfitting, consider increasing this
+                abundant enough relative to the model complexity. If the model is overfitting, consider increasing this
                 number to regularize the model more.
             verbose: Whether to print information, such as loss, during the training. Default is ``True``.
 
@@ -469,8 +477,91 @@ class OPTIMADEAdjuster(LocalAdjuster):
     different domain, which in the context of DFT datasets could mean adjusting the model to predict properties with DFT
     settings used by that database or focusing its attention to specific chemistry like, for instance, all compounds of
     Sn and all perovskites. It accepts OPTIMADE query as an input and then operates based on the ``LocalAdjuster`` class.
+
+    It will set up the environment for the adjustment, letting you progressively build up the training dataset by
+    OPTIMADE queries which get featurized and their results will be concatenated, i.e., you can make one big query or
+    several smaller ones and then adjust the model on the whole dataset when you are ready.
+
+    For details on more advanced uses of the OPTIMADE API client, please refer to [the documentation](https://www.optimade.org/optimade-python-tools/latest/getting_started/client/).
+
+    Args:
+        calculator: Instance of the ``Calculator`` class with the model to be adjusted, defined and loaded. Unlike in the
+            ``LocalAdjuster``, the descriptor data will not be passed, since it will be fetched from the OPTIMADE API.
+        model: Name of the model to be adjusted in the ``Calculator``. E.g., ``SIPFENN_Krajewski2022_NN30``.
+        provider: Tuple of strings with the names of the providers to be used for the OPTIMADE queries. The type-hinting
+            gives a list of providers available at the time of writing this code, but it is by no means limited to them.
+            For the up-to-date list, along with their current status, please refer to the
+            [OPTIMADE Providers Dashboard](https://optimade.org/providers-dashboard). The default is ``"mp"`` which
+            stands for the Materials Project, but we do not recommend any particular provider over any other. One has to
+            be picked to work out of the box. Your choice should be based on the data you are interested in.
+        targetPath: Tuple of strings with the path to the target data in the OPTIMADE response. This will be dependent
+            on the provider you choose, and you will need to identify it by looking at the response. The easiest way to
+            do this is by going to their endpoint, like
+            [this, very neat one, for JARVIS](https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/),
+            [this one for MP](https://optimade.materialsproject.org/v1/structures),
+             or [this one for our in-house MPDD](https://optimade.mpdd.org/v1/structures).
+        device: Same as in the ``LocalAdjuster``. Default is ``"cpu"``.
+        descriptor: *Not* the same as in the ``LocalAdjuster``. Since the descriptor data will be calculated for each
+            structure fetched from the OPTIMADE API, this parameter is needed to specify which descriptor to use. At the
+            time of writing this code, it can be either ``"Ward2017"`` or ``"KS2022"``. Special versions of ``KS2022``
+            cannot be used since assumptions cannot be made about the data fetched from the OPTIMADE API and only general
+            symmetry-based optimizations can be applied. Default is ``"KS2022"``.
+        useClearML: Same as in the ``LocalAdjuster``. Default is ``False``.
+        taskName: Same as in the ``LocalAdjuster``. Default is ``"OPTIMADEFineTuning"``, and you are encouraged to change
+            it, especially if you are using the ClearML platform.
     """
 
+    def __init__(
+            self,
+            calculator: Calculator,
+            model: str,
+            provider:
+                Literal[
+                    "aiida",
+                    "aflow",
+                    "alexandria",
+                    "cod",
+                    "ccpnc",
+                    "cmr",
+                    "httk",
+                    "matcloud",
+                    "mcloud",
+                    "mcloudarchive",
+                    "mp",
+                    "mpdd",
+                    "mpds",
+                    "mpod",
+                    "nmd",
+                    "odbx",
+                    "omdb",
+                    "oqmd",
+                    "jarvis",
+                    "pcod",
+                    "tcod",
+                    "twodmatpedia"
+                ] = "mp",
+            targetPath: Tuple[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+            device: Literal["cpu", "cuda", "mps"] = "cpu",
+            descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
+            useClearML: bool = False,
+            taskName: str = "OPTIMADEFineTuning"
+    ) -> None:
+        super().__init__(
+            calculator=calculator,
+            model=model,
+            targetData=np.array([]),
+            descriptorData=np.array([]),
+            device=device,
+            descriptor=None,
+            useClearML=useClearML,
+            taskName=taskName,
+        )
 
+        self.targetPath = targetPath
+        self.provider = provider
+        self.client = OptimadeClient(
+            use_async=False,
+            include_providers=[provider]
+        )
 
 
