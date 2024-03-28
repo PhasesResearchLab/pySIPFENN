@@ -500,6 +500,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
             [this, very neat one, for JARVIS](https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/),
             [this one for MP](https://optimade.materialsproject.org/v1/structures),
              or [this one for our in-house MPDD](https://optimade.mpdd.org/v1/structures).
+        targetSize: The length of the target data to be fetched from the OPTIMADE API. This is typically ``1`` for a single
+        scalar property, but it can be more. Default is ``1``.
         device: Same as in the ``LocalAdjuster``. Default is ``"cpu"``.
         descriptor: *Not* the same as in the ``LocalAdjuster``. Since the descriptor data will be calculated for each
             structure fetched from the OPTIMADE API, this parameter is needed to specify which descriptor to use. At the
@@ -541,6 +543,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                     "twodmatpedia"
                 ] = "mp",
             targetPath: Tuple[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+            targetSize: int = 1,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
             descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
             useClearML: bool = False,
@@ -557,6 +560,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
             taskName=taskName,
         )
 
+        self.descriptor = descriptor
         self.targetPath = targetPath
         self.provider = provider
         self.client = OptimadeClient(
@@ -564,4 +568,52 @@ class OPTIMADEAdjuster(LocalAdjuster):
             include_providers=[provider]
         )
 
+        if self.descriptor == "Ward2017":
+            self.descriptorData: np.ndarray = np.empty((0, 271))
+        elif self.descriptor == "KS2022":
+            self.descriptorData: np.ndarray = np.empty((0, 256))
+        else:
+            raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
 
+        self.targetData: np.ndarray = np.empty((0, targetSize))
+
+
+        print("Initialized Adjuster instance!\n")
+
+    def fetchAndFeturize(
+            self,
+            query: str,
+            parallelWorkers: int = 1,
+            verbose: bool = True
+    ) -> None:
+        response = self.client.get(query)
+        providerResponse = response['structures'][query]
+        respondingProviderURL = list(providerResponse.keys())[0]
+        data = providerResponse[respondingProviderURL]['data']
+
+        if verbose:
+            print(f"Obtained {len(data)} structures from the OPTIMADE API.")
+            print("Converting to pymatgen structures...")
+
+        structs = [pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)) for datapoint in data]
+
+        if verbose:
+            print("Featurizing the structures...")
+
+        if self.descriptor == "Ward2017":
+            self.calculator.calculate_Ward2017(structs, mode="parallel", max_workers=parallelWorkers)
+            self.descriptorData = np.concatenate((self.descriptorData, self.calculator.descriptorData), axis=0)
+
+        elif self.descriptor == "KS2022":
+            self.calculator.calculate_KS2022(structs, mode="parallel", max_workers=parallelWorkers)
+            self.descriptorData = np.concatenate((self.descriptorData, self.calculator.descriptorData), axis=0)
+
+        else:
+            raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
+
+        if verbose:
+            print("Featurization complete!")
+
+
+if __name__ == '__main__':
+    pass
