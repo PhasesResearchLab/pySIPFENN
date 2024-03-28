@@ -50,7 +50,7 @@ dev = [
     "onnxsim==0.4.33",
     "onnxruntime>=1.16.0",
     "plotly>=5.15.0",
-    "optimade>=1.0.0"
+    "optimade[http_client]>=1.0.0"
 ]
 
 [project.urls]
