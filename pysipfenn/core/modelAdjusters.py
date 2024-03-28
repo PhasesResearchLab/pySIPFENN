@@ -1,6 +1,7 @@
 import os
 from typing import Union, Literal, Tuple, List
 from copy import deepcopy
+import gc
 
 import numpy as np
 import torch
@@ -117,7 +118,7 @@ class LocalAdjuster:
         """
         self.model.eval()
         with torch.no_grad():
-            dataIn = torch.from_numpy(np.array(self.descriptorData)).to(device=self.device).float()
+            dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
             predictions = self.model(dataIn, None).detach().cpu().numpy().flatten()
         fig = px.scatter(
             x=self.targetData.flatten(),
@@ -134,7 +135,7 @@ class LocalAdjuster:
         assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
         self.adjustedModel.eval()
         with torch.no_grad():
-            dataIn = torch.from_numpy(np.array(self.descriptorData)).to(device=self.device).float()
+            dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
             predictions = self.adjustedModel(dataIn, None).detach().cpu().numpy().flatten()
         fig = px.scatter(
             x=self.targetData.flatten(),
@@ -296,9 +297,14 @@ class LocalAdjuster:
             task.close()
         model.eval()
         self.adjustedModel = model
+        del model
+        del optimizerInstance
+        del loss
+        gc.collect()
         print("All done!")
 
         return model, transferLosses, validationLosses
+        return self.adjustedModel, transferLosses, validationLosses
 
 
 
