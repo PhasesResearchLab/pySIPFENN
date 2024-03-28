@@ -511,6 +511,9 @@ class OPTIMADEAdjuster(LocalAdjuster):
         useClearML: Same as in the ``LocalAdjuster``. Default is ``False``.
         taskName: Same as in the ``LocalAdjuster``. Default is ``"OPTIMADEFineTuning"``, and you are encouraged to change
             it, especially if you are using the ClearML platform.
+        maxResults: The maximum number of results to be fetched from the OPTIMADE API for a given query. Default is
+            ``10000`` which is a very high number for most re-training tasks. If you are fetching a lot of data, it's
+            possible the query is too broad, and you should consider narrowing it down.
     """
 
     def __init__(
@@ -542,12 +545,18 @@ class OPTIMADEAdjuster(LocalAdjuster):
                     "tcod",
                     "twodmatpedia"
                 ] = "mp",
-            targetPath: Tuple[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+            targetPath: Tuple[str] = (
+                    'attributes',
+                    '_mp_stability',
+                    'gga_gga+u',
+                    'formation_energy_per_atom'
+            ),
             targetSize: int = 1,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
             descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
             useClearML: bool = False,
-            taskName: str = "OPTIMADEFineTuning"
+            taskName: str = "OPTIMADEFineTuning",
+            maxResults: int = 10000
     ) -> None:
         super().__init__(
             calculator=calculator,
@@ -565,7 +574,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
         self.provider = provider
         self.client = OptimadeClient(
             use_async=False,
-            include_providers=[provider]
+            include_providers=[provider],
+            max_results_per_provider=maxResults
         )
 
         if self.descriptor == "Ward2017":
