@@ -14,7 +14,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from pysipfenn.core.pysipfenn import Calculator
 from pymatgen.core import Structure
 
-# DEV requirements. Not installed by default.
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -122,6 +121,7 @@ class LocalAdjuster:
             else:
                 raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
 
+        self.comps: List[str] = []
         self.names: List[str] = []
         self.validationLabels: List[str] = []
 
@@ -656,6 +656,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         targetDataStage: List[List[float]] = []
         structs: List[Structure] = []
+        comps: List[str] = []
         names: List[str] = []
         missing: List[str] = []
 
@@ -665,7 +666,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         for datapoint in data:
             # OPTIMADE Standard Data
-            name = datapoint['attributes']['chemical_formula_reduced'] + '-' + datapoint['id']
+            comp = datapoint['attributes']['chemical_formula_reduced']
+            name = comp + '-' + datapoint['id']
 
             # Database-specific payload existing at a specific target path (e.g., formation energy per atom in MP)
             try:
@@ -674,6 +676,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                 missing.append(name)
                 continue
 
+            comps.append(comp)
             names.append(name)
             # Stage for featurization of the received data
             structs.append(pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)))
@@ -682,10 +685,11 @@ class OPTIMADEAdjuster(LocalAdjuster):
             print(f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
                   f"structures:\n{missing}\n")
 
-        dataIn = list(zip(names, structs, targetDataStage))
+        dataIn = list(zip(comps, names, structs, targetDataStage))
         shuffle(dataIn)
-        names, structs, targetDataStage = zip(*dataIn)
+        comps, names, structs, targetDataStage = zip(*dataIn)
 
+        self.comps.extend(comps)
         self.names.extend(names)
 
         print(f"Extracted {len(targetDataStage)} datapoints (composition+structure+target) from the OPTIMADE API.")
