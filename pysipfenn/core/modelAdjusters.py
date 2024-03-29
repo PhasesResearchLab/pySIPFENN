@@ -6,6 +6,7 @@ import gc
 from functools import reduce
 import operator
 from random import shuffle
+import time
 
 # Default 3rd party imports
 import numpy as np
@@ -451,8 +452,10 @@ class LocalAdjuster:
             verbose: Same as in the ``adjust`` method. Default is ``True``.
             plot: Whether to plot the training history after all the combinations are tested. Default is ``True``.
         """
+        nTasks = len(learningRates) * len(optimizers) * len(weightDecays)
         if verbose:
             print("Starting the hyperparameter search...")
+            print(f"{nTasks} combinations will be tested.\n")
 
         bestModel: torch.nn.Module = None
         bestTrainingLoss: float = np.inf
@@ -467,6 +470,8 @@ class LocalAdjuster:
         trainLossHistory: List[List[float]] = []
         validationLossHistory: List[List[float]] = []
         labels: List[str] = []
+        tasksDone = 0
+        t0 = time.perf_counter()
 
         for learningRate in learningRates:
             for optimizer in optimizers:
@@ -516,6 +521,11 @@ class LocalAdjuster:
                             bestHyperparameters["epochs"] = bestEpoch + 1
                         else:
                             print(f"Model with LR: {learningRate}, OPT: {optimizer}, WD: {weightDecay} did not improve.")
+
+                    tasksDone += 1
+                    pastTimePerTask = ((time.perf_counter() - t0)/60) / tasksDone
+                    print(f"Task {tasksDone}/{nTasks} done. Estimated time left: {pastTimePerTask * (nTasks - tasksDone):.2f} minutes.\n")
+
 
         if verbose:
             print(f"\n\nBest model found with LR: {bestHyperparameters['learningRate']}, OPT: {bestHyperparameters['optimizer']}, "
