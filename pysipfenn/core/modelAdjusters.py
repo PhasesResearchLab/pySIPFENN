@@ -775,7 +775,10 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         if verbose:
             print("Featurization complete!")
-            print(f"Current dataset size: {len(self.names)} with {len(set(self.names))} unique IDs.\n")
+            print(f"Current dataset size: "
+                  f"{len(self.names)} with "
+                  f"{len(set(self.names))} unique IDs belonging to "
+                  f"{len(set(self.comps))} unique compositions.\n")
             if len(self.names) > len(set(self.names)):
                 print("Please note that there are duplicate IDs in the dataset. Such degenerate dataset can be used "
                       "without issues for training (in some occasions may be even desirable to bias the model to areas "
