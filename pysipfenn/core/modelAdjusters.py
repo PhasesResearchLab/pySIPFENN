@@ -5,6 +5,7 @@ from copy import deepcopy
 import gc
 from functools import reduce
 import operator
+from random import shuffle
 
 # Default 3rd party imports
 import numpy as np
@@ -653,6 +654,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         targetDataStage: List[List[float]] = []
         structs: List[Structure] = []
+        names: List[str] = []
         missing: List[str] = []
 
         if verbose:
@@ -670,7 +672,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                 missing.append(name)
                 continue
 
-            self.names.append(name)
+            names.append(name)
             # Stage for featurization of the received data
             structs.append(pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)))
 
@@ -678,9 +680,14 @@ class OPTIMADEAdjuster(LocalAdjuster):
             print(f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
                   f"structures:\n{missing}\n")
 
+        dataIn = list(zip(names, structs, targetDataStage))
+        shuffle(dataIn)
+        names, structs, targetDataStage = zip(*dataIn)
+
+        self.names.extend(names)
+
         print(f"Extracted {len(targetDataStage)} datapoints (composition+structure+target) from the OPTIMADE API.")
-        targetDataStage = np.array(targetDataStage)
-        self.targetData = np.concatenate((self.targetData, targetDataStage), axis=0)
+        self.targetData = np.concatenate((self.targetData, np.array(targetDataStage)), axis=0)
 
         if verbose:
             print("Featurizing the structures...")
