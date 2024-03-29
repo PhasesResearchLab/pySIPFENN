@@ -581,6 +581,17 @@ class LocalAdjuster:
             assert p < len(self.validationLabels), "The index of the point to be highlighted is out of bounds."
             self.validationLabels[p] = "Highlight"
 
+    def highlightCompositions(
+            self,
+            compositions: List[str]
+    ) -> None:
+        if not self.validationLabels:
+            print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
+        assert self.comps, "The compositions must be set before highlighting them. If you use ``OPTIMADEAdjuster``, this is done automatically, but with ``LocalAdjuster``, you have to set them manually."
+        reducedFormulas = set([Composition(c).reduced_formula for c in compositions])
+        for idx, comp in enumerate(self.comps):
+            if comp in reducedFormulas:
+                self.validationLabels[idx] = "Highlight"
 
 
 class OPTIMADEAdjuster(LocalAdjuster):
@@ -772,6 +783,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         else:
             raise NotImplementedError("The descriptor must be either 'Ward2017' or 'KS2022'. Others will be added in the future.")
+
+        self.validationLabels = ["Training"]*len(self.descriptorData)
 
         if verbose:
             print("Featurization complete!")
