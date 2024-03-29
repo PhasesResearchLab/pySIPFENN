@@ -131,53 +131,30 @@ class LocalAdjuster:
         """
         Plot the starting model (before adjustment) on the target data. By default, it will plot in your browser.
         """
+        reference = self.targetData.flatten()
         self.model.eval()
         print("Running the STARTING model on the data and plotting the results...")
         with torch.no_grad():
             dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
             predictions = self.model(dataIn, None).detach().cpu().numpy().flatten()
-        fig = px.scatter(
-            x=self.targetData.flatten(),
-            y=predictions,
-            labels={
-                "x": "Target Data", "y": "Predictions"},
-            title="Starting (Unadjusted) Model Predictions")
-        # If the validation labels are set, color the points as blue for training, green for validation, and red for
-        # any other label, just in case advanced users want to use this method for other purposes.
-        if self.validationLabels:
-            print("Overlaying the training and validation labels on the plot.")
-            fig.update_traces(
-                marker=dict(
-                    color=[(
-                            "blue" if label == "Training" else
-                            "green" if label == "Validation" else
-                            "red"
-                    ) for label in self.validationLabels])
-            )
-        # If the names are set, add them to the plot.
-        if self.names:
-            print("Adding the names as hover data to the plot.")
-            fig.update_traces(
-                hovertext=self.names
-            )
-        fig.show()
+        minVal = min(min(reference), min(predictions))
+        maxVal = max(max(reference), max(predictions))
 
-    def plotAdjusted(self) -> None:
-        """
-        Plot the adjusted model on the target data. By default, it will plot in your browser.
-        """
-        assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
-        self.adjustedModel.eval()
-        print("Running the ADJUSTED model on the data and plotting the results...")
-        with torch.no_grad():
-            dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
-            predictions = self.adjustedModel(dataIn, None).detach().cpu().numpy().flatten()
-        fig = px.scatter(
-            x=self.targetData.flatten(),
-            y=predictions,
-            labels={
-                "x": "Target Data", "y": "Predictions"},
-            title="Adjusted Model Predictions")
+        if self.names:
+            fig = px.scatter(
+                x=reference,
+                y=predictions,
+                hover_name=self.names,
+                labels={"x": "Target Data", "y": "Predictions"},
+                title="Starting (Unadjusted) Model Predictions"
+                )
+        else:
+            fig = px.scatter(
+                x=reference,
+                y=predictions,
+                labels = {"x": "Target Data", "y": "Predictions"},
+                title = "Starting (Unadjusted) Model Predictions"
+            )
         # If the validation labels are set, color the points as blue for training, green for validation, and red for
         # any other label, just in case advanced users want to use this method for other purposes.
         if self.validationLabels:
@@ -187,15 +164,92 @@ class LocalAdjuster:
                     color=[(
                         "blue" if label == "Training" else
                         "green" if label == "Validation" else
-                        "red"
-                    ) for label in self.validationLabels])
-            )
-        # If the names are set, add them to the plot.
-        if self.names:
-            print("Adding the names as hover data to the plot.")
-            fig.update_traces(
-                   hovertext=self.names
+                        "red") for label in self.validationLabels],
+                    symbol='circle-dot',
+                    opacity=0.5,
+                    size=12
                 )
+            )
+        else:
+            fig.update_traces(
+                marker=dict(
+                    symbol='circle-dot',
+                    opacity=0.5,
+                    size=12
+                )
+            )
+        fig.add_trace(
+            go.Scatter(
+                x=[minVal, maxVal],
+                y=[minVal, maxVal],
+                mode='lines',
+                line=dict(color='gray'),
+                name='x=y'
+            )
+        )
+        fig.show()
+
+    def plotAdjusted(self) -> None:
+        """
+        Plot the adjusted model on the target data. By default, it will plot in your browser.
+        """
+        assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
+        self.adjustedModel.eval()
+        reference = self.targetData.flatten()
+        print("Running the ADJUSTED model on the data and plotting the results...")
+        with torch.no_grad():
+            dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
+            predictions = self.adjustedModel(dataIn, None).detach().cpu().numpy().flatten()
+        minVal = min(min(reference), min(predictions))
+        maxVal = max(max(reference), max(predictions))
+
+        if self.names:
+            fig = px.scatter(
+                x=reference,
+                y=predictions,
+                hover_name=self.names,
+                labels={"x": "Target Data", "y": "Predictions"},
+                title="Starting (Unadjusted) Model Predictions"
+                )
+        else:
+            fig = px.scatter(
+                x=reference,
+                y=predictions,
+                labels = {"x": "Target Data", "y": "Predictions"},
+                title = "Starting (Unadjusted) Model Predictions"
+            )
+        # If the validation labels are set, color the points as blue for training, green for validation, and red for
+        # any other label, just in case advanced users want to use this method for other purposes.
+        if self.validationLabels:
+            print("Overlaying the training and validation labels on the plot.")
+            fig.update_traces(
+                marker=dict(
+                    color=[(
+                        "blue" if label == "Training" else
+                        "green" if label == "Validation" else
+                        "red") for label in self.validationLabels],
+                    symbol='circle-dot',
+                    opacity=0.5,
+                    size=12
+                )
+            )
+        else:
+            fig.update_traces(
+                marker=dict(
+                    symbol='circle-dot',
+                    opacity=0.5,
+                    size=12
+                )
+            )
+        fig.add_trace(
+            go.Scatter(
+                x=[minVal, maxVal],
+                y=[minVal, maxVal],
+                mode='lines',
+                line=dict(color='gray'),
+                name='x=y'
+            )
+        )
         fig.show()
 
     def adjust(
