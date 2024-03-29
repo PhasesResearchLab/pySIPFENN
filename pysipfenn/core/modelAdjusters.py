@@ -571,6 +571,16 @@ class LocalAdjuster:
 
         return self.adjustedModel, bestHyperparameters
 
+    def highlightPoints(
+            self,
+            pointsIndices: List[int]
+    ) -> None:
+        if not self.validationLabels:
+            print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
+        for p in pointsIndices:
+            assert p < len(self.validationLabels), "The index of the point to be highlighted is out of bounds."
+            self.validationLabels[p] = "Highlight"
+
 
 
 class OPTIMADEAdjuster(LocalAdjuster):
