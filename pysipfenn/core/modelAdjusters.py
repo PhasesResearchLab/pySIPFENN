@@ -17,9 +17,6 @@ from pymatgen.core import Structure
 # DEV requirements. Not installed by default.
 import plotly.express as px
 import plotly.graph_objects as go
-from optimade.client import OptimadeClient
-from optimade.adapters.structures import pymatgen as pymatgen_adapter
-from optimade.models import StructureResource
 
 
 class LocalAdjuster:
@@ -610,6 +607,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
             taskName: str = "OPTIMADEFineTuning",
             maxResults: int = 10000
     ) -> None:
+        from optimade.client import OptimadeClient
+
         super().__init__(
             calculator=calculator,
             model=model,
@@ -647,6 +646,9 @@ class OPTIMADEAdjuster(LocalAdjuster):
             parallelWorkers: int = 1,
             verbose: bool = True
     ) -> None:
+        from optimade.adapters.structures import pymatgen as pymatgen_adapter
+        from optimade.models import StructureResource
+
         response = self.client.get(query)
         providerResponse = response['structures'][query]
         respondingProviderURL = list(providerResponse.keys())[0]
