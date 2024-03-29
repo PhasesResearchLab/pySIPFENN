@@ -146,7 +146,7 @@ class LocalAdjuster:
                 y=predictions,
                 hover_name=self.names,
                 labels={"x": "Target Data", "y": "Predictions"},
-                title="Starting (Unadjusted) Model Predictions"
+                title="Starting (Unadjusted) Model Predictions (Hover for Name)"
                 )
         else:
             fig = px.scatter(
@@ -209,14 +209,14 @@ class LocalAdjuster:
                 y=predictions,
                 hover_name=self.names,
                 labels={"x": "Target Data", "y": "Predictions"},
-                title="Starting (Unadjusted) Model Predictions"
+                title="Adjusted Model Predictions (Hover for Name)"
                 )
         else:
             fig = px.scatter(
                 x=reference,
                 y=predictions,
                 labels = {"x": "Target Data", "y": "Predictions"},
-                title = "Starting (Unadjusted) Model Predictions"
+                title = "Adjusted Model Predictions"
             )
         # If the validation labels are set, color the points as blue for training, green for validation, and red for
         # any other label, just in case advanced users want to use this method for other purposes.
@@ -622,8 +622,16 @@ class OPTIMADEAdjuster(LocalAdjuster):
             on the provider you choose, and you will need to identify it by looking at the response. The easiest way to
             do this is by going to their endpoint, like
             [this, very neat one, for JARVIS](https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/),
+            [this one for Alexandria PBEsol](https://alexandria.icams.rub.de/pbesol/v1/structures),
             [this one for MP](https://optimade.materialsproject.org/v1/structures),
-             or [this one for our in-house MPDD](https://optimade.mpdd.org/v1/structures).
+            or [this one for our in-house MPDD](https://optimade.mpdd.org/v1/structures). Examples include
+            ``('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom')`` for GGA+U formation energy
+            per atom in MP, or ``('attributes', '_alexandria_scan_formation_energy_per_atom')`` for the `SCAN` formation
+            energy per atom in Alexandria, or ``('attributes', '_alexandria_formation_energy_per_atom')`` for the
+            ``GGAsol`` formation energy per atom in Alexandria, or ``('attributes', '_jarvis_formation_energy_peratom')``
+            for the `optb88vdw` formation energy per atom in JARVIS, or ``('attributes',
+            '_mpdd_formationenergy_sipfenn_krajewski2020_novelmaterialsmodel')`` for the formation energy predicted
+            by the SIPFENN_Krajewski2020_NovelMaterialsModel for every structure in MPDD. Default is the MP example.
         targetSize: The length of the target data to be fetched from the OPTIMADE API. This is typically ``1`` for a single
         scalar property, but it can be more. Default is ``1``.
         device: Same as in the ``LocalAdjuster``. Default is ``"cpu"``.
@@ -669,12 +677,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                     "tcod",
                     "twodmatpedia"
                 ] = "mp",
-            targetPath: Tuple[str] = (
-                    'attributes',
-                    '_mp_stability',
-                    'gga_gga+u',
-                    'formation_energy_per_atom'
-            ),
+            targetPath: Tuple[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
             targetSize: int = 1,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
             descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
