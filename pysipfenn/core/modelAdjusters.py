@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from pysipfenn.core.pysipfenn import Calculator
-from pymatgen.core import Structure
+from pymatgen.core import Structure, Composition
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -730,7 +730,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         for datapoint in data:
             # OPTIMADE Standard Data
-            comp = datapoint['attributes']['chemical_formula_reduced']
+            comp = Composition(datapoint['attributes']['chemical_formula_reduced']).reduced_formula
             name = comp + '-' + datapoint['id']
 
             # Database-specific payload existing at a specific target path (e.g., formation energy per atom in MP)
