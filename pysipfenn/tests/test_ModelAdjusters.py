@@ -14,6 +14,12 @@ class TestModelAdjusters(unittest.TestCase):
     Test all model adjusting features that can operate on the Calculator object. Note that this will require
     the models to be downloaded and the environment variable MODELS_FETCHED to be set to true if running in GitHub
     Actions.
+
+    The setup will load the Krajewski2022_NN30 model and create an ``OPTIMADEAdjuster`` object for testing that is by
+    default connected to the Materials Project ``OPTIMADE`` server and looks for their GGA+U formation energies. In the
+    ``testFullRoutine`` test, the adjuster will be used to adjust the model to the Hf-Mo metallic system. The test will
+    cover almost all adjuster functionalities in different ways to hit all anticipated code paths. It also tests the
+    ``LocalAdjuster`` class for loading data from CSV and NPY files, which is a parent class of the ``OPTIMADEAdjuster``.
     """
 
     def setUp(self):
@@ -50,7 +56,8 @@ class TestModelAdjusters(unittest.TestCase):
         """
         Test the full routine of the adjuster based on the default values pointing to Materials Project. Get the data
         using OPTIMADE to adjust the model to Hf-Mo metallic system. Matrix search is reduced to 4 cases to speed up
-        the test.
+        the test and it is designed to explore all code paths in the search. The test will also check the highlighting
+        and plotting functionalities of the adjuster.
         """
         self.ma.fetchAndFeturize(
             'elements HAS "Hf" AND elements HAS "Mo" AND NOT elements HAS ANY "O","C","F","Cl","S"',
@@ -98,7 +105,11 @@ class TestModelAdjusters(unittest.TestCase):
 
     def testDataLoading(self):
         """
-        Test the data loading functionality of the adjuster.
+        Test the data loading functionality of the ``LocalAdjuster`` class (note, ``OPTIMADEAdjuster`` extends it). It
+        will test loading from both CSV and NPY files exported from the Calculator object. Note that CSV files have
+        names in the first column and headers in the first row, while NPY files are just the data arrays. It tests
+        implicit loading from the ``Calculator`` object as well. Lastly, it tests the error raising for unsupported
+        descriptors and data not matching the descriptor dimensions selected (an optional feature).
         """
 
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/') as testFileDir:
