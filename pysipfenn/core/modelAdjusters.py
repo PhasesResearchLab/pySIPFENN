@@ -95,6 +95,7 @@ class LocalAdjuster:
             else:
                 raise ValueError("If a string is provided as descriptor data parameter, it must be a path to a npy/NPY or csv/CSV file.")
         else:
+            print(descriptorData)
             raise ValueError("The descriptor data must be either (a) None to use the data in the Calculator,"
                              "(b) a path to a npy/NPY file, or (c) a path to a csv/CSV file.")
 
@@ -315,6 +316,7 @@ class LocalAdjuster:
             ddTrain, ddVal = ddTensor[:split], ddTensor[split:]
             tdTrain, tdVal = tdTensor[:split], tdTensor[split:]
         else:
+            self.validationLabels = ["Training"]*len(ddTensor)
             ddTrain, ddVal = ddTensor, None
             tdTrain, tdVal = tdTensor, None
 
@@ -428,9 +430,9 @@ class LocalAdjuster:
             epochs: int = 100,
             batchSize: int = 32,
             lossFunction: Literal["MSE", "MAE"] = "MAE",
-            learningRates: Tuple[float] = (1e-6, 1e-5, 1e-4),
-            optimizers: Tuple[Literal["Adam", "AdamW", "Adamax", "RMSprop"]] = ("Adam", "AdamW", "Adamax"),
-            weightDecays: Tuple[float] = (1e-5, 1e-4, 1e-3),
+            learningRates: List[float] = (1e-6, 1e-5, 1e-4),
+            optimizers: List[Literal["Adam", "AdamW", "Adamax", "RMSprop"]] = ("Adam", "AdamW", "Adamax"),
+            weightDecays: List[float] = (1e-5, 1e-4, 1e-3),
             verbose: bool = True,
             plot: bool = True
     ) -> Tuple[torch.nn.Module, Dict[str, Union[float, str]]]:
@@ -448,11 +450,11 @@ class LocalAdjuster:
             epochs: Same as in the ``adjust`` method. Default is ``100``.
             batchSize: Same as in the ``adjust`` method. Default is ``32``.
             lossFunction: Same as in the ``adjust`` method. Default is ``MAE``, i.e. Mean Absolute Error or L1 loss.
-            learningRates: Tuple of floats with the learning rates to be tested. Default is ``(1e-6, 1e-5, 1e-4)``. See
+            learningRates: List of floats with the learning rates to be tested. Default is ``(1e-6, 1e-5, 1e-4)``. See
                 the ``adjust`` method for more information.
-            optimizers: Tuple of strings with the optimizers to be tested. Default is ``("Adam", "AdamW", "Adamax")``. See
+            optimizers: List of strings with the optimizers to be tested. Default is ``("Adam", "AdamW", "Adamax")``. See
                 the ``adjust`` method for more information.
-            weightDecays: Tuple of floats with the weight decays to be tested. Default is ``(1e-5, 1e-4, 1e-3)``. See
+            weightDecays: List of floats with the weight decays to be tested. Default is ``(1e-5, 1e-4, 1e-3)``. See
                 the ``adjust`` method for more information.
             verbose: Same as in the ``adjust`` method. Default is ``True``.
             plot: Whether to plot the training history after all the combinations are tested. Default is ``True``.
@@ -627,13 +629,13 @@ class OPTIMADEAdjuster(LocalAdjuster):
         calculator: Instance of the ``Calculator`` class with the model to be adjusted, defined and loaded. Unlike in the
             ``LocalAdjuster``, the descriptor data will not be passed, since it will be fetched from the OPTIMADE API.
         model: Name of the model to be adjusted in the ``Calculator``. E.g., ``SIPFENN_Krajewski2022_NN30``.
-        provider: Tuple of strings with the names of the providers to be used for the OPTIMADE queries. The type-hinting
+        provider: Strings with the name of the provider to be used for the OPTIMADE queries. The type-hinting
             gives a list of providers available at the time of writing this code, but it is by no means limited to them.
             For the up-to-date list, along with their current status, please refer to the
             [OPTIMADE Providers Dashboard](https://optimade.org/providers-dashboard). The default is ``"mp"`` which
             stands for the Materials Project, but we do not recommend any particular provider over any other. One has to
             be picked to work out of the box. Your choice should be based on the data you are interested in.
-        targetPath: Tuple of strings with the path to the target data in the OPTIMADE response. This will be dependent
+        targetPath: List of strings with the path to the target data in the OPTIMADE response. This will be dependent
             on the provider you choose, and you will need to identify it by looking at the response. The easiest way to
             do this is by going to their endpoint, like
             [this, very neat one, for JARVIS](https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/),
@@ -692,7 +694,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                     "tcod",
                     "twodmatpedia"
                 ] = "mp",
-            targetPath: Tuple[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+            targetPath: List[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
             targetSize: int = 1,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
             descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
