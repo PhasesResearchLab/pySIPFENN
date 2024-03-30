@@ -134,6 +134,8 @@ class LocalAdjuster:
         Plot the starting model (before adjustment) on the target data. By default, it will plot in your browser.
         """
         reference = self.targetData.flatten()
+        assert len(reference) == len(self.descriptorData), "The target data and descriptor data must have the same length."
+        assert len(reference) != 0, "The target data must not be empty for plotting."
         self.model.eval()
         print("Running the STARTING model on the data and plotting the results...")
         with torch.no_grad():
@@ -198,6 +200,8 @@ class LocalAdjuster:
         assert self.adjustedModel is not None, "The model must be adjusted before plotting. It is currently None."
         self.adjustedModel.eval()
         reference = self.targetData.flatten()
+        assert len(reference) == len(self.descriptorData), "The target data and descriptor data must have the same length."
+        assert len(reference) != 0, "The target data must not be empty for plotting."
         print("Running the ADJUSTED model on the data and plotting the results...")
         with torch.no_grad():
             dataIn = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
