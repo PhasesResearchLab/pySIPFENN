@@ -91,7 +91,7 @@ class LocalAdjuster:
                 self.descriptorData = np.load(descriptorData)
             # Path to CSV file with data
             elif (descriptorData.endswith(".csv") or descriptorData.endswith(".CSV")) and os.path.exists(descriptorData):
-                self.descriptorData = np.loadtxt(descriptorData, delimiter=",")
+                self.descriptorData = np.loadtxt(descriptorData, delimiter=",", skiprows=1)[:, 1:]
             else:
                 raise ValueError("If a string is provided as descriptor data parameter, it must be a path to a npy/NPY or csv/CSV file.")
         else:
@@ -106,7 +106,8 @@ class LocalAdjuster:
                 self.targetData = np.load(targetData)
             # Path to CSV file with data
             elif (targetData.endswith(".csv") or targetData.endswith(".CSV")) and os.path.exists(targetData):
-                self.targetData = np.loadtxt(targetData, delimiter=",")
+                # Skip the first row if it is a header
+                self.targetData = np.loadtxt(targetData, delimiter=",", skiprows=1)[:, 1:]
             else:
                 raise ValueError("If a string is provided as target data parameter, it must be a path to a npy/NPY or csv/CSV file.")
         else:
