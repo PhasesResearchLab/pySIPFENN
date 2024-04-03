@@ -797,6 +797,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
                   f"structures:\n{missing}\n")
 
         dataIn = list(zip(comps, names, structs, targetDataStage))
+        assert len(dataIn) != 0, "No data was fetched from the OPTIMADE API. Please check both the query and the provider."
         shuffle(dataIn)
         comps, names, structs, targetDataStage = zip(*dataIn)
 
