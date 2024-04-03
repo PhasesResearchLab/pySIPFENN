@@ -427,8 +427,8 @@ class LocalAdjuster:
     def matrixHyperParameterSearch(
             self,
             validation: float = 0.2,
-            epochs: int = 100,
-            batchSize: int = 32,
+            epochs: int = 20,
+            batchSize: int = 64,
             lossFunction: Literal["MSE", "MAE"] = "MAE",
             learningRates: List[float] = (1e-6, 1e-5, 1e-4),
             optimizers: List[Literal["Adam", "AdamW", "Adamax", "RMSprop"]] = ("Adam", "AdamW", "Adamax"),
@@ -447,7 +447,9 @@ class LocalAdjuster:
 
         Args:
             validation: Same as in the ``adjust`` method. Default is ``0.2``.
-            epochs: Same as in the ``adjust`` method. Default is ``100``.
+            epochs: Same as in the ``adjust`` method. Default is ``20`` to keep the search time reasonable on most
+                CPU-only machines (around 1 hour). For most cases, a good starting number of epochs is 100-200, which
+                should complete in 10-30 minutes on most modern GPUs or Mac M1-series machines (w. device set to MPS).
             batchSize: Same as in the ``adjust`` method. Default is ``32``.
             lossFunction: Same as in the ``adjust`` method. Default is ``MAE``, i.e. Mean Absolute Error or L1 loss.
             learningRates: List of floats with the learning rates to be tested. Default is ``(1e-6, 1e-5, 1e-4)``. See
