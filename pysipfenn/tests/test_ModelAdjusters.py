@@ -168,5 +168,27 @@ class TestModelAdjusters(unittest.TestCase):
                     descriptor="SomeCrazyDescriptor",
                 )
 
+    def testEndpointOverride(self):
+        """
+        Test the endpoint override functionality of the ``OPTIMADEAdjuster`` class. It will test the override of the
+        endpoint and the data fetching from the new endpoint.
+        """
+        endpoint = ["https://alexandria.icams.rub.de/pbesol"]
+        targetPath = ['attributes', '_alexandria_formation_energy_per_atom']
 
+        self.ma2 = pysipfenn.OPTIMADEAdjuster(
+            self.c,
+            model="SIPFENN_Krajewski2022_NN30",
+            endpointOverride=endpoint,
+            targetPath=targetPath)
 
+        self.ma2.fetchAndFeturize(
+            'elements HAS "Hf" AND elements HAS "Mo" AND elements HAS "Zr"',
+            parallelWorkers=2)
+
+        self.assertGreaterEqual(len(self.ma2.comps), 0, "No compositions were found, thus no data was fetched.")
+        self.assertGreaterEqual(len(self.ma2.names), 0, "No names were found, thus no data was fetched.")
+        self.assertGreaterEqual(
+            len(self.ma2.descriptorData), 0,
+            "No descriptor data was found. If the other asserts passed, this is likely a bug in the featurization "
+            "or structural data has been made incompatible or otherwise corrupted.")
