@@ -652,8 +652,10 @@ class OPTIMADEAdjuster(LocalAdjuster):
             '_mpdd_formationenergy_sipfenn_krajewski2020_novelmaterialsmodel')`` for the formation energy predicted
             by the SIPFENN_Krajewski2020_NovelMaterialsModel for every structure in MPDD. Default is the MP example.
         targetSize: The length of the target data to be fetched from the OPTIMADE API. This is typically ``1`` for a single
-        scalar property, but it can be more. Default is ``1``.
-        device: Same as in the ``LocalAdjuster``. Default is ``"cpu"``.
+            scalar property, but it can be more. Default is ``1``.
+        device: Same as in the ``LocalAdjuster``. Default is ``"cpu"`` which is available on all systems. If you have a
+            GPU, you can set it to ``"cuda"``, or to ``"mps"`` if you are using a Mac M1-series machine, in order to
+            speed up the training process by orders of magnitude.
         descriptor: *Not* the same as in the ``LocalAdjuster``. Since the descriptor data will be calculated for each
             structure fetched from the OPTIMADE API, this parameter is needed to specify which descriptor to use. At the
             time of writing this code, it can be either ``"Ward2017"`` or ``"KS2022"``. Special versions of ``KS2022``
@@ -705,6 +707,18 @@ class OPTIMADEAdjuster(LocalAdjuster):
             maxResults: int = 10000
     ) -> None:
         from optimade.client import OptimadeClient
+
+        assert isinstance(calculator, Calculator), "The calculator must be an instance of the Calculator class."
+        assert isinstance(model, str), "The model must be a string with the name of the model to be adjusted."
+        assert isinstance(provider, str), "The provider must be a string with the name of the provider to be used."
+        assert len(provider) != 0, "The provider must not be an empty string."
+        assert targetPath and isinstance(targetPath, list), "The target path must be a list of strings pointing to the target data in the OPTIMADE response."
+        assert len(targetPath) > 0, "The target path must not be empty, i.e., it cannot point to no data."
+        if provider != "mp" and targetPath == ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'):
+            raise ValueError("You are utilizing the default (example) property target path specific to the Materials "
+                             "Project but you are connecting to a different provider. You must adjust the target path "
+                             "to receive data from the provider you are connecting to based on what they serve through "
+                             "their provider-specific OPTIMADE endpoint fields. See targetPath docstring for more info.")
 
         super().__init__(
             calculator=calculator,
