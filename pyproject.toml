@@ -38,6 +38,7 @@ dependencies = [
     "natsort>=8.3.0",
     "pymongo>=4.4",
     "pysmartdl2>=2.0.0",
+    "plotly>=5.15.0",
     "dnspython",
     "ruamel.yaml",
     "colorama"
@@ -48,7 +49,8 @@ dev = [
     "coremltools>=7.0",
     "onnxconverter_common>=1.14.0",
     "onnxsim==0.4.33",
-    "onnxruntime>=1.16.0"
+    "onnxruntime>=1.16.0",
+    "optimade[http_client]>=1.0.0"
 ]
 
 [project.urls]
