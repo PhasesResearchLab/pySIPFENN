@@ -92,10 +92,13 @@ pySIPFENN
     :alt: 2024 Paper DOI
 
 This repository contains 
-**py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks 
+**py** thon toolset for **S** tructure- **I** nformed **P** roperty and **F** eature **E** ngineering with **N** eural **N** etworks 
 which implements a numer of user-friendly tools for:
+
 - **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see `arXiv:2404.02849 <https://arxiv.org/abs/2404.02849>`_).
+
 - **Efficient deployment of pre-trained ML models** (not limited to neural networks) obtained from repositories like Zenodo (including `some we trained <https://doi.org/10.5281/zenodo.4006802>`_) or trained locally on user's machine. The system is very plug-and-play thanks to using Open Neural Network Exchange (ONNX) format which can be exported from nearly any machine learning framework.
+
 - **Tuning pre-trained ML models to new domains**, like new chemical compositions, different ab initio functional, or entirely new properties. Since V0.16, users can take advantage of integration with `OPTIMADE API <https://www.optimade.org>`_ which allows one to tune models based on DFT datasets like Materials Project, OQMD, AFLOW, or NIST-JARVIS, in **just 3 lines of code** specifying which provider to use, what to query for, and hyperparameters for tuning.
 
 The underlying methodology, efficiency optimizations, design choices, and implementation specifics are given in the following publications:

@@ -10,7 +10,7 @@ from pysipfenn.core.pysipfenn import __version__, __file__
 import os
 
 project = 'pySIPFENN'
-copyright = '2023, Adam M. Krajewski'
+copyright = '2019-24, Adam M. Krajewski'
 author = 'Adam M. Krajewski'
 version = __version__
 release = __version__
