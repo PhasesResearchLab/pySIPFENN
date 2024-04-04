@@ -139,6 +139,22 @@ News
 .. note::
    This project is under active development. We recommend using released (stable) versions.
 
+
+Main Schematic
+--------------
+
+The figure below is the main schematic of ``pySIPFENN`` framework detailing the interplay of internal components. The user interface provides 
+a high-level API to process structural data within ``core.Calculator``, pass it to featurization submodules in ``descriptorDefinitions`` to 
+obtain vector representation, then passed to models defined in ``models.json`` and (typically) run automatically through all available models. 
+All internal data of ``core.Calculator`` is accessible directly, enabling rapid customization. An auxiliary high-level API enables advanced 
+users to operate and retrain the models.
+
+.. image:: _static/pySIPFENN_MainSchematic.png
+    :width: 800pt
+    :alt: mainSchematic
+    :align: center
+
+
 Index
 -----
 
