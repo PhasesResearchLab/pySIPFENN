@@ -594,6 +594,15 @@ class LocalAdjuster:
             self,
             pointsIndices: List[int]
     ) -> None:
+        """
+        Highlights data points at certain indices, so that they can be distinguished at later steps. They will be plotted in red by ``plotStarting()``
+        and ``plotAdjusted()``. Please note that this will be overwriten the next time you make a call to the ``adjust()``, so you may need to perform 
+        it again.
+
+        Args:
+            pointsIndices: A list of point indices to highlight. Please note that in Python lists indices start from ``0``.
+        """
+
         if not self.validationLabels:
             print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
         for p in pointsIndices:
@@ -604,6 +613,18 @@ class LocalAdjuster:
             self,
             compositions: List[str]
     ) -> None:
+        """
+        Highlights data points that correspond to certain chemical compositions, so that they can be distinguished at later steps. The strings you 
+        provide will be interpreted when matching to the data, so ``HfMo``, ``Hf1Mo1``, ``Hf2Mo2``, and ``Hf50 Mo50`` will all be considered equal.
+        They will be plotted in red by ``plotStarting()`` and ``plotAdjusted()``. Please note that this will be overwriten the next time you make 
+        a call to the ``adjust()``, so you may need to perform it again.
+
+        Args:
+            compositions: A list of strings with chemical formulas. They will be interpreted, so any valid formula pointing to the same composition
+                will be parsed in the same fashion. Currently, the composition needs to be exact, i.e. ``Hf33 Mo33 Ni33`` will match to ``HfMoNi`` 
+                but ``Hf28.6 Mo71.4`` will not match to ``Hf2 Mo5``. This can be implemented if there is interest.
+        """
+        
         if not self.validationLabels:
             print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
         assert self.comps, "The compositions must be set before highlighting them. If you use ``OPTIMADEAdjuster``, this is done automatically, but with ``LocalAdjuster``, you have to set them manually."
@@ -625,7 +646,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
     OPTIMADE queries which get featurized and their results will be concatenated, i.e., you can make one big query or
     several smaller ones and then adjust the model on the whole dataset when you are ready.
 
-    For details on more advanced uses of the OPTIMADE API client, please refer to [the documentation](https://www.optimade.org/optimade-python-tools/latest/getting_started/client/).
+    For details on more advanced uses of the OPTIMADE API client, please refer to 
+    `the documentation <https://www.optimade.org/optimade-python-tools/latest/getting_started/client/>`_.
 
     Args:
         calculator: Instance of the ``Calculator`` class with the model to be adjusted, defined and loaded. Unlike in the
@@ -634,16 +656,16 @@ class OPTIMADEAdjuster(LocalAdjuster):
         provider: Strings with the name of the provider to be used for the OPTIMADE queries. The type-hinting
             gives a list of providers available at the time of writing this code, but it is by no means limited to them.
             For the up-to-date list, along with their current status, please refer to the
-            [OPTIMADE Providers Dashboard](https://optimade.org/providers-dashboard). The default is ``"mp"`` which
+            `OPTIMADE Providers Dashboard <https://optimade.org/providers-dashboard>`_. The default is ``"mp"`` which
             stands for the Materials Project, but we do not recommend any particular provider over any other. One has to
             be picked to work out of the box. Your choice should be based on the data you are interested in.
         targetPath: List of strings with the path to the target data in the OPTIMADE response. This will be dependent
             on the provider you choose, and you will need to identify it by looking at the response. The easiest way to
             do this is by going to their endpoint, like
-            [this, very neat one, for JARVIS](https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/),
-            [this one for Alexandria PBEsol](https://alexandria.icams.rub.de/pbesol/v1/structures),
-            [this one for MP](https://optimade.materialsproject.org/v1/structures),
-            or [this one for our in-house MPDD](https://optimade.mpdd.org/v1/structures). Examples include
+            `this, very neat one, for JARVIS <https://jarvis.nist.gov/optimade/jarvisdft/v1/structures/>`_,
+            `this one for Alexandria PBEsol <https://alexandria.icams.rub.de/pbesol/v1/structures>`_,
+            `this one for MP <https://optimade.materialsproject.org/v1/structures>`_,
+            or `this one for our in-house MPDD <https://optimade.mpdd.org/v1/structures>`_. Examples include
             ``('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom')`` for GGA+U formation energy
             per atom in MP, or ``('attributes', '_alexandria_scan_formation_energy_per_atom')`` for the `SCAN` formation
             energy per atom in Alexandria, or ``('attributes', '_alexandria_formation_energy_per_atom')`` for the
@@ -775,6 +797,22 @@ class OPTIMADEAdjuster(LocalAdjuster):
             parallelWorkers: int = 1,
             verbose: bool = True
     ) -> None:
+        """
+        Automatically (1) fetches data from ``OPTIMADE API`` provider specified in the given ``OPTIMADEAdjuster`` instance, (2)
+        filters the data by checking if the target property is available, and (3) featurizes the incoming data with the
+        descriptor calculator selected for ``OPTIMADEAdjuster`` instance (``KS2022`` by default). It effectively prepares everything
+        for the adjustments to be made as if local data was loaded and some metadata was added on top of that.
+
+        Args:
+            query: A valid ``OPTIMADE API`` query as defined at `the specification page for the OPTIMADE consortium <https://www.optimade.org/>`_.
+                These can be made very elaborate by stacking several filters together, but generally retain good readability and are easy to
+                interpret thanks to explicit structure written in English. Here are two quick examples: 
+                ``'elements HAS "Hf" AND elements HAS "Mo" AND NOT elements HAS ANY "O","C","F","Cl","S"'`` / 
+                ``'elements HAS "Hf" AND elements HAS "Mo" AND elements HAS "Zr"'``.
+            parallelWorkers: How many workers to use at the featurization step. See ``KS2022`` for more details. On most machines, ``4``-``12`` should 
+                be the optimal number.
+            verbose: Prints information about progress and results of the process. It is set to ``True`` by default.
+        """
         from optimade.adapters.structures import pymatgen as pymatgen_adapter
         from optimade.models import StructureResource
 
