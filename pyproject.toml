@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysipfenn"
-version = "0.15.1"
+version = "0.16.0"
 authors = [
   { name="Adam Krajewski", email="ak@psu.edu" },
-    { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
+  { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -23,7 +23,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-description = "Easily extensible Python package for featurizing periodic atomic structures and running Structure-Informed Prediction of Formation Energy using Neural Networks (SIPFENN)"
+description = "Python toolset for Structure-Informed Property and Feature Engineering with Neural Networks. It offers unique advantages through (1) effortless extensibility, (2) optimizations for ordered, dilute, and random atomic configurations, and (3) automated model tuning."
 readme = "README.md"
 
 requires-python = ">=3.9"
@@ -54,6 +54,6 @@ dev = [
 ]
 
 [project.urls]
-"Research Page" = "https://phaseslab.com/sipfenn"
+"Repository" = "https://git.pysipfenn.org"
 "Homepage" = "https://pysipfenn.org"
 "Bug Tracker" = "https://github.com/PhasesResearchLab/pySIPFENN/issues"
