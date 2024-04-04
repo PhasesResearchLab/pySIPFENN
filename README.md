@@ -23,21 +23,21 @@
 ## Summary
 
 This repository contains 
-**py**(**S**tructure-**I**nformed **P**rediction of 
-**F**ormation **E**nergy using **N**eural **N**etworks) software 
-package allowing efficient predictions of the energetics of 
-atomic configurations. The underlying methodology and implementation
-is given in
+**py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks 
+which implements a numer of user-friendly tools for:
+- **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see [arXiv:2404.02849](https://arxiv.org/abs/2404.02849))
+- **Efficient deployment of pre-trained ML models** obtained from repositories like Zenodo or trained locally on user's machine.
+- **Tuning pre-trained ML models to new domains**, like new chemical compositions, different ab initio functional, or entirely new properties. Since V0.16, users can take advantage of integration with [OPTIMADE API](https://www.optimade.org) which allows one to tune models based on DFT datasets like Materials Project, OQMD, AFLOW, or NIST-JARVIS, in **just 3 lines of code** specifying which provider to use, what to query for, and hyperparameters for tuning.
+
+The underlying methodology, efficiency optimizations, design choices, and implementation specifics are given in the following publications:
+
+- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, April 2024, [arXiv:2404.02849](https://arxiv.org/abs/2404.02849)
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
-While functionalities are similar to the software released along the 
-paper, this package contains improved methods for featurizing atomic 
-configurations. Notably, all of them are now written completely in 
-Python, removing reliance on Java and making extensions of the software
-much easier thanks to improved readability. A fuller description of capabilities is 
-given in documentation at https://pysipfenn.org and at PSU Phases 
-Research Lab webpage under https://phaseslab.com/sipfenn.
+A more complete (and verbose) description of capabilities is 
+given in documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our 
+Phases Research Lab website at [(phaseslab.org)](https://phaseslab.org).
 
 ### Major News:
 
@@ -193,6 +193,8 @@ Some general guidelines are:
 ## Cite
 
 If you use `pySIPFENN` software, please consider citing:
+
+- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, April 2024, [arXiv:2404.02849](https://arxiv.org/abs/2404.02849)
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
