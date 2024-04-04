@@ -91,9 +91,7 @@ pySIPFENN
     :target: https://doi.org/10.48550/arXiv.2404.02849
     :alt: 2024 Paper DOI
 
-This repository contains 
-**py** thon toolset for **S** tructure- **I** nformed **P** roperty and **F** eature **E** ngineering with **N** eural **N** etworks 
-which implements a numer of user-friendly tools for:
+``pySIPFENN`` or **py** thon toolset for **S** tructure- **I** nformed **P** roperty and **F** eature **E** ngineering with **N** eural **N** etworks implements a numer of researcher-friendly tools for:
 
 - **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see `arXiv:2404.02849 <https://arxiv.org/abs/2404.02849>`_).
 
@@ -103,13 +101,12 @@ which implements a numer of user-friendly tools for:
 
 The underlying methodology, efficiency optimizations, design choices, and implementation specifics are given in the following publications:
 
-- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, April 2024, `arXiv:2404.02849 <https://arxiv.org/abs/2404.02849>`_
+- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, `Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures`, April 2024, `arXiv:2404.02849 <https://arxiv.org/abs/2404.02849>`_
 
-- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI: `10.1016/j.commatsci.2022.111254 <https://doi.org/10.1016/j.commatsci.2022.111254>`_
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, `Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks`, Computational Materials Science, Volume 208, 2022, 111254, DOI: `10.1016/j.commatsci.2022.111254 <https://doi.org/10.1016/j.commatsci.2022.111254>`_
 
-A more complete (and verbose) description of capabilities is 
-given in documentation at `(pysipfenn.org) <https://pysipfenn.org>`_. You may also consider visiting our 
-Phases Research Lab website at `(phaseslab.org) <https://phaseslab.org>`_.
+The source code and developement discussions are available in the GitHub repository at `(git.pysipfenn.org) <https://git.pysipfenn.org>`_. 
+You may also consider visiting our Phases Research Lab website at `(phaseslab.org) <https://phaseslab.org>`_.
 
 News
 ----
@@ -142,9 +139,6 @@ News
 - **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the
   `Materials Genome Foundation <https://materialsgenomefoundation.org>`__, such a success! Over 100 of you simultaneously followed
   all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. 
-
-.. note::
-   This project is under active development. We recommend using released (stable) versions.
 
 
 Main Schematic
