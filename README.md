@@ -55,6 +55,13 @@ Phases Research Lab website at [(phaseslab.org)](https://phaseslab.org).
 [Materials Genome Foundation](https://materialsgenomefoundation.org), such a success! Over 100 of you simultaneously followed
 all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. 
 
+### Main Schematic
+
+The figure below is the main schematic of `pySIPFENN` framework detailing the interplay of internal components. The user interface provides a high-level API to process structural data within `core.Calculator`, pass it to featurization submodules in `descriptorDefinitions` to obtain vector representation, then passed to models defined in `models.json` and (typically) run automatically through all available models. All internal data of `core.Calculator` is accessible directly, enabling rapid customization. An auxiliary high-level API enables advanced users to operate and retrain the models.
+
+<img src="https://raw.githubusercontent.com/PhasesResearchLab/pySIPFENN/main/docs/_static/pySIPFENN_MainSchematic.png" alt="Main Schematic Figure" width="800" style="display: block; margin-left: auto; margin-right: auto;"/>
+   
+
 ### Applications
 
 pySIPFENN is a very flexible tool that can, in principle, be used for
