@@ -40,20 +40,20 @@ A more complete (and verbose) description of capabilities is
 given in documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our 
 Phases Research Lab website at [(phaseslab.org)](https://phaseslab.org).
 
-### Major News:
+### Recent News:
 
-- **(v0.15.0)** A new descriptor (feature vector) calculator [**`descriptorDefinitions.KS2022_randomSolutions`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/descriptorDefinitions/KS2022_randomSolutions.py) has been implemented. It is used for structure informed featurization of compositions randomly occupying a lattice, spiritually similar to SQS generation, but also taking into account (1) chemical differences between elements and (2) structural effects. A full description will be given in the upcoming manuscript.
+- **(v0.16.0)** Three exciting news! (1) The all new [`ModelAdjusters`](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelAdjusters.py) submodule automates tuning and can fetch data directly from [`OPTIMADE API`](https://www.optimade.org); (2) A new manuscript detailing advantages of our featurization tools has been put on [arXiv:2404.02849](https://arxiv.org/abs/2404.02849); and (3) the name of the software was updated to **py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks to retain the `pySIPFENN` acronym but better reflect our strengths and development direction.
 
-- **(v0.14.0)** Users can now take advantage of a **Prototype Library** to obtain common structures from any `Calculator` instance `c` with a simple `c.prototypeLibrary['BCC']['structure']`. It can be easily [updated](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.parsePrototypeLibrary) or [appended](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.appendPrototypeLibrary) with high-level API or by manually modifyig its YAML [here](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/misc/prototypeLibrary.yaml).
+- **(v0.15.0)** A new descriptor (feature vector) calculator [**`KS2022_randomSolutions`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/descriptorDefinitions/KS2022_randomSolutions.py) has been implemented. It is used for structure-informed featurization of compositions randomly occupying a lattice, spiritually similar to SQS generation, but also taking into account (1) chemical differences between elements and (2) structural effects. 
+
+- **(v0.14.0)** Users can now take advantage of a **Prototype Library** to obtain common structures from any `Calculator` instance with `c.prototypeLibrary[<name>]['structure']`. It can be easily [updated](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.parsePrototypeLibrary) or [appended](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.appendPrototypeLibrary) with high-level API or by manually modifyig its YAML [here](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/misc/prototypeLibrary.yaml).
 
 - **(v0.13.0)** Model exports (and more!) to PyTorch, CoreML, and ONNX are now effortless thanks to [**`core.modelExporters`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelExporters.py) module. Please note you need to install pySIPFENN with `dev` option (e.g., `pip install "pysipfenn[dev]"`) to use it. See [docs here](https://pysipfenn.readthedocs.io/en/stable/source/pysipfenn.core.html#module-pysipfenn.core.modelExporters).
 
-- **(v0.12.2)** Swith to LGPLv3 allowing for integration with proprietary software developed by CALPHAD community, while supporting the development of new pySIPFENN features for all. Many thanks to our colleagues from 
-[GTT-Technologies](https://gtt-technologies.de) and other participants of [CALPHAD 2023](https://calphad.org/calphad-2023) for fruitful discussions.
+- **(v0.12.2)** Swith to LGPLv3 allowing for integration with proprietary software developed by CALPHAD community, while supporting the development of new pySIPFENN features for all.
 
-- **(March 2023 Workshop)** We would like to thank all of our amazing attendees for making our workshop, co-organized with the
-[Materials Genome Foundation](https://materialsgenomefoundation.org), such a success! Over 100 of you simultaneously followed
-all exercises and, at the peak, we loaded over 1,200GB of models into the HPC's RAM. 
+- **(March 2023 Workshop)** We would like to thank all 100 of our amazing attendees for making our workshop, co-organized with the
+[Materials Genome Foundation](https://materialsgenomefoundation.org).
 
 ### Main Schematic
 

@@ -114,6 +114,13 @@ Phases Research Lab website at `(phaseslab.org) <https://phaseslab.org>`_.
 News
 ----
 
+- **(v0.16.0)** Three exciting news! (1) The all new ```ModelAdjusters`` submodule automates tuning and can fetch 
+  data directly from ``OPTIMADE API`` (https://www.optimade.org); (2) A new manuscript detailing advantages of our 
+  featurization tools has been put on `arXiv:2404.02849 <https://arxiv.org/abs/2404.02849>`_; and (3) the name of 
+  the software was updated to 
+  `python toolset for Structure-Informed Property and Feature Engineering with Neural Networks`` to retain the
+  ``pySIPFENN`` acronym but better reflect our strengths and development direction.
+
 - **(v0.15.0)** A new descriptor (feature vector) calculator ``descriptorDefinitions.KS2022_randomSolutions`` has been implemented. It is used 
   for structure informed featurization of compositions randomly occupying a lattice, spiritually similar to SQS generation, but also taking into 
   account (1) chemical differences between elements and (2) structural effects. A full description will be given in the upcoming manuscript.
