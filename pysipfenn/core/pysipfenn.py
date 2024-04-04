@@ -73,7 +73,7 @@ class Calculator:
         """Initializes the pySIPFENN Calculator object."""
         if verbose:
             print('\n*********  Initializing pySIPFENN Calculator  **********')
-            self.verbose = verbose
+        self.verbose = verbose
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
