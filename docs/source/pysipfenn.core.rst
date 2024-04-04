@@ -9,6 +9,14 @@ pySIPFENN
    :undoc-members:
    :show-inheritance:
 
+modelAdjusters
+--------------
+
+.. automodule:: pysipfenn.core.modelAdjusters
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 modelExporters
 --------------
 

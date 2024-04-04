@@ -72,4 +72,12 @@ Defining Custom Models
     :members:
     :undoc-members:
     :show-inheritance:
+    
+Automatic Model Tuning with OPTIMADE API
+----------------------------------------
+
+.. automodule:: pysipfenn.tests.test_ModelAdjusters
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
