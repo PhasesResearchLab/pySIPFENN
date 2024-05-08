@@ -609,7 +609,6 @@ class Calculator:
                 metaList.append(meta)
 
         elif mode == 'parallel':
-            print(pairedInputAndSettings)
             descList, metaList = zip(*process_map(
                 wrapper_KS2022_randomSolutions_generate_descriptor,
                 pairedInputAndSettings,
