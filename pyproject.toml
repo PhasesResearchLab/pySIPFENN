@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysipfenn"
-version = "0.16.0"
+version = "0.16.1"
 authors = [
   { name="Adam Krajewski", email="ak@psu.edu" },
   { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
@@ -33,7 +33,7 @@ dependencies = [
     "torch>=2.1.0",
     "onnx2torch>=1.5.2",
     "onnx>=1.13.0",
-    "numpy>=1.25.0",
+    "numpy>=1.25.0,<2.0.0",
     "tqdm>=4.65.0",
     "natsort>=8.3.0",
     "pymongo>=4.4",
