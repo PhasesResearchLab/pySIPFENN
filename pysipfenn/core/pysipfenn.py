@@ -211,9 +211,17 @@ class Calculator:
         for net, netName in zip(self.network_list, self.network_list_names):
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
-                print(f"{Fore.GREEN}✔ {netName}{Style.RESET_ALL}")
+                try:
+                    print(f"{Fore.GREEN}✔ {netName}{Style.RESET_ALL}")
+                except UnicodeEncodeError:
+                    # Fallback to ASCII characters if Unicode encoding fails
+                    print(f"{Fore.GREEN}+ {netName}{Style.RESET_ALL}")
             else:
-                print(f"{Style.DIM}x {netName}{Style.RESET_ALL}")
+                try:
+                    print(f"{Style.DIM}✘ {netName}{Style.RESET_ALL}")
+                except UnicodeEncodeError:
+                    # Fallback to ASCII characters if Unicode encoding fails
+                    print(f"{Fore.GREEN}x {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
