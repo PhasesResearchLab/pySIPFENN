@@ -385,11 +385,11 @@ def generate_descriptor(struct: Structure,
             # each feature found in OQMD to normalize the difference.
             if len(propHistory) > 2:
                 # Current iteration diff
-                diff = np.subtract(properties, propHistory[-2])
+                diff = np.subtract(propHistory[-1], propHistory[-2])
                 diff /= maxFeaturesInOQMD
                 diffHistory.append(diff)
                 # Calculate the additional diff to one level older iteration
-                diff2 = np.subtract(properties, propHistory[-3])
+                diff2 = np.subtract(propHistory[-1], propHistory[-3])
                 diff2 /= maxFeaturesInOQMD
                 # Calculate the maximum difference across both differences
                 maxDiff = max(np.concatenate((diff, diff2), axis=0))
@@ -443,11 +443,11 @@ def generate_descriptor(struct: Structure,
 
     # print(f'Target: {comp.fractional_composition}')
     # print(f'Final:  {currentComposition.fractional_composition}')
-    if properties is not None:
-        assert properties.shape == (256,)
-        assert isinstance(properties, np.ndarray)
+    if propHistory[-1] is not None:
+        assert propHistory[-1].shape == (256,)
+        assert isinstance(propHistory[-1], np.ndarray)
         if returnMeta:
-            return properties, {
+            return propHistory[-1], {
                 'diffHistory': diffHistory,
                 'propHistory': propHistory,
                 'individualResults': individualResults,
@@ -456,9 +456,9 @@ def generate_descriptor(struct: Structure,
                 'finalComposition': currentComposition.fractional_composition
             }
         else:
-            return properties
+            return propHistory[-1]
     else:
-        raise RuntimeError('KS2022_randomSolution descriptor failed to converge.')
+        raise RuntimeError('KS2022_randomSolution featurizer failed to obtain results.')
 
 
 def cite() -> List[str]:
