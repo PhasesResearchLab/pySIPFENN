@@ -320,7 +320,9 @@ def generate_descriptor(struct: Structure,
             diff_properties = np.concatenate((diff_properties, diff_properties_instance), axis=0)
             attribute_properties = np.concatenate((attribute_properties, attribute_properties_instance), axis=0)
 
-            def arrange_properties(diff_properties, attribute_properties
+            def arrange_properties(
+                    diff_properties: np.ndarray, 
+                    attribute_properties: np.ndarray
                 ) -> np.ndarray:
                 properties = np.concatenate(
                     (np.stack(
