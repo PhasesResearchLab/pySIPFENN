@@ -273,8 +273,7 @@ def generate_descriptor(struct: Structure,
 
     diff_properties = np.ndarray(shape=(0, 26))
     attribute_properties = np.ndarray(shape=(0, 21))
-    propHistory = []
-    diffHistory = []
+    propHistory, individualResults, diffHistory = [], [], []
     allOccupations = []
     maxDiff = 5
     compositionDistance = 1
@@ -377,7 +376,11 @@ def generate_descriptor(struct: Structure,
                 properties = np.append(properties, av_ionic_char)
                 properties = properties.astype(np.float32)
 
-            propHistory.append(properties)
+                return properties
+
+            propHistory.append(arrange_properties(diff_properties, attribute_properties))
+            individualResults.append(arrange_properties(diff_properties_instance, attribute_properties_instance))
+
             # Calculate the difference between the current step and the previous step and divide it by maximum value of
             # each feature found in OQMD to normalize the difference.
             if len(propHistory) > 2:
@@ -447,6 +450,7 @@ def generate_descriptor(struct: Structure,
             return properties, {
                 'diffHistory': diffHistory,
                 'propHistory': propHistory,
+                'individualResults': individualResults,
                 'finalAtomsN': attribute_properties.shape[0],
                 'finalCompositionDistance': compositionDistance,
                 'finalComposition': currentComposition.fractional_composition
