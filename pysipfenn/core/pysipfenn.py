@@ -12,7 +12,11 @@ from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 import natsort
 from pysmartdl2 import SmartDL
-from colorama import Fore, Style
+if sys.platform.startswith('win'):
+    from colorama import Fore, Style, just_fix_windows_console
+    just_fix_windows_console()
+else:
+    from colorama import Fore, Style
 
 # Scientific Computing Imports
 import numpy as np
