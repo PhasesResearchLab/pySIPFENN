@@ -4,6 +4,7 @@ import gc
 import csv
 import json
 from time import perf_counter
+from datetime import datetime
 from typing import List, Union, Dict
 from importlib import resources
 
@@ -49,8 +50,14 @@ class Calculator:
         autoLoad: Automatically load all available ML models based on the ``models.json`` file. This `will` require
             significant memory and time if they are available, so for featurization and other non-model-requiring
             tasks, it is recommended to set this to ``False``. Defaults to ``True``.
-        verbose: Print initialization messages and several other non-critical messages during runtime procedures.
-            Defaults to True.
+        verbose: Controls the verbosity of the ``Calculator`` printout messages. By default, it is set to ``True`` and
+            shows the level of information that shoudl be optimal for most users. Setting it to ``False`` will
+            make messages concise and only show critical information. To further suppress messages, use the
+            ``printOut`` switch.
+        printOut: Controls whether the ``Calculator`` should print any messages to the console. By default, it is set
+            to ``True``. If set to ``False``, no messages will be printed to the console, regardless of the ``verbose``
+            setting, but they will be retained in the ``self.printOutLog`` attribute of the ``Calculator`` object, allowing
+            easy access to the messages if needed for, e.g., debugging purposes.
 
     Attributes:
         models: Dictionary with all model information based on the ``models.json`` file in the modelsSIPFENN
@@ -65,15 +72,24 @@ class Calculator:
             of predictions for each structure corresponds to the order of networks in the toRun list.
         inputFiles: List of all input file names used during the last predictions run. The order of the list
             corresponds to the order of atomic structures given to models as input.
+        verbose: Boolean controlling the verbosity of the ``Calculator`` printout messages set during initialization.
+        printOut: Boolean controlling whether the ``Calculator`` should print any messages to the console set during
+            initialization.
+        printOutLog: String containing all messages logged by the ``Calculator`` object if ``printOut`` was set to ``True``.
     """
 
     def __init__(self,
                  autoLoad: bool = True,
-                 verbose: bool = True):
+                 verbose: bool = True,
+                 printOut: bool = True
+                 ):
         """Initializes the pySIPFENN Calculator object."""
-        if verbose:
-            print('\n*********  Initializing pySIPFENN Calculator  **********')
         self.verbose = verbose
+        self.printOut = printOut
+        self.printOutLog = ""
+
+        self.log('\n*********  Initializing pySIPFENN Calculator  **********')
+        
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
@@ -126,6 +142,24 @@ class Calculator:
             printOut += f'Last prediction run on: {len(self.predictions)} structures\n'
             printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
         return printOut
+
+    def log(self, message: str) -> None:
+        """Logs a message to the ``self.printOut`` attribute of the ``Calculator`` object if ``self.printOutSet`` is ``False``.
+        Otherwise, the message is printed to the console as usual. The messages stored in the ``self.printOut`` attribute are
+        additonally automatically time stamped (YY-MM-DD HH:MM:SS | ) for easy tracking of the events.
+
+        Args:
+            message: Message to log.
+
+        Returns:
+            None
+        """
+        if self.printOut:
+            print(message, flush=True)
+        else:
+            time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.printOutLog += f'{time} | {message}\n'
+
 
     # *********************************  PROTOTYPE HANDLING  *********************************
     def parsePrototypeLibrary(self,
