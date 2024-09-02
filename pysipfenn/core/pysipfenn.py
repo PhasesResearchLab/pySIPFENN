@@ -4,6 +4,7 @@ import gc
 import csv
 import json
 from time import perf_counter
+from datetime import datetime
 from typing import List, Union, Dict
 from importlib import resources
 
@@ -49,8 +50,14 @@ class Calculator:
         autoLoad: Automatically load all available ML models based on the ``models.json`` file. This `will` require
             significant memory and time if they are available, so for featurization and other non-model-requiring
             tasks, it is recommended to set this to ``False``. Defaults to ``True``.
-        verbose: Print initialization messages and several other non-critical messages during runtime procedures.
-            Defaults to True.
+        verbose: Controls the verbosity of the ``Calculator`` printout messages. By default, it is set to ``True`` and
+            shows the level of information that shoudl be optimal for most users. Setting it to ``False`` will
+            make messages concise and only show critical information. To further suppress messages, use the
+            ``printOut`` switch.
+        printOut: Controls whether the ``Calculator`` should print any messages to the console. By default, it is set
+            to ``True``. If set to ``False``, no messages will be printed to the console, regardless of the ``verbose``
+            setting, but they will be retained in the ``self.printOutLog`` attribute of the ``Calculator`` object, allowing
+            easy access to the messages if needed for, e.g., debugging purposes.
 
     Attributes:
         models: Dictionary with all model information based on the ``models.json`` file in the modelsSIPFENN
@@ -65,24 +72,33 @@ class Calculator:
             of predictions for each structure corresponds to the order of networks in the toRun list.
         inputFiles: List of all input file names used during the last predictions run. The order of the list
             corresponds to the order of atomic structures given to models as input.
+        verbose: Boolean controlling the verbosity of the ``Calculator`` printout messages set during initialization.
+        printOut: Boolean controlling whether the ``Calculator`` should print any messages to the console set during
+            initialization.
+        printOutLog: String containing all messages logged by the ``Calculator`` object if ``printOut`` was set to ``True``.
     """
 
     def __init__(self,
                  autoLoad: bool = True,
-                 verbose: bool = True):
+                 verbose: bool = True,
+                 printOut: bool = True
+                 ):
         """Initializes the pySIPFENN Calculator object."""
-        if verbose:
-            print('\n*********  Initializing pySIPFENN Calculator  **********')
         self.verbose = verbose
+        self.printOut = printOut
+        self.printOutLog = ""
+
+        if self.verbose:
+            self.log('\n*********  Initializing pySIPFENN Calculator  **********')
+        
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
-            if verbose:
-                print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
+            self.log(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
-        if verbose:
-            print(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
+        if self.verbose:
+            self.log(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
         # network names
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
@@ -90,13 +106,13 @@ class Calculator:
 
         self.loadedModels = {}
         if autoLoad:
-            print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
+            self.log(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
             self.loadModels()
         else:
-            print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
+            self.log(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
 
         self.prototypeLibrary = {}
-        self.parsePrototypeLibrary(verbose=verbose)
+        self.parsePrototypeLibrary()
 
         self.toRun = []
         self.descriptorData = []
@@ -105,8 +121,8 @@ class Calculator:
             'RSS': []
         }
         self.inputFiles = []
-        if verbose:
-            print(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
+        if self.verbose:
+            self.log(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
 
     def __str__(self):
         """Prints the status of the ``Calculator`` object."""
@@ -127,10 +143,27 @@ class Calculator:
             printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
         return printOut
 
+    def log(self, message: str) -> None:
+        """Logs a message to the ``self.printOut`` attribute of the ``Calculator`` object if ``self.printOutSet`` is ``False``.
+        Otherwise, the message is printed to the console as usual. The messages stored in the ``self.printOut`` attribute are
+        additonally automatically time stamped (YY-MM-DD HH:MM:SS | ) for easy tracking of the events.
+
+        Args:
+            message: Message to log.
+
+        Returns:
+            None
+        """
+        if self.printOut:
+            print(message, flush=True)
+        else:
+            time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.printOutLog += f'{time} | {message}\n'
+
+
     # *********************************  PROTOTYPE HANDLING  *********************************
     def parsePrototypeLibrary(self,
                               customPath: str = "default",
-                              verbose: bool = False,
                               printCustomLibrary: bool = False) -> None:
         """Parses the prototype library YAML file in the ``misc`` directory, interprets them into pymatgen ``Structure``
         objects, and stores them in the ``self.prototypeLibrary`` dict attribute of the ``Calculator`` object. You can use it
@@ -140,8 +173,6 @@ class Calculator:
         Args:
             customPath: Path to the prototype library YAML file. Defaults to the magic string ``"default"``, which loads the
                 default prototype library included in the package in the ``misc`` directory.
-            verbose: If True, it prints the number of prototypes loaded. Defaults to ``False``, but note that ``Calculator``
-                class automatically initializes with ``verbose=True``.
             printCustomLibrary: If True, it prints the name and POSCAR of each prototype being added to the prototype
                 library. Has no effect if ``customPath`` is ``'default'``. Defaults to ``False``.
 
@@ -175,12 +206,15 @@ class Calculator:
                     'origin': prototype['origin']
                 }
             })
-        if verbose:
-            protoLen = len(self.prototypeLibrary)
-            if protoLen == 0:
-                print(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+        
+        protoLen = len(self.prototypeLibrary)
+        if protoLen == 0:
+            self.log(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+        else:
+            if self.verbose:
+                self.log(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library: {Fore.BLUE}{', '.join(natsort.natsorted(self.prototypeLibrary.keys()))}{Style.RESET_ALL}")
             else:
-                print(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
+                self.log(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
             
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
@@ -212,16 +246,16 @@ class Calculator:
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
                 try:
-                    print(f"{Fore.GREEN}✔ {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.GREEN}✔ {net:<45} | {netName}{Style.RESET_ALL}")
                 except UnicodeEncodeError:
                     # Fallback to ASCII characters if Unicode encoding fails
-                    print(f"{Fore.GREEN}+ {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.GREEN}+ {net:<45} | {netName}{Style.RESET_ALL}")
             else:
                 try:
-                    print(f"{Style.DIM}✘ {netName}{Style.RESET_ALL}")
+                    self.log(f"{Style.DIM}✘ {net:<45} | {netName}{Style.RESET_ALL}")
                 except UnicodeEncodeError:
                     # Fallback to ASCII characters if Unicode encoding fails
-                    print(f"{Fore.DIM}x {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.DIM}x {net:<45} | {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
