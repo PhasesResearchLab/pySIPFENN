@@ -164,7 +164,6 @@ class Calculator:
     # *********************************  PROTOTYPE HANDLING  *********************************
     def parsePrototypeLibrary(self,
                               customPath: str = "default",
-                              verbose: bool = False,
                               printCustomLibrary: bool = False) -> None:
         """Parses the prototype library YAML file in the ``misc`` directory, interprets them into pymatgen ``Structure``
         objects, and stores them in the ``self.prototypeLibrary`` dict attribute of the ``Calculator`` object. You can use it
@@ -174,8 +173,6 @@ class Calculator:
         Args:
             customPath: Path to the prototype library YAML file. Defaults to the magic string ``"default"``, which loads the
                 default prototype library included in the package in the ``misc`` directory.
-            verbose: If True, it prints the number of prototypes loaded. Defaults to ``False``, but note that ``Calculator``
-                class automatically initializes with ``verbose=True``.
             printCustomLibrary: If True, it prints the name and POSCAR of each prototype being added to the prototype
                 library. Has no effect if ``customPath`` is ``'default'``. Defaults to ``False``.
 
@@ -209,12 +206,15 @@ class Calculator:
                     'origin': prototype['origin']
                 }
             })
-        if verbose:
-            protoLen = len(self.prototypeLibrary)
-            if protoLen == 0:
-                print(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+        
+        protoLen = len(self.prototypeLibrary)
+        if protoLen == 0:
+            self.log(f"{Style.DIM}No prototypes were loaded into the prototype library.{Style.RESET_ALL}")
+        else:
+            if self.verbose:
+                self.log(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library: {Fore.BLUE}{', '.join(natsort.natsorted(self.prototypeLibrary.keys()))}{Style.RESET_ALL}")
             else:
-                print(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
+                self.log(f"Loaded {Fore.GREEN}{protoLen} prototypes {Style.RESET_ALL}into the library.")
             
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
