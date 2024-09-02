@@ -519,7 +519,7 @@ def profile(test: str = 'FCC',
         the descriptor and a dictionary containing the convergence history, or None. In either case, the descriptor
         will be persisted in `f'TestResult_KS2022_randomSolution_{test}_{nIterations}iter.csv'` file.
     """
-    c = pysipfenn.Calculator(autoLoad=False)
+    c = pysipfenn.Calculator(autoLoad=False, printOut=False)
 
     try:
         s = c.prototypeLibrary[test]['structure']
