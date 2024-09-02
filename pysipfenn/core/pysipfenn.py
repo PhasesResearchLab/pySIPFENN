@@ -88,17 +88,17 @@ class Calculator:
         self.printOut = printOut
         self.printOutLog = ""
 
-        self.log('\n*********  Initializing pySIPFENN Calculator  **********')
+        if self.verbose:
+            self.log('\n*********  Initializing pySIPFENN Calculator  **********')
         
         # dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
-            if verbose:
-                print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
+            self.log(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
         # networks list
         self.network_list = list(self.models.keys())
-        if verbose:
-            print(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
+        if self.verbose:
+            self.log(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
         # network names
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
@@ -106,13 +106,13 @@ class Calculator:
 
         self.loadedModels = {}
         if autoLoad:
-            print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
+            self.log(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
             self.loadModels()
         else:
-            print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
+            self.log(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
 
         self.prototypeLibrary = {}
-        self.parsePrototypeLibrary(verbose=verbose)
+        self.parsePrototypeLibrary()
 
         self.toRun = []
         self.descriptorData = []
@@ -121,8 +121,8 @@ class Calculator:
             'RSS': []
         }
         self.inputFiles = []
-        if verbose:
-            print(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
+        if self.verbose:
+            self.log(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
 
     def __str__(self):
         """Prints the status of the ``Calculator`` object."""
