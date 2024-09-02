@@ -246,16 +246,16 @@ class Calculator:
             if all_files.__contains__(net + '.onnx'):
                 detectedNets.append(net)
                 try:
-                    print(f"{Fore.GREEN}✔ {net:<45} | {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.GREEN}✔ {net:<45} | {netName}{Style.RESET_ALL}")
                 except UnicodeEncodeError:
                     # Fallback to ASCII characters if Unicode encoding fails
-                    print(f"{Fore.GREEN}+ {net:<45} | {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.GREEN}+ {net:<45} | {netName}{Style.RESET_ALL}")
             else:
                 try:
-                    print(f"{Style.DIM}✘ {net:<45} | {netName}{Style.RESET_ALL}")
+                    self.log(f"{Style.DIM}✘ {net:<45} | {netName}{Style.RESET_ALL}")
                 except UnicodeEncodeError:
                     # Fallback to ASCII characters if Unicode encoding fails
-                    print(f"{Fore.DIM}x {net:<45} | {netName}{Style.RESET_ALL}")
+                    self.log(f"{Fore.DIM}x {net:<45} | {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
