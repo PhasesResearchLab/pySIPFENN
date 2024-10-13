@@ -186,9 +186,12 @@ class TestModelAdjusters(unittest.TestCase):
             'elements HAS "Hf" AND elements HAS "Mo" AND elements HAS "Zr"',
             parallelWorkers=2)
 
-        self.assertGreaterEqual(len(self.ma2.comps), 0, "No compositions were found, thus no data was fetched.")
-        self.assertGreaterEqual(len(self.ma2.names), 0, "No names were found, thus no data was fetched.")
-        self.assertGreaterEqual(
+        self.assertGreater(len(self.ma2.comps), 0, "No compositions were found, thus no data was fetched.")
+        self.assertGreater(len(self.ma2.names), 0, "No names were found, thus no data was fetched.")
+        self.assertGreater(
             len(self.ma2.descriptorData), 0,
             "No descriptor data was found. If the other asserts passed, this is likely a bug in the featurization "
             "or structural data has been made incompatible or otherwise corrupted.")
+        
+        for ref in self.ma2.references:
+            self.assertGreater(len(ref), 0, "No references were found for the datapoint despite Alexendria being used and having them for this test case as of writing this (and very likely into the future).")
