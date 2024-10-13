@@ -789,6 +789,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         self.targetData: np.ndarray = np.empty((0, targetSize))
 
+        self.references: List[List[str]] = []
+
         print("Initialized Adjuster instance!\n")
 
     def fetchAndFeturize(
@@ -826,6 +828,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
         comps: List[str] = []
         names: List[str] = []
         missing: List[str] = []
+        references: List[List[str]] = []
 
         if verbose:
             print(f"Obtained {len(data)} structures from the OPTIMADE API.")
@@ -845,6 +848,16 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
             comps.append(comp)
             names.append(name)
+
+            # References for the data. Not present for most providers but we want to capture them if they are.
+            try:
+                reference = []
+                for ref in datapoint['relationships']['references']['data']:
+                    if ref['type'] == "references":
+                        reference.append(ref['id'])
+                references.append(reference)
+            except:
+                references.append([])
             # Stage for featurization of the received data
             structs.append(pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)))
 
@@ -852,13 +865,14 @@ class OPTIMADEAdjuster(LocalAdjuster):
             print(f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
                   f"structures:\n{missing}\n")
 
-        dataIn = list(zip(comps, names, structs, targetDataStage))
+        dataIn = list(zip(comps, names, references, structs, targetDataStage))
         assert len(dataIn) != 0, "No data was fetched from the OPTIMADE API. Please check both the query and the provider."
         shuffle(dataIn)
-        comps, names, structs, targetDataStage = zip(*dataIn)
+        comps, names, references, structs, targetDataStage = zip(*dataIn)
 
         self.comps.extend(comps)
         self.names.extend(names)
+        self.references.extend(references)
 
         print(f"Extracted {len(targetDataStage)} datapoints (composition+structure+target) from the OPTIMADE API.")
         self.targetData = np.concatenate((self.targetData, np.array(targetDataStage)), axis=0)
