@@ -697,6 +697,12 @@ class OPTIMADEAdjuster(LocalAdjuster):
             include version (``/v1/``), nor the specific endpoint (``/structures``) as the client will add them. I.e.,
             you want ``https://alexandria.icams.rub.de/pbesol`` rather than
             ``alexandria.icams.rub.de/pbesol/v1/structures``. Default is ``None`` which has no effect.
+
+    Attributes:
+        reference: List of lists of strings with the references to the data fetched from the OPTIMADE API by looking up
+            relations of a given data point. This is not given by most of the providers (as of Fall 2024) but can be
+            very useful for some users to track the provenance of the data when possible. If no references are found, the
+            list will be a list of empty lists.
     """
 
     def __init__(
