@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysipfenn"
-version = "0.16.1"
+version = "0.16.2"
 authors = [
   { name="Adam Krajewski", email="ak@psu.edu" },
   { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
