@@ -51,7 +51,7 @@ class TestPL(unittest.TestCase):
         library and stay there."""
 
         with resources.files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml') as f:
-            self.c.parsePrototypeLibrary(customPath=f, verbose=True, printCustomLibrary=True)
+            self.c.parsePrototypeLibrary(customPath=f, printCustomLibrary=True)
 
         with self.subTest(msg="Custom prototype present with correct parse"):
             self.assertTrue("NicePhase" in self.c.prototypeLibrary)
