@@ -221,7 +221,7 @@ class Calculator:
                     print(f"{Style.DIM}✘ {netName}{Style.RESET_ALL}")
                 except UnicodeEncodeError:
                     # Fallback to ASCII characters if Unicode encoding fails
-                    print(f"{Fore.DIM}x {netName}{Style.RESET_ALL}")
+                    print(f"{Style.DIM}x {netName}{Style.RESET_ALL}")
         self.network_list_available = detectedNets
 
     def downloadModels(self, network: str = 'all') -> None:
