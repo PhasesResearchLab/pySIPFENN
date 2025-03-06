@@ -101,6 +101,7 @@ class Calculator:
         self.toRun = []
         self.descriptorData = []
         self.predictions = []
+        self.predictedProperties = []
         self.metas = {
             'RSS': []
         }
@@ -124,7 +125,7 @@ class Calculator:
             printOut += f'Last Prediction Run Using: {self.toRun}\n'
         if len(self.predictions) > 0:
             printOut += f'Last prediction run on: {len(self.predictions)} structures\n'
-            printOut += f'                        {len(self.predictions[0])} predictions/structure\n'
+            printOut += f'                        {len(self.predictions[0])} properties/structure\n'
         return printOut
 
     # *********************************  PROTOTYPE HANDLING  *********************************
@@ -653,6 +654,7 @@ class Calculator:
             predictions is the same as the order of the networks in ``toRun``.
         """
         dataOuts = []
+        self.predictedProperties = []
         if self.verbose:
             print('Making predictions...')
         # Run for each network
@@ -673,12 +675,24 @@ class Calculator:
             for col_idx in range(temp_numpy.shape[1]):
                     dataOuts.append(temp_numpy[:, col_idx].reshape(-1, 1))
 
+            # Attach appropriate property names; toRun name if the model is single-property, or toRun+Idx if multi-property
+            if temp_numpy.shape[1] == 1:
+                self.predictedProperties.append(net)
+            else:
+                for i in range(temp_numpy.shape[1]):
+                    self.predictedProperties.append(f'{net}_{i}')
+
             if self.verbose:
                 print(f'Prediction rate: {round(len(tempOut) / (t1 - t0), 1)} pred/s')
                 print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
         # Transpose the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
+        
+        # Double check that the number of predictions is correct relative to the number of properties
+        assert len(dataOuts[0]) == len(self.predictedProperties), 'Number of predictions per material does not match ' \
+                                                                  'the number of properties expected.'
+
         self.predictions = dataOuts
         return dataOuts
 
@@ -996,7 +1010,7 @@ class Calculator:
         Returns:
             List of dictionaries with the predictions.
         """
-        return [dict(zip(self.toRun, pred)) for pred in self.predictions]
+        return [dict(zip(self.predictedProperties, pred)) for pred in self.predictions]
 
     def get_resultDictsWithNames(self) -> List[dict]:
         """Returns a list of dictionaries with the predictions for each network. The keys of the dictionaries are the
@@ -1012,7 +1026,7 @@ class Calculator:
         assert self.inputFiles is not []
         assert len(self.inputFiles) == len(self.predictions)
         return [
-            dict(zip(['name'] + self.toRun, [name] + pred))
+            dict(zip(['name'] + self.predictedProperties, [name] + pred))
             for name, pred in
             zip(self.inputFiles, self.predictions)]
 
@@ -1030,11 +1044,14 @@ class Calculator:
         """
 
         assert self.toRun is not []
+        assert self.predictions is not []
+        assert self.predictedProperties is not []
+
         with open(file, 'w+', encoding="utf-8") as f:
-            f.write('Name,' + ','.join(self.toRun) + '\n')
+            f.write('Name,' + ','.join(self.predictedProperties) + '\n')
             if len(self.inputFiles) == len(self.predictions):
                 for name, pred in zip(self.inputFiles, self.predictions):
-                    assert len(pred) == len(self.toRun)
+                    assert len(pred) == len(self.predictedProperties)
                     f.write(f'{name},{",".join(str(v) for v in pred)}\n')
             else:
                 i = 1
