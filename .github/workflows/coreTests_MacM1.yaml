@@ -13,7 +13,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11"]
       fail-fast: false
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       
