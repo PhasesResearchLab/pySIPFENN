@@ -58,11 +58,18 @@ class Calculator:
         loadedModels: Dictionary with all loaded models. The keys are the network names and the values
             are the loaded pytorch models.
         descriptorData: List of all descriptor data created during the last predictions run. The order
-            of the list corresponds to the order of atomic structures given to models as input. The order of the
-            list of descriptor data for each structure corresponds to the order of networks in the toRun list.
+            of the list corresponds to the order of atomic structures given to models as input. The order and meaning 
+            of the individual vector values for each structure depends on the descriptor selected/used to generate them
+            and should be consulted in the respective descriptor documentation or source code in the 
+            ``descriptorDefinitions``.
         predictions: List of all predictions created during the last predictions run. The order of the
             list corresponds to the order of atomic structures given to models as input. The order of the list
-            of predictions for each structure corresponds to the order of networks in the toRun list.
+            of predictions for each structure corresponds to the order of networks in the ``toRun`` list.
+        predictedProperties: List of names of all predicted properties. These are currently auto-generated
+            during the inference (prediction) run based on the model names (in the ``toRun`` order) and either matches them 
+            (if the model outputs are scalar) or are appended with the output index (if the model outputs are vectors). 
+            It can be customized by the user to any list of strings of correct length. In the future, it will be 
+            auto-generated based on the model JSON/YAML metadata when available.
         inputFiles: List of all input file names used during the last predictions run. The order of the list
             corresponds to the order of atomic structures given to models as input.
     """
@@ -74,16 +81,16 @@ class Calculator:
         if verbose:
             print('\n*********  Initializing pySIPFENN Calculator  **********')
         self.verbose = verbose
-        # dictionary with all model information
+        # Dictionary with all model information
         with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
                 print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
-        # networks list
+        # Networks list (corresponding to keys in models.json)
         self.network_list = list(self.models.keys())
         if verbose:
             print(f'Found {Fore.BLUE}{len(self.network_list)} network definitions in models.json{Style.RESET_ALL}')
-        # network names
+        # Network names (human-readable)
         self.network_list_names = [self.models[net]['name'] for net in self.network_list]
         self.network_list_available = []
         self.updateModelAvailability()
