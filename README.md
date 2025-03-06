@@ -16,28 +16,32 @@
 [![Static Badge](https://img.shields.io/badge/First%20MGF%20Workshop%20Video%20-%20March%202023%20(v0.10.3)-rev?logo=YouTube&color=green)](https://youtube.com/watch?v=OHgkRuE0UQM)
 
 
-[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4006802.svg)](https://doi.org/10.5281/zenodo.4006802)
+**2022 Paper:** [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2022.111254-blue)](https://doi.org/10.1016/j.commatsci.2022.111254)
+[![Arxiv](https://img.shields.io/badge/arXiv-2008.13654-8F1515?style=flat&logo=arxiv&logoColor=red)](https://doi.org/10.48550/arXiv.2008.13654)
+
+**2024 Paper:** [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2024.113495-blue)](https://doi.org/10.1016/j.commatsci.2024.113495)
 [![Arxiv](https://img.shields.io/badge/arXiv-2404.02849-8F1515?style=flat&logo=arxiv&logoColor=red)](https://doi.org/10.48550/arXiv.2404.02849)
+
+**ML Models:**  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4006802.svg)](https://doi.org/10.5281/zenodo.4006802)
+
 
 ## Summary
 
 This repository contains 
 **py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks 
 which implements a numer of user-friendly tools for:
-- **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see [arXiv:2404.02849](https://arxiv.org/abs/2404.02849))
+- **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495))
 - **Efficient deployment of pre-trained ML models** (not limited to neural networks) obtained from repositories like Zenodo (including [some we trained](https://doi.org/10.5281/zenodo.4006802)) or trained locally on user's machine. The system is very plug-and-play thanks to using Open Neural Network Exchange (ONNX) format which can be exported from nearly any machine learning framework.
 - **Tuning pre-trained ML models to new domains**, like new chemical compositions, different ab initio functional, or entirely new properties. Since V0.16, users can take advantage of integration with [OPTIMADE API](https://www.optimade.org) which allows one to tune models based on DFT datasets like Materials Project, OQMD, AFLOW, or NIST-JARVIS, in **just 3 lines of code** specifying which provider to use, what to query for, and hyperparameters for tuning.
 
 The underlying methodology, efficiency optimizations, design choices, and implementation specifics are given in the following publications:
 
-- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, April 2024, [arXiv:2404.02849](https://arxiv.org/abs/2404.02849)
+- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, Computational Materials Science, Volume 247, 2025, 113495, DOI: [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495)
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
-A more complete (and verbose) description of capabilities is 
-given in documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our 
-Phases Research Lab website at [(phaseslab.org)](https://phaseslab.org).
+A more complete (and verbose) description of capabilities is given in documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our 
+Phases Research Lab group website at [(phaseslab.org)](https://phaseslab.org).
 
 ### Recent News:
 
@@ -201,11 +205,12 @@ Some general guidelines are:
 
 If you use `pySIPFENN` software, please consider citing:
 
-- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, April 2024, [arXiv:2404.02849](https://arxiv.org/abs/2404.02849)
+- Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, Computational Materials Science, Volume 247, 2025, 113495, DOI: [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495)
 
 - Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
 If you are using predictions from pySIPFENN models accessed through `OPTIMADE` from `MPDD`, please additionally cite:
 
-- Matthew L. Evans, Johan Bergsma, ..., Adam M. Krajewski, ..., Zi-Kui Liu, ..., et al., _Developments and applications of the OPTIMADE API for materials discovery, design, and data exchange_, 2024, [arXiv:2402.00572](https://arxiv.org/abs/2402.00572)
+- Matthew L. Evans, Johan Bergsma, ..., Adam M. Krajewski, ..., Zi-Kui Liu, ..., et al., _Developments and applications of the OPTIMADE API for materials discovery, design, and data exchange_, Digital Discovery, 2024, 3, 1509-1533, DOI: [10.1039/D4DD00039K](
+https://doi.org/10.1039/D4DD00039K)
 
