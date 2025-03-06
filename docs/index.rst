@@ -11,7 +11,7 @@ pySIPFENN
 
 |GitHub last commit| |GitHub last release| |GitHub issues| |GitHub commits since previous| |GitHub commits since last| 
 
-|Full| |Linux| |MacM1| |MacIntel| |Windows| |Coverage Status|
+|Full| |Linux| |MacM1| |Windows| |Coverage Status|
 
 |Paper DOI| |Zenodo DOI| |Paper2 DOI|
 
@@ -42,10 +42,6 @@ pySIPFENN
 .. |MacM1| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml/badge.svg
     :alt: Mac M1 Status 
     :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacM1.yaml
-
-.. |MacIntel| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacIntel.yaml/badge.svg
-    :alt: Mac M1 Status 
-    :target: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_MacIntel.yaml
 
 .. |Windows| image:: https://github.com/PhasesResearchLab/pySIPFENN/actions/workflows/coreTests_Windows.yaml/badge.svg
     :alt: Windows Status 
