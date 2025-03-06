@@ -80,13 +80,26 @@ If you downloaded the models before, they should be retained as long as you do n
 change the Conda environment. If you do, you will have to download them again.
 
 ### Model Download
-One of the most common concerns users have contacted us about is the inability to download
-the model files in reasonable time. This is usually correlated in time with a workshop, 
-after which many users try to download them from Zenodo concurrently and exhaust the
-bandwidth. In such a case, we recommend trying again in a day or two.
 
-If your download is slow or fails during normal time periods, please let us know, and we
-will try to help you by providing the files directly.
+All default `pySIPFENN` models are hosted in our Zenodo repository (linked in the
+main page of this documentation and GitHub README). They are ready to be downloaded
+automatically by `pySIPFENN` by simply rinning the `downloadModels()` function over 
+any `Calculator` instance and will be permanently stored in the `pySIPFENN` installation
+directory (inside the `models` folder). Printing the `Calculator` instance will show
+you the exact path where the models are stored if you want to check it.
+
+If you have issues downloading the model files in reasonable time, this is usually 
+correlated with a workshop, after which many users try to download them from Zenodo 
+concurrently and exhaust the bandwidth. If that is the case, please try to download
+the models in a few hours or the next day; otherwise, please let us know, and we will
+try to help you by providing the files directly.
+
+We also received a report that some **MacOS** installations of `python` itself can lack 
+`SSL` certificate support out-of-the-box and it needs to be enabled manually to enable 
+downloading `pySIPFENN` models from Zenodo, with the following one-line command (after
+replacing `Python 3.9` with your Python version):
+
+    open /Applications/Python\ 3.9/Install\ Certificates.command
 
 ## Known problems with easy solutions
 
