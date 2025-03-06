@@ -667,12 +667,17 @@ class Calculator:
             else:
                 tempOut = model(dataIn)
             t1 = perf_counter()
-            dataOuts.append(tempOut.cpu().detach().numpy())
+
+            # Convert to numpy and reshape multi-property outputs
+            temp_numpy = tempOut.cpu().detach().numpy()
+            for col_idx in range(temp_numpy.shape[1]):
+                    dataOuts.append(temp_numpy[:, col_idx].reshape(-1, 1))
+
             if self.verbose:
                 print(f'Prediction rate: {round(len(tempOut) / (t1 - t0), 1)} pred/s')
                 print(f'Obtained {len(tempOut)} predictions from:  {net}')
 
-        # Transpose and round the predictions
+        # Transpose the predictions
         dataOuts = np.array(dataOuts).T.tolist()[0]
         self.predictions = dataOuts
         return dataOuts
