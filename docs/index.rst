@@ -163,7 +163,7 @@ Index
    miscellaneousnotes
    examples/sipfenn_examples
    2022 Article <https://doi.org/10.1016/j.commatsci.2022.111254>
-   2024 Pre-Print <https://doi.org/10.48550/arXiv.2404.02849>
+   2024 Article <https://doi.org/10.1016/j.commatsci.2024.113495>
    changelog
    contributing
    genindex

@@ -34,9 +34,12 @@ from pysipfenn.descriptorDefinitions import (
 
 # - add new ones here if extending the code
 
-__version__ = '0.16.2'
-__authors__ = [["Adam Krajewski", "ak@psu.edu"],
-               ["Jonathan Siegel", "jwsiegel@tamu.edu"]]
+__version__ = '0.16.3'
+__authors__ = [
+    ["Adam Krajewski", "ak@psu.edu"],
+    ["Jonathan Siegel", "jwsiegel@tamu.edu"],
+    ["Ricardo Amaral", "rna5137@psu.edu"]
+    ]
 __name__ = 'pysipfenn'
 
 # *********************************  CALCULATION HIGH-LEVEL ENVIRONMENT  *********************************

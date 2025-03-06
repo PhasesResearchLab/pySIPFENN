@@ -4,10 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pysipfenn"
-version = "0.16.2"
+version = "0.16.3"
 authors = [
   { name="Adam Krajewski", email="ak@psu.edu" },
   { name="Jonathan Siegel", email="jwsiegel@tamu.edu" },
+  { name="Ricardo Amaral", email="rna5137@psu.edu" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
