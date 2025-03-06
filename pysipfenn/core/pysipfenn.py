@@ -1010,6 +1010,10 @@ class Calculator:
         Returns:
             List of dictionaries with the predictions.
         """
+        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
+
         return [dict(zip(self.predictedProperties, pred)) for pred in self.predictions]
 
     def get_resultDictsWithNames(self) -> List[dict]:
@@ -1023,8 +1027,12 @@ class Calculator:
         Returns:
             List of dictionaries with the predictions.
         """
-        assert self.inputFiles is not []
-        assert len(self.inputFiles) == len(self.predictions)
+        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
+        assert self.inputFiles is not [], 'No input file names were set. This is automatic using runFromDirectory() or has to be set manually.'
+        assert len(self.inputFiles) == len(self.predictions), 'Number of input files does not match the number of predictions.'
+
         return [
             dict(zip(['name'] + self.predictedProperties, [name] + pred))
             for name, pred in
@@ -1043,9 +1051,9 @@ class Calculator:
                 correctly.
         """
 
-        assert self.toRun is not []
-        assert self.predictions is not []
-        assert self.predictedProperties is not []
+        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
 
         with open(file, 'w+', encoding="utf-8") as f:
             f.write('Name,' + ','.join(self.predictedProperties) + '\n')
@@ -1058,6 +1066,9 @@ class Calculator:
                 for pred in self.predictions:
                     f.write(f'{i},{",".join(str(v) for v in pred)}\n')
                     i += 1
+
+        if self.verbose:
+            print(f'{len(self.predictions)} predictions written to {file} successfully.')
 
     def writeDescriptorsToCSV(self, descriptor: str, file: str = 'descriptorData.csv') -> None:
         """Writes the descriptor data to a CSV file. The first column is the name of the structure. If the
@@ -1117,15 +1128,15 @@ class Calculator:
             np.save(file, self.descriptorData)
 
     def destroy(self) -> None:
-            """Deallocates all loaded models and clears all data from the Calculator object."""
-            self.loadedModels.clear()
-            self.toRun.clear()
-            self.descriptorData.clear()
-            self.predictions.clear()
-            self.inputFiles.clear()
-            gc.collect()
-            print("Calculator and all loaded models deallocated. All data cleared.")
-            del self
+        """Deallocates all loaded models and clears all data from the Calculator object."""
+        self.loadedModels.clear()
+        self.toRun.clear()
+        self.descriptorData.clear()
+        self.predictions.clear()
+        self.inputFiles.clear()
+        gc.collect()
+        print("Calculator and all loaded models deallocated. All data cleared.")
+        del self
 
 
 # ************************  SATELLITE FUNCTIONS  ************************
