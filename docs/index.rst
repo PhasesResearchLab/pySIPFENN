@@ -13,7 +13,11 @@ pySIPFENN
 
 |Full| |Linux| |MacM1| |Windows| |Coverage Status|
 
-|Paper DOI| |Zenodo DOI| |Paper2 DOI|
+**2022 Paper:** |Paper DOI| |Paper Arxiv|
+
+**2024 Paper:** |Paper2 DOI| |Paper2 Arxiv|
+
+**ML Models:** |Zenodo DOI| 
 
 .. |GitHub top language| image:: https://img.shields.io/github/languages/top/PhasesResearchLab/pysipfenn
     :alt: GitHub top language
@@ -79,13 +83,21 @@ pySIPFENN
     :target: https://doi.org/10.1016/j.commatsci.2022.111254
     :alt: 2022 Paper DOI
 
+.. |Paper Arxiv| image:: https://img.shields.io/badge/arXiv-2008.13654-8F1515?style=flat&logo=arxiv&logoColor=red
+    :target: https://doi.org/10.48550/arXiv.2008.13654
+    :alt: 2022 Paper ArXiv
+
 .. |Zenodo DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7373089.svg?
     :target: https://doi.org/10.5281/zenodo.7373089
     :alt: Zenodo DOI
 
-.. |Paper2 DOI| image:: https://img.shields.io/badge/arXiv-2404.02849-8F1515?style=flat&logo=arxiv&logoColor=red
-    :target: https://doi.org/10.48550/arXiv.2404.02849
+.. |Paper2 DOI| image:: https://img.shields.io/badge/DOI-10.1016%2Fj.commatsci.2024.113495-blue
+    :target: https://doi.org/10.1016/j.commatsci.2024.113495
     :alt: 2024 Paper DOI
+
+.. |Paper2 Arxiv| image:: https://img.shields.io/badge/arXiv-2404.02849-8F1515?style=flat&logo=arxiv&logoColor=red
+    :target: https://doi.org/10.48550/arXiv.2404.02849
+    :alt: 2024 Paper ArXiv
 
 ``pySIPFENN`` or **py** thon toolset for **S** tructure- **I** nformed **P** roperty and **F** eature **E** ngineering with **N** eural **N** etworks implements a numer of researcher-friendly tools for:
 
@@ -207,5 +219,5 @@ materials, as presented in these two papers:
 -  Shun-Li Shang, Hui Sun, Bo Pan, Yi Wang, Adam M. Krajewski, Mihaela
    Banu, Jingjing Li & Zi-Kui Liu, Forming mechanism of equilibrium and
    non-equilibrium metallurgical phases in dissimilar aluminum/steel
-   (Al–Fe) joints. Nature Scientific Reports 11, 24251 (2021).
+   (Al-Fe) joints. Nature Scientific Reports 11, 24251 (2021).
    https://doi.org/10.1038/s41598-021-03578-0
