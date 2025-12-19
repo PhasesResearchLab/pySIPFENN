@@ -366,9 +366,9 @@ class LocalAdjuster:
         else:
             raise NotImplementedError("The loss function must be one of the following: 'MSE', 'MAE'.")
 
-        transferLosses = [float(loss(model(ddTrain, None), tdTrain))]
+        transferLosses = [loss(model(ddTrain, None), tdTrain).detach().item()]
         if validation > 0:
-            validationLosses = [float(loss(model(ddVal, None), tdVal))]
+            validationLosses = [loss(model(ddVal, None), tdVal).detach().item()]
             if verbose:
                 print(
                     f'Train: {transferLosses[-1]:.4f} | Validation: {validationLosses[-1]:.4f} | Epoch: 0/{epochs}')
@@ -385,11 +385,11 @@ class LocalAdjuster:
                 lossValue = loss(output, target)
                 lossValue.backward()
                 optimizerInstance.step()
-            transferLosses.append(float(loss(model(ddTrain, None), tdTrain)))
+            transferLosses.append(loss(model(ddTrain, None), tdTrain).detach().item())
 
             if validation > 0:
                 model.eval()
-                validationLosses.append(float(loss(model(ddVal, None), tdVal)))
+                validationLosses.append(loss(model(ddVal, None), tdVal).detach().item())
                 model.train()
                 if self.useClearML:
                     task.get_logger().report_scalar(
