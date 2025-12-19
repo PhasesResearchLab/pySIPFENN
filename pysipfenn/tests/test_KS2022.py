@@ -28,7 +28,7 @@ class TestKS2022(unittest.TestCase):
             referenceDescriptorTable = list(reader)
 
         self.labels = referenceDescriptorTable[0]
-        self.testReferenceData = np.float_(referenceDescriptorTable[1:]).tolist()
+        self.testReferenceData = np.float64(referenceDescriptorTable[1:]).tolist()
         emptyLabels = [
             'mean_WCMagnitude_Shell1', 'mean_WCMagnitude_Shell2', 'mean_WCMagnitude_Shell3',
             'mean_NeighDiff_shell1_SpaceGroupNumber', 'var_NeighDiff_shell1_SpaceGroupNumber',

@@ -26,7 +26,7 @@ class TestWard2017(unittest.TestCase):
             self.referenceDescriptorTable = list(reader)
 
         self.labels = self.referenceDescriptorTable[0]
-        self.testReferenceData = np.float_(self.referenceDescriptorTable[1:]).tolist()
+        self.testReferenceData = np.float64(self.referenceDescriptorTable[1:]).tolist()
         self.skipLabels = ['mean_WCMagnitude_Shell3']
 
         with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as exampleInputsDir:

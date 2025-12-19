@@ -16,7 +16,7 @@ class TestKSRandomSolution2022(unittest.TestCase):
         testFilePath = 'tests/testCaseFiles/TestFile_DescriptorData_KS2022_randomSolution_valueRangesMeans.csv'
         with resources_files('pysipfenn').joinpath(testFilePath).open('r', newline='') as f:
             reader = csv.reader(f)
-            self.descriptorRangeList, self.descriptorMeanList = np.float_(list(reader)).T
+            self.descriptorRangeList, self.descriptorMeanList = np.float64(list(reader)).T
 
         with resources_files('pysipfenn').joinpath('descriptorDefinitions/labels_KS2022.csv').open('r') as f:
             reader = csv.reader(f)
