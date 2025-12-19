@@ -1,6 +1,6 @@
 import unittest
 from pymatgen.core import Structure
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 import shutil
 import pysipfenn
 import pytest
@@ -17,7 +17,7 @@ class TestCustomModel(unittest.TestCase):
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def setUp(self) -> None:
         '''Copies the model to CWD.'''
-        with open(resources.files('pysipfenn').joinpath('modelsSIPFENN/SIPFENN_Krajewski2020_NN24.onnx'),
+        with open(resources_files('pysipfenn').joinpath('modelsSIPFENN/SIPFENN_Krajewski2020_NN24.onnx'),
                   'rb') as modelForTest:
             with open('MyFunNet.onnx', 'wb') as modelForTestCopy:
                 shutil.copyfileobj(modelForTest, modelForTestCopy)
@@ -37,10 +37,10 @@ class TestCustomModel(unittest.TestCase):
                                descriptor='Ward2017',
                                modelDirectory='.')
         print(self.c.network_list_available)
-        testFilesDir = resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')
-        self.c.runFromDirectory(directory=testFilesDir,
-                                descriptor='Ward2017',
-                                mode='serial')
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as testFilesDir:
+            self.c.runFromDirectory(directory=testFilesDir,
+                                    descriptor='Ward2017',
+                                    mode='serial')
         for p in self.c.get_resultDictsWithNames()[:3]:
             self.assertIn('MyFunNet', p.keys())
             self.assertAlmostEqual(p['MyFunNet'], p['SIPFENN_Krajewski2020_NN24'], places=9)

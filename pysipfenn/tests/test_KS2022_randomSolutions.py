@@ -1,7 +1,7 @@
 import unittest
 import csv
 import numpy as np
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 from tqdm.contrib.concurrent import process_map
 
 from pysipfenn.descriptorDefinitions import KS2022_randomSolutions
@@ -14,11 +14,11 @@ class TestKSRandomSolution2022(unittest.TestCase):
         alloy.
         '''
         testFilePath = 'tests/testCaseFiles/TestFile_DescriptorData_KS2022_randomSolution_valueRangesMeans.csv'
-        with resources.files('pysipfenn').joinpath(testFilePath).open('r', newline='') as f:
+        with resources_files('pysipfenn').joinpath(testFilePath).open('r', newline='') as f:
             reader = csv.reader(f)
             self.descriptorRangeList, self.descriptorMeanList = np.float_(list(reader)).T
 
-        with resources.files('pysipfenn').joinpath('descriptorDefinitions/labels_KS2022.csv').open('r') as f:
+        with resources_files('pysipfenn').joinpath('descriptorDefinitions/labels_KS2022.csv').open('r') as f:
             reader = csv.reader(f)
             self.labels = [row[0] for row in reader]
 

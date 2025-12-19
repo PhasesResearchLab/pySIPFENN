@@ -5,7 +5,7 @@ import csv
 import json
 from time import perf_counter
 from typing import List, Union, Dict
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 # Helper Imports
 from tqdm import tqdm
@@ -85,7 +85,7 @@ class Calculator:
             print('\n*********  Initializing pySIPFENN Calculator  **********')
         self.verbose = verbose
         # Dictionary with all model information
-        with resources.files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
+        with resources_files('pysipfenn.modelsSIPFENN').joinpath('models.json').open('r') as f:
             if verbose:
                 print(f'Loading model definitions from: {Fore.BLUE}{f.name}{Style.RESET_ALL}')
             self.models = json.load(f)
@@ -122,8 +122,8 @@ class Calculator:
     def __str__(self):
         """Prints the status of the ``Calculator`` object."""
         printOut = f'pySIPFENN Calculator Object. Version: {__version__}\n'
-        printOut += f'Models are located in:\n   {resources.files("pysipfenn.modelsSIPFENN")}\n'
-        printOut += f'Auxiliary files (incl. structure prototypes):\n   {resources.files("pysipfenn.misc")}\n{"-" * 80}\n'
+        printOut += f'Models are located in:\n   {resources_files("pysipfenn.modelsSIPFENN")}\n'
+        printOut += f'Auxiliary files (incl. structure prototypes):\n   {resources_files("pysipfenn.misc")}\n{"-" * 80}\n'
         printOut += f'Loaded Networks: {list(self.loadedModels.keys())}\n'
         if len(self.inputFiles) > 0:
             printOut += f'Last files selected as input: {len(self.inputFiles)}\n'
@@ -162,7 +162,7 @@ class Calculator:
         yaml_safeLoader = YAML(typ='safe')
 
         if customPath == 'default':
-            with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
+            with resources_files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('r') as f:
                 prototypes = yaml_safeLoader.load(f)
         else:
             with open(customPath, 'r') as f:
@@ -216,7 +216,7 @@ class Calculator:
     def updateModelAvailability(self) -> None:
         """Updates availability of models based on the pysipfenn.modelsSIPFENN directory contents. Works only for
         current ONNX model definitions."""
-        with resources.files('pysipfenn.modelsSIPFENN') as p:
+        with as_file(resources_files('pysipfenn.modelsSIPFENN')) as p:
             all_files = os.listdir(p)
         detectedNets = []
         for net, netName in zip(self.network_list, self.network_list_names):
@@ -244,7 +244,7 @@ class Calculator:
             network: Name of the network to download. Defaults to ``'all'``.
 
         """
-        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+        with as_file(resources_files('pysipfenn.modelsSIPFENN')) as modelPath:
             # Fetch all
             if network == 'all':
                 print('Fetching all networks!')
@@ -302,7 +302,7 @@ class Calculator:
         Returns:
             None. It updates the loadedModels attribute of the Calculatorclass.
         """
-        with resources.files('pysipfenn.modelsSIPFENN') as modelPath:
+        with as_file(resources_files('pysipfenn.modelsSIPFENN')) as modelPath:
             if network == 'all':
                 print('Loading models:')
                 for net in tqdm(self.network_list_available):
@@ -1097,7 +1097,7 @@ class Calculator:
         """
 
         # Load descriptor labels
-        with resources.files('pysipfenn').joinpath(f'descriptorDefinitions/labels_{descriptor}.csv') as labelsCSV:
+        with as_file(resources_files('pysipfenn').joinpath(f'descriptorDefinitions/labels_{descriptor}.csv')) as labelsCSV:
             with open(labelsCSV, 'r') as f:
                 reader = csv.reader(f)
                 labels = [v[0] for v in list(reader)]
@@ -1185,7 +1185,7 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
     yaml_customDumper = YAML()
     yaml_customDumper.top_level_colon_align = True
 
-    with resources.files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
+    with resources_files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
         # Restructure the prototype library back to the original format of a list of dictionaries
         print(prototypeLibrary)
         prototypeList = [

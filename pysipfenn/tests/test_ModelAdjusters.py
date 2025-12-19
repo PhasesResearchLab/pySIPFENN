@@ -3,7 +3,7 @@ import pytest
 import os
 import pysipfenn
 import torch
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 # Skip the tests if we're in GitHub Actions and the models haven't been fetched yet
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("MODELS_FETCHED") != "true"
@@ -112,7 +112,7 @@ class TestModelAdjusters(unittest.TestCase):
         descriptors and data not matching the descriptor dimensions selected (an optional feature).
         """
 
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/') as testFileDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/')) as testFileDir:
 
             # From CSV
             self.lma1 = pysipfenn.LocalAdjuster(

@@ -2,7 +2,7 @@ import unittest
 import pytest
 import os
 from pymatgen.core import Structure
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 import pysipfenn
 
@@ -13,7 +13,7 @@ toTest = ['SIPFENN_Krajewski2020_NN9', 'SIPFENN_Krajewski2020_NN20', 'SIPFENN_Kr
 referenceEnergies_MxNet = [0.0790368840098381, 0.0498688854277133, 0.0871851742267608]
 referenceEnergies_ONNX =  [0.0790369734168053, 0.0498689748346806, 0.0871851146221161]
 
-with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
+with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as exampleInputsDir:
     testStructure = Structure.from_file(f'{exampleInputsDir}/{testFile}')
 
 class TestKrajewski2020ModelsFromONNX(unittest.TestCase):

@@ -25,7 +25,7 @@ import math
 import time
 from collections import Counter
 from typing import List, Union, Tuple
-from importlib import resources
+from importlib.resources import files as resources_files
 
 # Third Party Dependencies
 from tqdm.contrib.concurrent import process_map
@@ -37,7 +37,7 @@ from pymatgen.analysis.local_env import VoronoiNN
 # and maxFeaturesInOQMD is based on the 2017 snapshot of OQMD, which was current when we started and will be retained in KS2022, but
 # change in the future).
 periodic_table_size = 112
-f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+f = resources_files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
 attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]
@@ -433,7 +433,7 @@ def generate_descriptor(struct: Structure,
         diffArray = np.array(diffHistory)
 
         # Plot the parameters as lines. Add hover text to show the parameter name based on the labels_KS2022.csv file.
-        with resources.files('pysipfenn.descriptorDefinitions').joinpath('labels_KS2022.csv').open() as f:
+        with resources_files('pysipfenn.descriptorDefinitions').joinpath('labels_KS2022.csv').open() as f:
             labels = f.readlines()
         fig = px.line(pd.DataFrame(diffArray, columns=labels), title='KS2022 Descriptor Parameters',
                       range_y=[-0.5, 0.5])

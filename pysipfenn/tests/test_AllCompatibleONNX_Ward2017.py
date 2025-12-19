@@ -1,7 +1,7 @@
 import unittest
 import pytest
 import os
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 import pysipfenn
 
@@ -15,7 +15,7 @@ class TestAllCompatibleONNX_Ward2017(unittest.TestCase):
     def test_runtime(self):
         '''Runs the test.'''
         c = pysipfenn.Calculator()
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as exampleInputsDir:
             c.runFromDirectory(directory=exampleInputsDir, descriptor='Ward2017')
         print(c.get_resultDicts())
         c.writeResultsToCSV('Ward2017-ONNX_testResults.csv')

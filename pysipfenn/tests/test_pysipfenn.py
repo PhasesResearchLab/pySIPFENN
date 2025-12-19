@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 import pysipfenn
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 from natsort import natsorted
 from numpy import zeros
 
@@ -69,7 +69,7 @@ class TestCore(unittest.TestCase):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('Ward2017')).intersection(set(self.c.network_list_available)))
         if toRun:
-            with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
+            with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'Ward2017')
         else:
@@ -84,7 +84,7 @@ class TestCore(unittest.TestCase):
         self.c.updateModelAvailability()
         toRun = list(set(self.c.findCompatibleModels('KS2022')).intersection(set(self.c.network_list_available)))
         if toRun:
-            with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as testFileDir:
+            with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as testFileDir:
                 print(testFileDir)
                 self.c.runFromDirectory(testFileDir, 'KS2022')
         else:
@@ -162,7 +162,7 @@ class TestCore(unittest.TestCase):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in series. A separate test for
         calculation accuracy is done in test_Ward2017.py.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)[:6]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             descList = self.c.calculate_Ward2017(structList=testStructures, mode='serial')
@@ -172,7 +172,7 @@ class TestCore(unittest.TestCase):
         '''Test succesful execution of the descriptorCalculate() method with Ward2017 in parallel. A separate test for
         calculation accuracy is done in test_Ward2017.py.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)[:6]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             descList = self.c.calculate_Ward2017(structList=testStructures, mode='parallel', max_workers=2)
@@ -182,7 +182,7 @@ class TestCore(unittest.TestCase):
         '''Test succesful execution of the descriptorCalculate() method with KS2022 in series. A separate test for
         calculation accuracy is done in test_KS2022.py.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             descList = self.c.calculate_KS2022(structList=testStructures, mode='serial')
@@ -192,7 +192,7 @@ class TestCore(unittest.TestCase):
         '''Test succesful execution of the descriptorCalculate() method with KS2022 in parallel. A separate test for
         calculation accuracy is done in test_KS2022.py.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = os.listdir(exampleInputsDir)
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             descList = self.c.calculate_KS2022(structList=testStructures, mode='parallel', max_workers=4)
@@ -291,7 +291,7 @@ class TestCore(unittest.TestCase):
         consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
         structures based on the c.inputFileNames list.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = natsorted(os.listdir(exampleInputsDir))[:4]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             self.c.calculate_KS2022(structList=testStructures, mode='serial')
@@ -300,7 +300,7 @@ class TestCore(unittest.TestCase):
                                      file='TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv')
 
         with open('TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv', 'r', newline='') as f1:
-            with resources.files('pysipfenn').joinpath(
+            with resources_files('pysipfenn').joinpath(
                     'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_enumerated.csv').open('r',
                                                                                                         newline='') as f2:
                 for line1, line2 in zip(f1, f2):
@@ -312,7 +312,7 @@ class TestCore(unittest.TestCase):
                                      file='TestFile_DescriptorData_4_KS2022_labeled_named.csv')
 
         with open('TestFile_DescriptorData_4_KS2022_labeled_named.csv', 'r', newline='') as f1:
-            with resources.files('pysipfenn').joinpath(
+            with resources_files('pysipfenn').joinpath(
                     'tests/testCaseFiles/TestFile_DescriptorData_4_KS2022_labeled_named.csv').open('r',
                                                                                                    newline=''
                                                                                                    ) as f2:
@@ -324,7 +324,7 @@ class TestCore(unittest.TestCase):
         consistent with the reference output. It does that with both anonymous structures it enumerates and labeled
         structures based on the c.inputFileNames list.
         '''
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles')) as exampleInputsDir:
             exampleInputFiles = natsorted(os.listdir(exampleInputsDir))[:4]
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in exampleInputFiles]
             self.c.calculate_KS2022(structList=testStructures, mode='serial')

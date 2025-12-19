@@ -22,7 +22,7 @@ import time
 import json
 from collections import Counter
 from typing import List, Union
-from importlib import resources
+from importlib.resources import files as resources_files
 
 # Third Party Dependencies
 from tqdm import tqdm
@@ -33,7 +33,7 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 # Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).
 periodic_table_size = 112
-f = resources.files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
+f = resources_files('pysipfenn.descriptorDefinitions').joinpath("element_properties_Ward2017KS2022.csv")
 attribute_matrix = np.loadtxt(f, delimiter=',')
 attribute_matrix = np.nan_to_num(attribute_matrix)
 attribute_matrix = attribute_matrix[:,[45, 33, 2, 32, 5, 48, 6, 10, 44, 42, 38, 40, 36, 43, 41, 37, 39, 35, 18, 13, 17]]

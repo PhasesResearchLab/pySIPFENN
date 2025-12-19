@@ -5,7 +5,7 @@ from pymatgen.core import Structure
 from tqdm import tqdm
 import numpy as np
 from natsort import natsorted
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 from pysipfenn.descriptorDefinitions import Ward2017
 
@@ -20,7 +20,7 @@ class TestWard2017(unittest.TestCase):
         descriptors for them. The results are stored in the functionOutput list. It also persists the test results in
         the Ward2017_TestResult.csv file.
         '''
-        with resources.files('pysipfenn'). \
+        with resources_files('pysipfenn'). \
                 joinpath('tests/testCaseFiles/exampleInputFilesDescriptorTable.csv').open('r', newline='') as f:
             reader = csv.reader(f)
             self.referenceDescriptorTable = list(reader)
@@ -29,12 +29,12 @@ class TestWard2017(unittest.TestCase):
         self.testReferenceData = np.float_(self.referenceDescriptorTable[1:]).tolist()
         self.skipLabels = ['mean_WCMagnitude_Shell3']
 
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as exampleInputsDir:
             self.exampleInputFiles = natsorted(os.listdir(exampleInputsDir))
             self.testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in self.exampleInputFiles]
 
         self.functionOutput = [Ward2017.generate_descriptor(s).tolist() for s in tqdm(self.testStructures[:5])]
-        with resources.files('pysipfenn'). \
+        with resources_files('pysipfenn'). \
                 joinpath('tests/Ward2017_TestResult.csv').open('w+', newline='') as f:
             f.writelines([f'{v}\n' for v in self.functionOutput[0]])
 

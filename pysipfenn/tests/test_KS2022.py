@@ -5,7 +5,7 @@ from pymatgen.core import Structure
 from tqdm import tqdm
 import numpy as np
 from natsort import natsorted
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 from pysipfenn.descriptorDefinitions import KS2022
 
@@ -22,7 +22,7 @@ class TestKS2022(unittest.TestCase):
         that contains the indices of the labels that are not used in the KS2022 (vs Ward2017) descriptor generation. It
         also persists the test results in the KS2022_TestResult.csv file.
         '''
-        with resources.files('pysipfenn'). \
+        with resources_files('pysipfenn'). \
                 joinpath('tests/testCaseFiles/exampleInputFilesDescriptorTable.csv').open('r', newline='') as f:
             reader = csv.reader(f)
             referenceDescriptorTable = list(reader)
@@ -39,12 +39,12 @@ class TestKS2022(unittest.TestCase):
         emptyLabels.reverse()
         self.emptyLabelsIndx = [self.labels.index(l) for l in emptyLabels]
 
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/') as exampleInputsDir:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/exampleInputFiles/')) as exampleInputsDir:
             self.exampleInputFiles = natsorted(os.listdir(exampleInputsDir))
             testStructures = [Structure.from_file(f'{exampleInputsDir}/{eif}') for eif in self.exampleInputFiles]
 
         self.functionOutput = [KS2022.generate_descriptor(s).tolist() for s in tqdm(testStructures[:25])]
-        with resources.files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
+        with resources_files('pysipfenn').joinpath('tests/KS2022_TestResult.csv').open('w+', newline='') as f:
             f.writelines([f'{v}\n' for v in self.functionOutput[0]])
 
     def test_resutls(self):

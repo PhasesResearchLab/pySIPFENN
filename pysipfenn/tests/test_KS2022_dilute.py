@@ -5,7 +5,7 @@ from pymatgen.core import Structure
 from tqdm import tqdm
 import numpy as np
 from natsort import natsorted
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 
 from pysipfenn.descriptorDefinitions import KS2022, KS2022_dilute
 
@@ -21,7 +21,7 @@ class TestKS2022(unittest.TestCase):
         base, and implicit (pure) base, are persisted in the KS2022_dilute_TestReslt.csv
         '''
 
-        with resources.files('pysipfenn'). \
+        with resources_files('pysipfenn'). \
                 joinpath('descriptorDefinitions/labels_KS2022_dilute.csv').open('r', newline='') as f:
             reader = csv.reader(f)
             self.labels = [l[0] for l in list(reader)]
@@ -46,7 +46,7 @@ class TestKS2022(unittest.TestCase):
         self.functionOutput_explicitBase = [KS2022_dilute.generate_descriptor(s, baseStruct=bs).tolist()
                                             for s, bs in tqdm(zip(testStructures, baseStructures))]
 
-        with resources.files('pysipfenn').joinpath('tests/KS2022_dilute_TestResult.csv').open('w+', newline='') as f:
+        with resources_files('pysipfenn').joinpath('tests/KS2022_dilute_TestResult.csv').open('w+', newline='') as f:
             f.writelines(
                 [f'{name},{trd},{fo1},{fo2}\n' for fo2, fo1, trd, name in
                  zip(self.functionOutput_explicitBase[0],

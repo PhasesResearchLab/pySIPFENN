@@ -1,6 +1,6 @@
 import unittest
 from pymatgen.core import Structure
-from importlib import resources
+from importlib.resources import files as resources_files, as_file
 import shutil
 import pysipfenn
 import pytest
@@ -50,7 +50,7 @@ class TestPL(unittest.TestCase):
         """Test that a custom prototype can be loaded. Then test that a custom prototype can be appended to the default
         library and stay there."""
 
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml') as f:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml')) as f:
             self.c.parsePrototypeLibrary(customPath=f, verbose=True, printCustomLibrary=True)
 
         with self.subTest(msg="Custom prototype present with correct parse"):
@@ -73,7 +73,7 @@ class TestPL(unittest.TestCase):
         self.c = pysipfenn.Calculator(autoLoad=False)
         backup = self.c.prototypeLibrary.copy()
 
-        with resources.files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml') as f:
+        with as_file(resources_files('pysipfenn').joinpath('tests/testCaseFiles/prototypeLibrary-custom.yaml')) as f:
             self.c.appendPrototypeLibrary(customPath=f)
 
         with self.subTest(msg="Custom prototype present and valid in a different Calculator instance"):
