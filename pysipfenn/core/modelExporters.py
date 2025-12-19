@@ -2,6 +2,7 @@ from pysipfenn import Calculator
 import torch
 import onnx
 import io
+import warnings
 from tqdm import tqdm
 
 class ONNXExporter:
@@ -53,16 +54,19 @@ class ONNXExporter:
                 inputs_tracer = (inputs_tracer, torch.zeros(1, ))
 
             temp = io.BytesIO()
-            torch.onnx.export(
-                loadedModel,
-                inputs_tracer,
-                temp,
-                export_params=True,
-                opset_version=16,
-                do_constant_folding=True,
-                input_names=[descriptorUsed],
-                output_names=['property'],
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)
+                torch.onnx.export(
+                    loadedModel,
+                    inputs_tracer,
+                    temp,
+                    export_params=True,
+                    opset_version=18,
+                    do_constant_folding=True,
+                    input_names=[descriptorUsed],
+                    output_names=['property'],
+                    dynamo=False
+                )
             temp.seek(0)
             self.calculator.loadedModels.update({
                 model: onnx.load(temp)
