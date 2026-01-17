@@ -171,7 +171,7 @@ def generate_voronoi_attributes(
 
     # Find equivalent positions in the original base structure
     spgAbase = SpacegroupAnalyzer(baseStruct, symprec=0.001, angle_tolerance=0.1)
-    originalEquivalents = list(spgAbase.get_symmetry_dataset()['equivalent_atoms'])
+    originalEquivalents = list(spgAbase.get_symmetry_dataset().equivalent_atoms)
 
     # Output list
     attribute_list = list()

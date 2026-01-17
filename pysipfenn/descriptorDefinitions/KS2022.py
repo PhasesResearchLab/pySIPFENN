@@ -213,7 +213,7 @@ def get_equivalentSitesMultiplicities(
         symprec=symprec)
     return dict(
         Counter(
-            list(spgA.get_symmetry_dataset()['equivalent_atoms'])))
+            list(spgA.get_symmetry_dataset().equivalent_atoms)))
 
 
 def generate_descriptor(struct: Structure) -> np.ndarray:
