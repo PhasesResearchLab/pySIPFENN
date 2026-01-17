@@ -7,18 +7,16 @@ docs/jupyter_execute
 **/__pycache__
 pysipfenn.egg-info
 
-# ONNX Models
-*.onnx
+# ONNX and other local model files
+**/*.onnx
+**/*.mlpackage
+**/*.pt
 
 # Test and temporary files
-**/*_TestResult.csv
-**/TestResult_*.csv
-**/*_TestResult.npy
-**/TestResult_*.npy
-**/*_TestFile.csv
-**/TestFile_*.csv
-**/*_TestFile.npy
-**/TestFile_*.npy
+**/*Test*.npy
+**/*Test*.csv
+**/*test*.npy
+**/*test*.csv
 
 # Any venv test
 **/venv_**
