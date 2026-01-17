@@ -51,7 +51,8 @@ dev = [
     "coremltools>=7.0",
     "onnxconverter_common>=1.14.0",
     "onnxsim==0.4.33",
-    "onnxruntime>=1.16.0",
+    "onnxscript",
+    "onnxruntime>=1.20.0",
     "optimade[http_client]>=1.0.0"
 ]
 
