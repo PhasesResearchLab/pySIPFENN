@@ -12,6 +12,9 @@ pysipfenn.egg-info
 **/*.mlpackage
 **/*.pt
 
+# Local descriptor data files
+**/*descriptorData.npy
+
 # Test and temporary files
 **/*Test*.npy
 **/*Test*.csv
