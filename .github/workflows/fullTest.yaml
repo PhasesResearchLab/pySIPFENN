@@ -11,7 +11,7 @@ on:
 
 jobs:
   testPython310:
-    runs-on: macos-15-intel
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       
@@ -43,7 +43,7 @@ jobs:
           
   testPython311:
     needs: testPython310
-    runs-on: macos-15-intel
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       
@@ -75,7 +75,7 @@ jobs:
 
   testPython312:
     needs: testPython311
-    runs-on: macos-15-intel
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       
