@@ -77,6 +77,8 @@ class ONNXExporter:
                 model: onnx.load(temp)
             })
             del temp
+            # Force garbage collection to free memory immediately
+            gc.collect()
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
     def simplify(self, model: str) -> None:

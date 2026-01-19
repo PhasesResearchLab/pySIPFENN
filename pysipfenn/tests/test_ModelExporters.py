@@ -1,6 +1,9 @@
 import unittest
 import pytest
 import os
+import gc
+import shutil
+from time import sleep
 import pysipfenn
 
 # Skip the tests if we're in GitHub Actions and the models haven't been fetched yet
@@ -105,9 +108,29 @@ class TestExporters(unittest.TestCase):
         assert self.onnxexp.calculator == self.c
 
         self.onnxexp.simplify('SIPFENN_Krajewski2020_NN9')
-        self.onnxexp.toFP16('SIPFENN_Krajewski2020_NN24')
+        self.onnxexp.toFP16('SIPFENN_Krajewski2022_NN30')
 
-        self.onnxexp.exportAll()
+        # Export the simplified SIPFENN_Krajewski2020_NN9 model, assert the file was created, and then clean up
+        self.onnxexp.export('SIPFENN_Krajewski2020_NN9')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2020_NN9_simplified.onnx'), \
+            'ONNX Exporter did not create the expected simplified file for NN9.'
+        assert os.path.getsize('SIPFENN_Krajewski2020_NN9_simplified.onnx') > 0, \
+            'ONNX Exporter created an empty simplified file for NN9.'
+        os.remove('SIPFENN_Krajewski2020_NN9_simplified.onnx')
+
+        # Export the FP16 SIPFENN_Krajewski2022_NN30 model, assert the file was created, and then clean up
+        self.onnxexp.export('SIPFENN_Krajewski2022_NN30')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2022_NN30_fp16.onnx'), \
+            'ONNX Exporter did not create the expected FP16 file for NN30.'
+        assert os.path.getsize('SIPFENN_Krajewski2022_NN30_fp16.onnx') > 0, \
+            'ONNX Exporter created an empty FP16 file for NN30.'
+        os.remove('SIPFENN_Krajewski2022_NN30_fp16.onnx')
+
+        # Explicityly free up the memory used by the ONNX exporter
+        del self.onnxexp
+        gc.collect()
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testTorchExport(self):
@@ -116,8 +139,28 @@ class TestExporters(unittest.TestCase):
         '''
         self.torchexp = pysipfenn.TorchExporter(self.c)
         assert self.torchexp.calculator == self.c
+        
+        # Export the older NN9 model first to check backward compatibility and then clean up
+        self.torchexp.export('SIPFENN_Krajewski2020_NN9')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2020_NN9.pt'), \
+            'Torch Exporter did not create the expected file for NN9.'
+        assert os.path.getsize('SIPFENN_Krajewski2020_NN9.pt') > 0, \
+            'Torch Exporter created an empty file for NN9.'
+        os.remove('SIPFENN_Krajewski2020_NN9.pt')
 
-        self.torchexp.exportAll()
+        # Export the newer NN30 model and then clean up
+        self.torchexp.export('SIPFENN_Krajewski2022_NN30')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2022_NN30.pt'), \
+            'Torch Exporter did not create the expected file for NN30.'
+        assert os.path.getsize('SIPFENN_Krajewski2022_NN30.pt') > 0, \
+            'Torch Exporter created an empty file for NN30.'
+        os.remove('SIPFENN_Krajewski2022_NN30.pt')
+        
+        # Explicityly free up the memory used by the Torch exporter
+        del self.torchexp
+        gc.collect()
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def testCoreMLExport(self):
@@ -127,4 +170,24 @@ class TestExporters(unittest.TestCase):
         self.coremlexp = pysipfenn.CoreMLExporter(self.c)
         assert self.coremlexp.calculator == self.c
 
-        self.coremlexp.exportAll()
+        # Export the older NN24 model first to check backward compatibility, and then clean up
+        self.coremlexp.export('SIPFENN_Krajewski2020_NN24')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2020_NN24.mlpackage'), \
+            'CoreML Exporter did not create the expected file for NN24.'
+        assert os.path.getsize('SIPFENN_Krajewski2020_NN24.mlpackage') > 0, \
+            'CoreML Exporter created an empty file for NN24.'
+        shutil.rmtree('SIPFENN_Krajewski2020_NN24.mlpackage')
+
+        # Export the newer NN30 model, and then clean up
+        self.coremlexp.export('SIPFENN_Krajewski2022_NN30')
+        sleep(0.1)  # Ensure file system has time to register the new file
+        assert os.path.exists('SIPFENN_Krajewski2022_NN30.mlpackage'), \
+            'CoreML Exporter did not create the expected file for NN30.'
+        assert os.path.getsize('SIPFENN_Krajewski2022_NN30.mlpackage') > 0, \
+            'CoreML Exporter created an empty file for NN30.'
+        shutil.rmtree('SIPFENN_Krajewski2022_NN30.mlpackage')
+        
+        # Explicityly free up the memory used by the CoreML exporter
+        del self.coremlexp
+        gc.collect()
