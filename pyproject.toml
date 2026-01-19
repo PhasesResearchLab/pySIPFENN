@@ -53,9 +53,11 @@ dev = [
     "onnxsim==0.4.33",
     "onnxscript",
     "onnxruntime>=1.20.0",
-    "optimade[http_client]>=1.0.0",
-    "pytest",
-    "flask"
+    "optimade[http_client]>=1.0.0"
+]
+test = [
+    "pytest>=7.0.0",
+    "flask>=2.0.0"
 ]
 
 [project.urls]

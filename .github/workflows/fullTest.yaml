@@ -25,7 +25,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install -e ".[dev]"
+          python -m pip install -e ".[dev,test]"
       
       - name: Download Models
         id: DownloadModelsAttempt1
@@ -57,7 +57,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install -e ".[dev]"
+          python -m pip install -e ".[dev,test]"
       
       - name: Download Models
         id: DownloadModelsAttempt1
@@ -89,7 +89,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install -e ".[dev]"
+          python -m pip install -e ".[dev,test]"
       
       - name: Download Models
         id: DownloadModelsAttempt1
