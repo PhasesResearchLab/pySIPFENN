@@ -2,6 +2,8 @@ from pysipfenn import Calculator
 import torch
 import onnx
 import io
+import re
+import gc
 import warnings
 from tqdm import tqdm
 
@@ -36,7 +38,9 @@ class ONNXExporter:
 
         for model in calculator.loadedModels:
             print(f'Converting {model} to ONNX')
-            assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
+
+            assert 'descriptor' in self.calculator.models[model], \
+                f'{model} does not have a descriptor set for it. Cannot export.'
             descriptorUsed = self.calculator.models[model]['descriptor']
             if descriptorUsed == 'Ward2017':
                 dLen = 271
@@ -45,7 +49,8 @@ class ONNXExporter:
             else:
                 raise NotImplementedError(f'ONNX export for {descriptorUsed} not implemented yet.')
 
-            assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+            assert model in self.calculator.loadedModels, \
+                f'{model} not loaded in calculator. The loaded models are: {list(self.calculator.loadedModels.keys())}'
             loadedModel = self.calculator.loadedModels[model]
             loadedModel.eval()
 
@@ -88,8 +93,12 @@ class ONNXExporter:
         except ModuleNotFoundError as e:
             print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
                   '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
+        
         print(f'Simplifying {model}')
-        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to simplify.'
+
+        assert model in self.calculator.loadedModels, \
+            f'{model} not loaded in calculator. Nothing to simplify.'
+        
         loadedModel = self.calculator.loadedModels[model]
         onnx_model_simp, check = simplify(loadedModel)
         assert check, "Simplified ONNX model could not be validated"
@@ -117,9 +126,13 @@ class ONNXExporter:
         except ModuleNotFoundError as e:
             print('\n\nNote: Export Dependencies are not installed by default. If you need them, you have to install pySIPFENN in '
                   '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
+        
         print(f'Converting {model} to FP16')
-        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to convert to FP16.'
+
+        assert model in self.calculator.loadedModels, \
+            f'{model} not loaded in calculator. The loaded models are: {list(self.calculator.loadedModels.keys())}'
         loadedModel = self.calculator.loadedModels[model]
+
         # Convert to FP16
         onnx_model_fp16 = float16.convert_float_to_float16(loadedModel)
         self.calculator.loadedModels[model] = onnx_model_fp16
@@ -143,9 +156,15 @@ class ONNXExporter:
         Returns:
             None
         """
+        if append and not re.match(r'^[a-zA-Z0-9_-]*$', append):
+            raise ValueError(f'Invalid characters in append string: "{append}". Only alphanumeric, underscore, and hyphen allowed.')
+        
         print(f'Exporting {model} to ONNX')
-        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+
+        assert model in self.calculator.loadedModels, \
+            f'{model} not loaded in calculator. The loaded models are: {list(self.calculator.loadedModels.keys())}'
         loadedModel = self.calculator.loadedModels[model]
+
         name = f"{model}"
         if self.simplifiedDict[model]:
             name += '_simplified'
@@ -196,13 +215,19 @@ class TorchExporter:
         Returns:
             None
         """
+        if append and not re.match(r'^[a-zA-Z0-9_-]*$', append):
+            raise ValueError(f'Invalid characters in append string: "{append}". Only alphanumeric, underscore, and hyphen allowed.')
+        
         print(f'Exporting {model} to PyTorch PT format')
 
-        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+        assert model in self.calculator.loadedModels, \
+            f'{model} not loaded in calculator. The loaded models are: {list(self.calculator.loadedModels.keys())}'
         loadedModel = self.calculator.loadedModels[model]
 
-        assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
+        assert 'descriptor' in self.calculator.models[model], \
+            f'{model} does not have a descriptor set for it. Cannot export.'
         descriptorUsed = self.calculator.models[model]['descriptor']
+
         if descriptorUsed == 'Ward2017':
             dLen = 271
         elif descriptorUsed == 'KS2022':
@@ -266,6 +291,9 @@ class CoreMLExporter:
         Returns:
             None
         """
+        if append and not re.match(r'^[a-zA-Z0-9_-]*$', append):
+            raise ValueError(f'Invalid characters in append string: "{append}". Only alphanumeric, underscore, and hyphen allowed.')
+        
         try:
             import coremltools as ct
         except ModuleNotFoundError as e:
@@ -273,10 +301,15 @@ class CoreMLExporter:
                   '`dev` mode like: `pip install "pysipfenn[dev]"`, or like `pip install -e ".[dev]"` (see pysipfenn.org)')
             
         print(f'Exporting {model} to CoreML')
-        assert model in self.calculator.loadedModels, f'{model} not loaded in calculator. Nothing to export.'
+
+        assert model in self.calculator.loadedModels, \
+            f'{model} not loaded in calculator. The loaded models are: {list(self.calculator.loadedModels.keys())}'
         loadedModel = self.calculator.loadedModels[model]
-        assert 'descriptor' in self.calculator.models[model], f'{model} does not have a descriptor. Cannot export.'
+
+        assert 'descriptor' in self.calculator.models[model], \
+            f'{model} does not have a descriptor set for it. Cannot export.'
         descriptorUsed = self.calculator.models[model]['descriptor']
+
         if descriptorUsed == 'Ward2017':
             dLen = 271
         elif descriptorUsed == 'KS2022':
