@@ -35,7 +35,7 @@ jobs:
         continue-on-error: true
     
       - name: Download Models Retry if failed the first time
-        if: failure()
+        if: steps.DownloadModelsAttempt1.outcome == 'failure'
         run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
@@ -69,7 +69,7 @@ jobs:
         continue-on-error: true
     
       - name: Download Models Retry if failed the first time
-        if: failure()
+        if: steps.DownloadModelsAttempt1.outcome == 'failure'
         run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
@@ -103,7 +103,7 @@ jobs:
         continue-on-error: true
     
       - name: Download Models Retry if failed the first time
-        if: failure()
+        if: steps.DownloadModelsAttempt1.outcome == 'failure'
         run: python -c "import time; time.sleep(120); import pysipfenn; c = pysipfenn.Calculator(autoLoad=False); c.downloadModels(); c.loadModels();"
            
       - name: Test with pytest
