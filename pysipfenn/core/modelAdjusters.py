@@ -37,7 +37,7 @@ class LocalAdjuster:
             use the data in the ``Calculator``, or provided as a path to a NumPy ``.npy``/``.NPY`` or CSV ``.csv``/
             ``.CSV`` file, or directly as a NumPy array. It has to be the same length as the target data. Default is
             ``None``.
-        device: Device to be used for training the model. It Has to be one of the following: ``"cpu"``, ``"cuda"``, or
+        device: Device to be used for training the model. It has to be one of the following: ``"cpu"``, ``"cuda"``, or
             ``"mps"``. Default is ``"cpu"``.
         descriptor: Name of the feature vector provided in the descriptorData. It can be optionally provided to
             check if the descriptor data is compatible.
@@ -277,22 +277,22 @@ class LocalAdjuster:
         to slowly adjust it (1% of the typical learning rate) and not overfit it (50 epochs).
 
         Args:
-            learningRate: The learning rate to be used for the adjustment. Default is ``1e-5`` that is 1% of a typical
-                learning rate of ``Adam`` optimizer.
+            validation: Fraction of the data to be used for validation. Default is the common ``0.2`` (20% of the data).
+                If set to ``0``, the model will be trained on the whole dataset without validation, and you will not be able
+                to check for overfitting or gauge the model's performance on unseen data.
+            learningRate: The learning rate to be used for the adjustment. Default is ``1e-5``, that is 1% of a typical
+                learning rate of the ``Adam`` optimizer.
             epochs: The number of times to iterate over the data, i.e., how many times the model will see the data.
                 Default is ``50``, which is on the higher side for fine-tuning. If the model does not retrain fast enough
-                but already converged, consider lowering this number to reduce the time and possibly overfitting to the
+                but already converged, consider lowering this number to reduce the time and possibly the overfitting to the
                 training data.
             batchSize: The number of points passed to the model at once. Default is ``32``, which is a typical batch size for
                 smaller datasets. If the dataset is large, consider increasing this number to speed up the training.
             optimizer: Algorithm to be used for optimization. Default is ``Adam``, which is a good choice for most models
-                and one of the most popular optimizers. Other options are
+                and one of the most popular optimizers. Other options are ``AdamW``, ``Adamax``, and ``RMSprop``.
             lossFunction: Loss function to be used for optimization. Default is ``MAE`` (Mean Absolute Error / L1) that is
                 more robust to outliers than ``MSE`` (Mean Squared Error).
-            validation: Fraction of the data to be used for validation. Default is the common ``0.2`` (20% of the data).
-                If set to ``0``, the model will be trained on the whole dataset without validation, and you will not be able
-                to check for overfitting or gauge the model's performance on unseen data.
-            weightDecay: Weight decay to be used for optimization. Default is ``1e-5`` that should work well if data is
+            weightDecay: Weight decay to be used for optimization. Default is ``1e-5``, which should work well if data is
                 abundant enough relative to the model complexity. If the model is overfitting, consider increasing this
                 number to regularize the model more.
             verbose: Whether to print information, such as loss, during the training. Default is ``True``.
@@ -325,7 +325,7 @@ class LocalAdjuster:
 
         if verbose:
             print(f'LR: {learningRate} |  Optimizer: {optimizer}  |  Weight Decay: {weightDecay} |  Loss: {lossFunction}')
-        # Training a logging platform. Completely optional and does not affect the training.
+        # Training logging platform. Completely optional and does not affect the training.
         if self.useClearML:
             if verbose and not self.useClearMLMessageDisplayed:
                 print("Using ClearML for logging. Make sure to have (1) their Python package installed and (2) the API key"
@@ -438,7 +438,7 @@ class LocalAdjuster:
     ) -> Tuple[torch.nn.Module, Dict[str, Union[float, str]]]:
         """
         Performs a grid search over the hyperparameters provided to find the best combination. By default, it will
-        plot the training history with plotly in your browser, and (b) print the best hyperparameters found. If the
+        (a) plot the training history with plotly in your browser, and (b) print the best hyperparameters found. If the
         ClearML platform was set to be used for logging (at the class initialization), the results will be uploaded
         there as well. If the default values are used, it will test 27 combinations of learning rates, optimizers, and
         weight decays. The method will then adjust the model to the best hyperparameters found, corresponding to the
@@ -450,7 +450,7 @@ class LocalAdjuster:
             epochs: Same as in the ``adjust`` method. Default is ``20`` to keep the search time reasonable on most
                 CPU-only machines (around 1 hour). For most cases, a good starting number of epochs is 100-200, which
                 should complete in 10-30 minutes on most modern GPUs or Mac M1-series machines (w. device set to MPS).
-            batchSize: Same as in the ``adjust`` method. Default is ``32``.
+            batchSize: Same as in the ``adjust`` method. Default is ``64``.
             lossFunction: Same as in the ``adjust`` method. Default is ``MAE``, i.e. Mean Absolute Error or L1 loss.
             learningRates: List of floats with the learning rates to be tested. Default is ``(1e-6, 1e-5, 1e-4)``. See
                 the ``adjust`` method for more information.
@@ -460,6 +460,11 @@ class LocalAdjuster:
                 the ``adjust`` method for more information.
             verbose: Same as in the ``adjust`` method. Default is ``True``.
             plot: Whether to plot the training history after all the combinations are tested. Default is ``True``.
+
+        Returns:
+            A tuple with 2 elements: (1) the best adjusted model, and (2) a dictionary with the best hyperparameters
+            found (keys: ``"learningRate"``, ``"optimizer"``, ``"weightDecay"``, ``"epochs"``). The best model is also
+            stored in the ``adjustedModel`` attribute of the class.
         """
         nTasks = len(learningRates) * len(optimizers) * len(weightDecays)
         if verbose:
@@ -596,15 +601,18 @@ class LocalAdjuster:
     ) -> None:
         """
         Highlights data points at certain indices, so that they can be distinguished at later steps. They will be plotted in red by ``plotStarting()``
-        and ``plotAdjusted()``. Please note that this will be overwriten the next time you make a call to the ``adjust()``, so you may need to perform 
+        and ``plotAdjusted()``. Please note that this will be overwritten the next time you make a call to ``adjust()``, so you may need to perform 
         it again.
 
         Args:
             pointsIndices: A list of point indices to highlight. Please note that in Python lists indices start from ``0``.
+
+        Returns:
+            None
         """
 
         if not self.validationLabels:
-            print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
+            print("No validation labels set yet. Please note highlights will be overwritten by the next adjustment call.")
         for p in pointsIndices:
             assert p < len(self.validationLabels), "The index of the point to be highlighted is out of bounds."
             self.validationLabels[p] = "Highlight"
@@ -616,18 +624,21 @@ class LocalAdjuster:
         """
         Highlights data points that correspond to certain chemical compositions, so that they can be distinguished at later steps. The strings you 
         provide will be interpreted when matching to the data, so ``HfMo``, ``Hf1Mo1``, ``Hf2Mo2``, and ``Hf50 Mo50`` will all be considered equal.
-        They will be plotted in red by ``plotStarting()`` and ``plotAdjusted()``. Please note that this will be overwriten the next time you make 
-        a call to the ``adjust()``, so you may need to perform it again.
+        They will be plotted in red by ``plotStarting()`` and ``plotAdjusted()``. Please note that this will be overwritten the next time you make 
+        a call to ``adjust()``, so you may need to perform it again.
 
         Args:
             compositions: A list of strings with chemical formulas. They will be interpreted, so any valid formula pointing to the same composition
                 will be parsed in the same fashion. Currently, the composition needs to be exact, i.e. ``Hf33 Mo33 Ni33`` will match to ``HfMoNi`` 
                 but ``Hf28.6 Mo71.4`` will not match to ``Hf2 Mo5``. This can be implemented if there is interest.
+
+        Returns:
+            None
         """
         
         if not self.validationLabels:
-            print("No validation labels set yet. Please note highlights will be overwriten by the next adjustemnt call.")
-        assert self.comps, "The compositions must be set before highlighting them. If you use ``OPTIMADEAdjuster``, this is done automatically, but with ``LocalAdjuster``, you have to set them manually."
+            print("No validation labels set yet. Please note highlights will be overwritten by the next adjustment call.")
+        assert self.comps, "The compositions must be set before highlighting them. If you use ``OPTIMADEAdjuster``, this is done automatically, but with ``LocalAdjuster`` you have to set them manually."
         reducedFormulas = set([Composition(c).reduced_formula for c in compositions])
         for idx, comp in enumerate(self.comps):
             if comp in reducedFormulas:
@@ -640,7 +651,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
     models based on other atomistic databases, or their subsets, accessed through OPTIMADE, to adjust the model to a
     different domain, which in the context of DFT datasets could mean adjusting the model to predict properties with DFT
     settings used by that database or focusing its attention to specific chemistry like, for instance, all compounds of
-    Sn and all perovskites. It accepts OPTIMADE query as an input and then operates based on the ``LocalAdjuster`` class.
+    Sn and all perovskites. It accepts OPTIMADE queries as input and then operates based on the ``LocalAdjuster`` class.
 
     It will set up the environment for the adjustment, letting you progressively build up the training dataset by
     OPTIMADE queries which get featurized and their results will be concatenated, i.e., you can make one big query or
@@ -653,7 +664,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
         calculator: Instance of the ``Calculator`` class with the model to be adjusted, defined and loaded. Unlike in the
             ``LocalAdjuster``, the descriptor data will not be passed, since it will be fetched from the OPTIMADE API.
         model: Name of the model to be adjusted in the ``Calculator``. E.g., ``SIPFENN_Krajewski2022_NN30``.
-        provider: Strings with the name of the provider to be used for the OPTIMADE queries. The type-hinting
+        provider: String with the name of the provider to be used for the OPTIMADE queries. The type-hinting
             gives a list of providers available at the time of writing this code, but it is by no means limited to them.
             For the up-to-date list, along with their current status, please refer to the
             `OPTIMADE Providers Dashboard <https://optimade.org/providers-dashboard>`_. The default is ``"mp"`` which
@@ -820,6 +831,10 @@ class OPTIMADEAdjuster(LocalAdjuster):
             parallelWorkers: How many workers to use at the featurization step. See ``KS2022`` for more details. On most machines, ``4``-``12`` should 
                 be the optimal number.
             verbose: Prints information about progress and results of the process. It is set to ``True`` by default.
+
+        Returns:
+            None. Updates ``self.descriptorData``, ``self.targetData``, ``self.comps``, ``self.names``, and
+            ``self.references`` in place by concatenating newly fetched data.
         """
         from optimade.adapters.structures import pymatgen as pymatgen_adapter
         from optimade.models import StructureResource
@@ -868,8 +883,10 @@ class OPTIMADEAdjuster(LocalAdjuster):
             structs.append(pymatgen_adapter.get_pymatgen(StructureResource(**datapoint)))
 
         if missing:
-            print(f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
-                  f"structures:\n{missing}\n")
+            print(
+                f"\nCould not find the target data at the provided path: {self.targetPath}\nfor {len(missing)} "
+                f"structures:\n{missing}\n"
+            )
 
         dataIn = list(zip(comps, names, references, structs, targetDataStage))
         assert len(dataIn) != 0, "No data was fetched from the OPTIMADE API. Please check both the query and the provider."
@@ -901,15 +918,18 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         if verbose:
             print("Featurization complete!")
-            print(f"Current dataset size: "
-                  f"{len(self.names)} with "
-                  f"{len(set(self.names))} unique IDs belonging to "
-                  f"{len(set(self.comps))} unique compositions.\n")
+            print(
+                f"Current dataset size: "
+                f"{len(self.names)} with "
+                f"{len(set(self.names))} unique IDs belonging to "
+                f"{len(set(self.comps))} unique compositions.\n")
             if len(self.names) > len(set(self.names)):
-                print("Please note that there are duplicate IDs in the dataset. Such degenerate dataset can be used "
-                      "without issues for training (in some occasions may be even desirable to bias the model to areas "
-                      "matching multiple criteria), but the validation error may be underestimated since some data"
-                      "may be in both training and validation set.")
+                print(
+                    "Please note that there are duplicate IDs in the dataset. Such degenerate dataset can be used "
+                    "without issues for training (in some occasions may be even desirable to bias the model to areas "
+                    "matching multiple criteria), but the validation error may be underestimated since some data "
+                    "may be in both the training and validation set."
+                )
 
 
 if __name__ == '__main__':
