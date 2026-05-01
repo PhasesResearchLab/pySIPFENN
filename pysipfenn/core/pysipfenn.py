@@ -274,6 +274,7 @@ class Calculator:
                             print(f'{net} not detected on disk and no ONNX URL has been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
+                self.updateModelAvailability()
                 if downloadableNets == self.network_list_available:                
                     print('All downloadable networks are now available!')
                 else:
@@ -294,7 +295,7 @@ class Calculator:
             # Not recognized
             else:
                 print('Network name not recognized')
-        self.updateModelAvailability()
+            self.updateModelAvailability()
 
     def loadModels(self, network: str = 'all') -> None:
         """Load model/models into memory of the ``Calculator`` class. The models are loaded from the ``modelsSIPFENN`` directory
