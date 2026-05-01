@@ -27,40 +27,39 @@
 
 ## Summary
 
-This repository contains 
-**py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks 
-which implements a numer of user-friendly tools for:
-- **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, utilize crystallographic information and some other techniques to make this process very efficient for the vast majority of use cases (see [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495))
-- **Efficient deployment of pre-trained ML models** (not limited to neural networks) obtained from repositories like Zenodo (including [some we trained](https://doi.org/10.5281/zenodo.4006802)) or trained locally on user's machine. The system is very plug-and-play thanks to using Open Neural Network Exchange (ONNX) format which can be exported from nearly any machine learning framework.
-- **Tuning pre-trained ML models to new domains**, like new chemical compositions, different ab initio functional, or entirely new properties. Since V0.16, users can take advantage of integration with [OPTIMADE API](https://www.optimade.org) which allows one to tune models based on DFT datasets like Materials Project, OQMD, AFLOW, or NIST-JARVIS, in **just 3 lines of code** specifying which provider to use, what to query for, and hyperparameters for tuning.
+This repository contains the
+**py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks,
+which implements a number of user-friendly tools for:
+- **Calculating different vector representations of atomic structures** for a number of applications including supervised (e.g., predictive machine learning models) and unsupervised learning (e.g., clustering of atomic structures based on similarity or performing anomaly detection). Notably, it utilizes crystallographic information and other techniques to make this process very efficient for the vast majority of use cases (see [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495)).
+- **Efficient deployment of pre-trained ML models** (not limited to neural networks) obtained from repositories like Zenodo (including [some we trained](https://doi.org/10.5281/zenodo.4006802)) or trained locally on the user's machine. The system is highly plug-and-play thanks to the use of Open Neural Network Exchange (ONNX) format, which can be exported from nearly any machine learning framework.
+- **Tuning pre-trained ML models to new domains**, like new chemical compositions, a different ab initio functional, or entirely new properties. Since v0.16, users can take advantage of integration with the [OPTIMADE API](https://www.optimade.org), which allows one to tune models based on DFT datasets like Materials Project, OQMD, AFLOW, or NIST-JARVIS, in **just 3 lines of code** specifying which provider to use, what to query for, and hyperparameters for tuning.
 
 The underlying methodology, efficiency optimizations, design choices, and implementation specifics are given in the following publications:
 
 - Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, Computational Materials Science, Volume 247, 2025, 113495, DOI: [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495)
 
-- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI: [10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
-A more complete (and verbose) description of capabilities is given in documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our 
-Phases Research Lab group website at [(phaseslab.org)](https://phaseslab.org).
+A more complete (and verbose) description of capabilities is given in the documentation at [(pysipfenn.org)](https://pysipfenn.org). You may also consider visiting our Phases Research Lab group website at [(phaseslab.org)](https://phaseslab.org).
 
 ### Recent News:
 
-- **(v0.16.0)** Three exciting news! (1) The all new [`ModelAdjusters`](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelAdjusters.py) submodule automates tuning and can fetch data directly from [`OPTIMADE API`](https://www.optimade.org); (2) A new manuscript detailing advantages of our featurization tools has been put on [arXiv:2404.02849](https://arxiv.org/abs/2404.02849); and (3) the name of the software was updated to **py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks to retain the `pySIPFENN` acronym but better reflect our strengths and development direction.
+- **(v0.16.0)** Three exciting updates! (1) The all-new [`ModelAdjusters`](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelAdjusters.py) submodule automates tuning and can fetch data directly from [`OPTIMADE API`](https://www.optimade.org); (2) A new manuscript detailing advantages of our featurization tools has been put on [arXiv:2404.02849](https://arxiv.org/abs/2404.02849); and (3) the name of the software was updated to **py**thon toolset for **S**tructure-**I**nformed **P**roperty and **F**eature **E**ngineering with **N**eural **N**etworks to retain the `pySIPFENN` acronym but better reflect our strengths and development direction.
 
 - **(v0.15.0)** A new descriptor (feature vector) calculator [**`KS2022_randomSolutions`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/descriptorDefinitions/KS2022_randomSolutions.py) has been implemented. It is used for structure-informed featurization of compositions randomly occupying a lattice, spiritually similar to SQS generation, but also taking into account (1) chemical differences between elements and (2) structural effects. 
 
-- **(v0.14.0)** Users can now take advantage of a **Prototype Library** to obtain common structures from any `Calculator` instance with `c.prototypeLibrary[<name>]['structure']`. It can be easily [updated](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.parsePrototypeLibrary) or [appended](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.appendPrototypeLibrary) with high-level API or by manually modifyig its YAML [here](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/misc/prototypeLibrary.yaml).
+- **(v0.14.0)** Users can now take advantage of a **Prototype Library** to obtain common structures from any `Calculator` instance with `c.prototypeLibrary[<name>]['structure']`. It can be easily [updated](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.parsePrototypeLibrary) or [appended](https://pysipfenn.readthedocs.io/en/latest/source/pysipfenn.core.html#pysipfenn.Calculator.appendPrototypeLibrary) with high-level API or by manually modifying its YAML [here](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/misc/prototypeLibrary.yaml).
 
-- **(v0.13.0)** Model exports (and more!) to PyTorch, CoreML, and ONNX are now effortless thanks to [**`core.modelExporters`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelExporters.py) module. Please note you need to install pySIPFENN with `dev` option (e.g., `pip install "pysipfenn[dev]"`) to use it. See [docs here](https://pysipfenn.readthedocs.io/en/stable/source/pysipfenn.core.html#module-pysipfenn.core.modelExporters).
+- **(v0.13.0)** Model exports (and more!) to PyTorch, CoreML, and ONNX are now effortless thanks to [**`core.modelExporters`**](https://github.com/PhasesResearchLab/pySIPFENN/blob/main/pysipfenn/core/modelExporters.py) module. Please note that you need to install pySIPFENN with `dev` option (e.g., `pip install "pysipfenn[dev]"`) to use it. See [docs here](https://pysipfenn.readthedocs.io/en/stable/source/pysipfenn.core.html#module-pysipfenn.core.modelExporters).
 
-- **(v0.12.2)** Swith to LGPLv3 allowing for integration with proprietary software developed by CALPHAD community, while supporting the development of new pySIPFENN features for all.
+- **(v0.12.2)** Switched to LGPLv3, allowing for integration with proprietary software developed by the CALPHAD community while supporting the development of new pySIPFENN features for all.
 
 - **(March 2023 Workshop)** We would like to thank all 100 of our amazing attendees for making our workshop, co-organized with the
-[Materials Genome Foundation](https://materialsgenomefoundation.org).
+[Materials Genome Foundation](https://materialsgenomefoundation.org), a success.
 
 ### Main Schematic
 
-The figure below is the main schematic of `pySIPFENN` framework detailing the interplay of internal components. The user interface provides a high-level API to process structural data within `core.Calculator`, pass it to featurization submodules in `descriptorDefinitions` to obtain vector representation, then passed to models defined in `models.json` and (typically) run automatically through all available models. All internal data of `core.Calculator` is accessible directly, enabling rapid customization. An auxiliary high-level API enables advanced users to operate and retrain the models.
+The figure below is the main schematic of `pySIPFENN` framework detailing the interplay of internal components. The user interface provides a high-level API to process structural data within `core.Calculator`, pass it to featurization submodules in `descriptorDefinitions` to obtain a vector representation, which is then passed to models defined in `models.json` and (typically) run automatically through all available models. All internal data of `core.Calculator` is accessible directly, enabling rapid customization. An auxiliary high-level API enables advanced users to operate and retrain the models.
 
 <img src="https://raw.githubusercontent.com/PhasesResearchLab/pySIPFENN/main/docs/_static/pySIPFENN_MainSchematic.png" alt="Main Schematic Figure" width="800" style="display: block; margin-left: auto; margin-right: auto;"/>
    
@@ -103,7 +102,7 @@ https://doi.org/10.1038/s41598-021-03578-0
 
 ## Installation
 
-Installing pySIPFENN is simple and easy by utilizing **PyPI** package repository, **conda-forge**  package repository, or by cloning from **GitHub** directly.
+Installing pySIPFENN is straightforward using the **PyPI** package repository, the **conda-forge** package repository, or by cloning from **GitHub** directly.
 While not required, it is recommended to first set up a virtual environment using venv or Conda. This ensures that (a) one of the required 
 versions of Python (3.9+) is used and (b) there are no dependency conflicts. If you have Conda installed on your system (see [`miniconda` install instructions](https://docs.conda.io/en/latest/miniconda.html)), you can create a new environment with a simple:
 
@@ -114,8 +113,8 @@ If you are managing a large set of dependencies in your project, you may conside
 
 ### Standard
 
-If your main goal is to run pySIPFENN models, provided by us or any other vendor, you need only a subset of the capabilities of our code, so
-you can follow with the following install. Simply install pySIPFENN:
+If your main goal is to run pySIPFENN models, provided by us or any other vendor, you need only a subset of the capabilities of our code.
+Simply install pySIPFENN:
 
 - from **PyPI** with `pip`:
     ```shell
@@ -154,7 +153,7 @@ the last instruction with `dev` _extras_ marker.
 pip install -e ".[dev]"
 ```
 
-> Note: `pip install "pysipfenn[dev]"` will also work, but will be less conveninet for model modifications (which you likely want to do), as all persisted
+> Note: `pip install "pysipfenn[dev]"` will also work, but will be less convenient for model modifications (which you likely want to do), as all persisted
 > files will be located outside your working directory. You can quickly find where, by calling `import pysipfenn; c = pysipfenn.Calculator(); print(c)` and
 > `Calculator` will tell you (amongst other things) where they are.
 
@@ -207,7 +206,7 @@ If you use `pySIPFENN` software, please consider citing:
 
 - Adam M. Krajewski, Jonathan W. Siegel, Zi-Kui Liu, _Efficient Structure-Informed Featurization and Property Prediction of Ordered, Dilute, and Random Atomic Structures_, Computational Materials Science, Volume 247, 2025, 113495, DOI: [10.1016/j.commatsci.2024.113495](https://doi.org/10.1016/j.commatsci.2024.113495)
 
-- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI:[10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
+- Adam M. Krajewski, Jonathan W. Siegel, Jinchao Xu, Zi-Kui Liu, _Extensible Structure-Informed Prediction of Formation Energy with improved accuracy and usability employing neural networks_, Computational Materials Science, Volume 208, 2022, 111254, DOI: [10.1016/j.commatsci.2022.111254](https://doi.org/10.1016/j.commatsci.2022.111254)
 
 If you are using predictions from pySIPFENN models accessed through `OPTIMADE` from `MPDD`, please additionally cite:
 
