@@ -69,7 +69,7 @@ class Calculator:
             list corresponds to the order of atomic structures given to models as input. The order of the list
             of predictions for each structure corresponds to the order of networks in the ``toRun`` list.
         predictedProperties: List of names of all predicted properties. These are currently auto-generated
-            during the inference (prediction) run based on the model names (in the ``toRun`` order) and either matches them 
+            during the inference (prediction) run based on the model names (in the ``toRun`` order) and either match them 
             (if the model outputs are scalar) or are appended with the output index (if the model outputs are vectors). 
             It can be customized by the user to any list of strings of correct length. In the future, it will be 
             auto-generated based on the model JSON/YAML metadata when available.
@@ -120,7 +120,7 @@ class Calculator:
             print(f'{Fore.GREEN}**********      Successfully Initialized      **********{Style.RESET_ALL}')
 
     def __str__(self):
-        """Prints the status of the ``Calculator`` object."""
+        """Returns a string representation of the ``Calculator`` object."""
         printOut = f'pySIPFENN Calculator Object. Version: {__version__}\n'
         printOut += f'Models are located in:\n   {resources_files("pysipfenn.modelsSIPFENN")}\n'
         printOut += f'Auxiliary files (incl. structure prototypes):\n   {resources_files("pysipfenn.misc")}\n{"-" * 80}\n'
@@ -144,8 +144,8 @@ class Calculator:
                               verbose: bool = False,
                               printCustomLibrary: bool = False) -> None:
         """Parses the prototype library YAML file in the ``misc`` directory, interprets them into pymatgen ``Structure``
-        objects, and stores them in the ``self.prototypeLibrary`` dict attribute of the ``Calculator`` object. You can use it
-        also to temporarily append a custom prototype library (by providing a path) which will live as long as the
+        objects, and stores them in the ``self.prototypeLibrary`` dict attribute of the ``Calculator`` object. You can also
+        use it to temporarily append a custom prototype library (by providing a path), which will live as long as the
         ``Calculator``. For permanent changes, use ``appendPrototypeLibrary()``.
 
         Args:
@@ -195,8 +195,8 @@ class Calculator:
             
 
     def appendPrototypeLibrary(self, customPath: str) -> None:
-        """Parses a custom prototype library YAML file and permanently appends it into the internal prototypeLibrary
-        of the pySIPFENN package. They will be persisted for future use and, by default, they will be loaded
+        """Parses a custom prototype library YAML file and permanently appends it to the internal prototypeLibrary
+        of the pySIPFENN package. The entries will be persisted for future use and, by default, they will be loaded
         automatically when instantiating the ``Calculator`` object, similar to your custom models.
 
         Args:
@@ -208,7 +208,7 @@ class Calculator:
         """
 
         self.parsePrototypeLibrary(customPath=customPath, printCustomLibrary=True, verbose=True)
-        print(f'Now, {len(self.prototypeLibrary)} prototype structures are present into the prototype library. '
+        print(f'Now, {len(self.prototypeLibrary)} prototype structures are present in the prototype library. '
               f'Persisting them for future use.')
         overwritePrototypeLibrary(self.prototypeLibrary)
 
@@ -238,7 +238,7 @@ class Calculator:
     def downloadModels(self, network: str = 'all') -> None:
         """Downloads ONNX models. By default, all available models are downloaded. If a model is already available
         on disk, it is skipped. If a specific ``network`` is given, only that network is downloaded, possibly overwriting
-        the existing one. If the ``network`` name is not recognized, the message will be printed.
+        the existing one. If the ``network`` name is not recognized, a message will be printed.
 
         Args:
             network: Name of the network to download. Defaults to ``'all'``.
@@ -268,7 +268,7 @@ class Calculator:
                             downloadObject.start()
                             print('\nONNX Network Successfully Fetched.')
                         else:
-                            print(f'{net} not detected on disk and ONNX URL has not been provided.')
+                            print(f'{net} not detected on disk and no ONNX URL has been provided.')
                     else:
                         print(f'{net} detected on disk. Ready to use.')
                 if downloadableNets == self.network_list_available:                
@@ -312,7 +312,7 @@ class Calculator:
                 directory.
 
         Returns:
-            None. It updates the loadedModels attribute of the Calculatorclass.
+            None. It updates the loadedModels attribute of the Calculator class.
         """
         with as_file(resources_files('pysipfenn.modelsSIPFENN')) as modelPath:
             if network == 'all':
@@ -403,7 +403,7 @@ class Calculator:
                 will be set to the number of available CPU cores. If set to ``0``, 1 worker will be used.
 
         Returns:
-            List of ``Ward2017`` descriptor (feature vector) for each structure.
+            List of ``Ward2017`` descriptors (feature vectors) - one for each structure.
 
         """
         if mode == 'serial':
@@ -435,7 +435,7 @@ class Calculator:
                 will be set to the number of available CPU cores. If set to ``0``, 1 worker will be used.
 
         Returns:
-            List of ``KS2022`` descriptor (feature vector) for each structure.
+            List of ``KS2022`` descriptors (feature vectors) - one for each structure.
 
         """
         if mode == 'serial':
@@ -456,7 +456,7 @@ class Calculator:
             mode: str = 'serial',
             max_workers: int = 8
     ) -> List[np.ndarray]:
-        """Calculates ``KS2022`` descriptors for a list of dilute structures (either based on pure elements and on custom
+        """Calculates ``KS2022`` descriptors for a list of dilute structures (either based on pure elements or on custom
         base structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
         substantial compared to the ``KS2022`` descriptor, which is more general and can be used on any structure. The
         calculation can be done in serial or parallel mode. In parallel mode, the number of workers can be specified.
@@ -528,14 +528,14 @@ class Calculator:
             max_workers: int = 8
     ) -> List[np.ndarray]:
         """Calculates ``KS2022`` descriptors corresponding to random solid solutions occupying base structure / lattice
-        sites for a list of compositions through method described in ``descriptorDefinitions.KS2022_randomSolutions``
-        submodule. The results are stored in the descriptorData attribute. The function returns the list of descriptors
+        sites for a list of compositions through the method described in ``descriptorDefinitions.KS2022_randomSolutions``
+        submodule. The results are stored in the ``self.descriptorData`` attribute. The function returns the list of descriptors
         in numpy format as well.
 
         Args:
             baseStructList: The base structure to generate a random solid solution (RSS). It does _not_ need to be a simple
-                Bravis lattice, such as BCC lattice, but can be any ``Structure`` object or a list of them, if you need to
-                define them on per-case basis. In addition to `Structure` objects, you can use "magic" strings
+                Bravais lattice, such as a BCC lattice, but can be any ``Structure`` object or a list of them, if you need to
+                define them on a per-case basis. In addition to `Structure` objects, you can use "magic" strings
                 corresponding to one of the structures in the library you can find under ``pysipfenn.misc`` directory or
                 loaded under ``self.prototypeLibrary`` attribute. The magic strings include, but are not limited to:
                 ``'BCC'``, ``'FCC'``, ``'HCP'``, ``'DHCP'``, ``'Diamond'``, and so on. You can invoke them by their name, e.g. ``BCC``, or
@@ -560,18 +560,18 @@ class Calculator:
                 (statistics based on the global ensemble of local chemical environments) and the previous iteration
                 (before last expansion) expressed as a fraction of the maximum value of each feature found in the OQMD
                 database at the time of SIPFENN creation (see ``KS2022_randomSolutions.maxFeaturesInOQMD`` array).
-                The default value is ``0.01``, corresponding to 1% of the maximum value.
+                The default value is ``0.005``, corresponding to 0.5% of the maximum value.
             compositionConvergenceCriterion: The maximum average difference between any element fraction belonging to
                 the current composition (net of all expansions) and the target composition (``comp``). The default value
-                is ``0.01``, corresponding to 1% deviation, which interpretation will depend on the number of elements
+                is ``0.01``, corresponding to 1% deviation, whose interpretation will depend on the number of elements
                 in the composition.
             minimumElementOccurrences: The minimum number of times all elements must occur in the composition before it
                 is considered converged. This setting prevents the algorithm from converging before very dilute elements
-                like C in low-carbon steel, have had a chance to occur. The default value is ``10``.
+                like C in low-carbon steel have had a chance to occur. The default value is ``10``.
             plotParameters: If True, the convergence history will be plotted using plotly. The default value is ``False``,
                 but tracking them is recommended and will be accessible in the `metas` attribute of the Calculator under
                 the key ``'RSS'``.
-            printProgress: If True, the progress will be printed to the console. The default value is False.
+            printProgress: If True, the progress will be printed to the console. The default value is ``False``.
             mode: Mode of calculation. Options are ``serial`` (default) and ``parallel``.
             max_workers: Number of workers to use in parallel mode. Defaults to ``8``.
 
@@ -669,7 +669,7 @@ class Calculator:
                 with ``loadModels()`` / ``loadModelCustom()`` or manually (fairly simple!).
             toRun: List of networks to run. It must be a subset of ``models.keys()``.
             dataInList: List of data to make predictions for. Each element of the list should be a descriptor accepted
-                by all networks in toRun. Can be a list of lists of floats or a list of numpy ``nd.array``s.
+                by all networks in toRun. Can be a list of lists of floats or a list of numpy ``np.ndarray``s.
 
         Returns:
             List of predictions. Each element of the list is a list of predictions for all run networks. The order of the
@@ -740,7 +740,7 @@ class Calculator:
                 ``None``, will use all available cores. If set to ``0``, will use ``1`` core.
 
         Returns:
-            List of predictions. Each element of the list is a list of predictions for all ran networks. The
+            List of predictions. Each element of the list is a list of predictions for all run networks. The
             order of the predictions is the same as the order of the input structures. The order of the networks is
             the same as the order of the networks in ``self.network_list_available``. If a network is not available, it
             will not be included in the list. If a network is not compatible with the selected descriptor, it will
@@ -771,7 +771,7 @@ class Calculator:
                 max_workers=max_workers
             )
         else:
-            print('Descriptor handing not implemented. Check spelling.')
+            print('Descriptor handling not implemented. Check spelling.')
             raise AssertionError
 
         self.makePredictions(
@@ -791,8 +791,8 @@ class Calculator:
             max_workers: int = 4
     ) -> List[List[float]]:
         """Runs all loaded models on a list of Structures using specified descriptor. A critical difference
-        from runModels() is that this function will call dilute-specific featurizer, e.g. ``KS2022_dilute`` when ``'KS2022'`` is
-        provided as input, which can only be used on dilute structures (both based on pure elements and on custom base
+        from runModels() is that this function will call a dilute-specific featurizer, e.g. ``KS2022_dilute`` when ``'KS2022'`` is
+        provided as input, which can only be used on dilute structures (both based on pure elements or on custom base
         structures, e.g. TCP endmember configurations) that contain a single alloying atom. Speed increases are
         substantial compared to the KS2022 descriptor, which is more general and can be used on any structure.
         Supports serial and parallel modes in the same way as ``runModels()``.
@@ -840,7 +840,7 @@ class Calculator:
                 max_workers=max_workers
             )
         else:
-            print('Descriptor handing not implemented. Check spelling.')
+            print('Descriptor handling not implemented. Check spelling.')
             raise AssertionError
 
         self.makePredictions(
@@ -866,14 +866,14 @@ class Calculator:
             max_workers: int = 8,
         ) -> List[List[float]]:
         """A top-level convenience wrapper for the ``calculate_KS2022_randomSolutions`` function. It passes all the
-        arguments to that function directly (except for ``descriptor`` and uses its result to run all applicable models.
+        arguments to that function directly (except for ``descriptor``) and uses its result to run all applicable models.
         The result is a list of predictions for all run networks.
 
         Args:
             descriptor: Descriptor to use for predictions. Must be one of the descriptors which support the random
-            solid solution structures (i.e. `*_randomSolutions`). See ``pysipfenn.descriptorDefinitions`` to see
-            available modules or add yours here. As of v0.15.0, the only available descriptor is
-            ``'KS2022'`` through its ``KS2022_randomSolutions`` submodule.
+                solid solution structures (i.e. `*_randomSolutions`). See ``pysipfenn.descriptorDefinitions`` to see
+                available modules or add yours here. As of v0.15.0, the only available descriptor is
+                ``'KS2022'`` through its ``KS2022_randomSolutions`` submodule.
             baseStructList: See ``calculate_KS2022_randomSolutions`` for details. You can mix-and-match ``Structure``
                 objects and magic strings, either individually (to use the same entity for all calculations) or in a
                 list.
@@ -918,7 +918,7 @@ class Calculator:
                 max_workers=max_workers
             )
         else:
-            print('Descriptor handing not implemented. Check spelling.')
+            print('Descriptor handling not implemented. Check spelling.')
             raise AssertionError
 
         self.makePredictions(
@@ -949,7 +949,7 @@ class Calculator:
             directory: Directory containing the structures to run the models on. The directory must contain only atomic
                 structures in formats such as ``'poscar'``, ``'cif'``, ``'json'``, ``'mcsqs'``, etc., or a mix of these. The structures
                 are automatically sorted as described above.
-            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipgenn.descriptorDefinitions``
+            descriptor: Descriptor to use. Must be one of the available descriptors. See ``pysipfenn.descriptorDefinitions``
                 for a list of available descriptors.
             mode: Computation mode. ``'serial'`` or ``'parallel'``. Default is ``'serial'``. Parallel mode is not recommended for
                 small datasets.
@@ -985,7 +985,7 @@ class Calculator:
         for example, will sort the structures in the following order: ``'1-Fe'``, ``'2-Al'``, ``'10-xx'``, ``'11-xx'``, ``'20-xx'``,
         ``'21-xx'``, ``'11111-xx'``, etc. This is useful when the structures are named using a numbering system. The order of
         the predictions is the same as the order of the input structures. The order of the networks in a prediction
-        is the same as the order of the networks in self.network_list_available. If a network is not available,
+        is the same as the order of the networks in ``self.network_list_available``. If a network is not available,
         it will not be included in the list.
 
         Args:
@@ -1094,7 +1094,7 @@ class Calculator:
 
     def writeDescriptorsToCSV(self, descriptor: str, file: str = 'descriptorData.csv') -> None:
         """Writes the descriptor data to a CSV file. The first column is the name of the structure. If the
-        ``self.inputFiles`` attribute is populated automatically by runFromDirectory() or set manually, the names of the
+        ``self.inputFiles`` attribute is populated automatically by ``runFromDirectory()`` or set manually, the names of the
         structures will be used. Otherwise, the names will be ``'1'``, ``'2'``, ``'3'``, etc. The remaining columns are the
         descriptor values. The order of the columns is the same as the order of the labels in the descriptor
         definition file.
@@ -1192,7 +1192,7 @@ def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
 
 def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
     """Destructively overwrites the prototype library with a custom one. Used by the ``appendPrototypeLibrary()`` function
-    to persist its changes. The other main use it to restore the default one to the original state based on a backup
+    to persist its changes. The other main use is to restore the default one to the original state based on a backup
     made earlier (see tests for an example)."""
     yaml_customDumper = YAML()
     yaml_customDumper.top_level_colon_align = True
