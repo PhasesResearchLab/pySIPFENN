@@ -77,9 +77,11 @@ class Calculator:
             corresponds to the order of atomic structures given to models as input.
     """
 
-    def __init__(self,
-                 autoLoad: bool = True,
-                 verbose: bool = True):
+    def __init__(
+            self,
+            autoLoad: bool = True,
+            verbose: bool = True
+        ) -> None:
         """Initializes the pySIPFENN Calculator object."""
         if verbose:
             print('\n*********  Initializing pySIPFENN Calculator  **********')
@@ -99,11 +101,12 @@ class Calculator:
         self.updateModelAvailability()
 
         self.loadedModels = {}
-        if autoLoad:
-            print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
-            self.loadModels()
-        else:
-            print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
+        if verbose:
+            if autoLoad:
+                print(f'Loading all available models ({Fore.BLUE}autoLoad=True{Style.RESET_ALL})')
+                self.loadModels()
+            else:
+                print(f'Skipping model loading ({Fore.BLUE}autoLoad=False{Style.RESET_ALL})')
 
         self.prototypeLibrary = {}
         self.parsePrototypeLibrary(verbose=verbose)
