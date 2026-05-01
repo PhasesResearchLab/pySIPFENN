@@ -244,6 +244,12 @@ class Calculator:
             network: Name of the network to download. Defaults to ``'all'``.
 
         """
+        # Custom user agent to prevent Zenodo from blocking the request. It identifies the request as coming from 
+        # pySIPFENN, which is a legitimate one.
+        downloadHeaders = {
+            'headers': {
+                'User-Agent': 'pysipfenn/' + __version__}
+        }
         with as_file(resources_files('pysipfenn.modelsSIPFENN')) as modelPath:
             # Fetch all
             if network == 'all':
@@ -253,9 +259,12 @@ class Calculator:
                     if net not in self.network_list_available:
                         if 'URL_ONNX' in self.models[net]:
                             print(f'Fetching: {net}')
-                            downloadObject = SmartDL(self.models[net]['URL_ONNX'],
-                                                     f'{modelPath}/{net}.onnx',
-                                                     threads=16)
+                            downloadObject = SmartDL(
+                                self.models[net]['URL_ONNX'],
+                                f'{modelPath}/{net}.onnx',
+                                threads=16,
+                                request_args=downloadHeaders
+                            )
                             downloadObject.start()
                             print('\nONNX Network Successfully Fetched.')
                         else:
@@ -270,9 +279,12 @@ class Calculator:
             # Fetch single
             elif network in self.network_list:
                 print(f'Fetching: {network}')
-                downloadObject = SmartDL(self.models[network]['URL_ONNX'],
-                                         f'{modelPath}/{network}.onnx',
-                                         threads=16)
+                downloadObject = SmartDL(
+                    self.models[network]['URL_ONNX'],
+                    f'{modelPath}/{network}.onnx',
+                    threads=16,
+                    request_args=downloadHeaders
+                )
                 downloadObject.start()
                 print('\nONNX Network Successfully Fetched.')
             # Not recognized
