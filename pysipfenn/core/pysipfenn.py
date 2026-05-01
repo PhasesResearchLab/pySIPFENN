@@ -1119,7 +1119,11 @@ class Calculator:
         if self.verbose:
             print(f'{len(self.predictions)} predictions written to {file} successfully.')
 
-    def writeDescriptorsToCSV(self, descriptor: str, file: str = 'descriptorData.csv') -> None:
+    def writeDescriptorsToCSV(
+            self, 
+            descriptor: str, 
+            file: str = None
+        ) -> None:
         """Writes the descriptor data to a CSV file. The first column is the name of the structure. If the
         ``self.inputFiles`` attribute is populated automatically by ``runFromDirectory()`` or set manually, the names of the
         structures will be used. Otherwise, the names will be ``'1'``, ``'2'``, ``'3'``, etc. The remaining columns are the
@@ -1132,11 +1136,14 @@ class Calculator:
                 descriptor values.
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
                 file does not exist, it will be created. The file must have a ``'.csv'`` extension to be recognized
-                correctly.
+                correctly. Defaults to ``'{descriptor}_descriptorData.csv'`` when not specified.
 
         Returns:
             None
         """
+
+        if file is None:
+            file = f'{descriptor}_descriptorData.csv'
 
         # Load descriptor labels
         with as_file(resources_files('pysipfenn').joinpath(f'descriptorDefinitions/labels_{descriptor}.csv')) as labelsCSV:
@@ -1157,7 +1164,11 @@ class Calculator:
                     f.write(f'{i},{",".join(str(v) for v in dd)}\n')
                     i += 1
 
-    def writeDescriptorsToNPY(self, descriptor: str, file: str = 'descriptorData.npy') -> None:
+    def writeDescriptorsToNPY(
+            self, 
+            descriptor: str, 
+            file: str = None
+        ) -> None:
         """Writes the descriptor data to a numpy file (.NPY). The order of the columns in the numpy array corresponds 
         to the order of the labels in the descriptor definition files at ``descriptorDefinitions`` directory. To match the 
         data with the labels, load the labels from the descriptor definition file and use the same index to access the 
@@ -1168,15 +1179,15 @@ class Calculator:
                 for a list of available descriptors, such as ``'KS2022'`` and ``'Ward2017'``.
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
                 file does not exist, it will be created. The file must have a ``'.npy'`` extension to be recognized
-                correctly. Default is ``'descriptorData.npy'``.
+                correctly. Defaults to ``'{descriptor}_descriptorData.npy'`` when not specified.
 
         Returns:
             None
         """
 
         # Write descriptor data
-        if file == 'descriptorData.npy':
-            print(f"Writing descriptor data to {descriptor}_{file}...")
+        if file is None:
+            print(f"Writing descriptor data to {descriptor}_descriptorData.npy...")
             np.save(f'{descriptor}_descriptorData.npy', self.descriptorData)
         else:
             print(f"Writing descriptor data to {file}...")
