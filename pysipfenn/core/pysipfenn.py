@@ -53,7 +53,7 @@ class Calculator:
             significant memory and time if they are available, so for featurization and other non-model-requiring
             tasks, it is recommended to set this to ``False``. Defaults to ``True``.
         verbose: Print initialization messages and several other non-critical messages during runtime procedures.
-            Defaults to True.
+            Defaults to ``True``.
 
     Attributes:
         models: Dictionary with all model information based on the ``models.json`` file in the modelsSIPFENN
@@ -243,6 +243,8 @@ class Calculator:
         Args:
             network: Name of the network to download. Defaults to ``'all'``.
 
+        Returns:
+            None
         """
         # Custom user agent to prevent Zenodo from blocking the request. It identifies the request as coming from 
         # pySIPFENN, which is a legitimate one.
@@ -343,14 +345,18 @@ class Calculator:
         directory because of write permissions (e.g. on restrictive HPC systems) or storage allocations.
 
         Args:
-            modelDirectory: Directory where the model is located. Defaults to the current directory.
             networkName: Name of the network. This is the name used to refer to the ONNX network. It has to be
                 unique, not contain any spaces, and correspond to the name of the ONNX file (excluding the ``.onnx``
                 extension).
             modelName: Name of the model. This is the name that will be displayed in the model selection menu. It
                 can be any string desired.
             descriptor: Descriptor/feature vector used by the model. pySIPFENN currently supports the following
-                descriptors: ``'KS2022'``, and ``'Ward2017'``.
+                descriptors: ``'KS2022'`` and ``'Ward2017'``.
+            modelDirectory: Directory where the model is located. Defaults to the current directory.
+
+        Returns:
+            None. It updates the ``loadedModels``, ``models``, ``network_list``, ``network_list_names``, and
+            ``network_list_available`` attributes of the ``Calculator``.
         """
 
         self.loadedModels.update({
@@ -424,7 +430,7 @@ class Calculator:
             max_workers: int = 8
     ) -> list:
         """Calculates ``KS2022`` descriptors for a list of structures. The calculation can be done in serial or parallel
-        mode. In parallel mode, the number of workers can be specified. The results are stored in the descriptorData
+        mode. In parallel mode, the number of workers can be specified. The results are stored in the ``self.descriptorData``
         attribute. The function returns the list of descriptors as well.
 
         Args:
@@ -805,7 +811,7 @@ class Calculator:
                 dilute structure featurizer.
             structList: List of pymatgen ``Structure`` objects to run the models on. Must be dilute structures as described
                 above.
-            baseStruct: Non-diluted references for the dilute structures. Defaults to 'pure', which assumes that the
+            baseStruct: Non-diluted references for the dilute structures. Defaults to ``'pure'``, which assumes that the
                 structures are based on pure elements and generates references automatically. Alternatively, a list of
                 structures can be provided, which can be either pure elements or custom base structures (e.g. TCP
                 endmember configurations).
@@ -888,6 +894,7 @@ class Calculator:
             printProgress: See ``calculate_KS2022_randomSolutions``.
             mode: Computation mode. ``'serial'`` or ``'parallel'``. Default is ``'serial'``. Parallel mode is not
                 recommended for small datasets.
+            max_workers: Number of workers to use in parallel mode. Default is ``8``. Ignored in serial mode.
 
         Returns:
             List of predictions. They will correspond to the order of the networks in ``self.toRun`` established by the
@@ -1071,6 +1078,9 @@ class Calculator:
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
                 file does not exist, it will be created. The file must have a ``'.csv'`` extension to be recognized
                 correctly.
+
+        Returns:
+            None
         """
 
         assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
@@ -1106,6 +1116,9 @@ class Calculator:
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
                 file does not exist, it will be created. The file must have a ``'.csv'`` extension to be recognized
                 correctly.
+
+        Returns:
+            None
         """
 
         # Load descriptor labels
@@ -1139,6 +1152,9 @@ class Calculator:
             file: Name of the file to write the results to. If the file already exists, it will be overwritten. If the
                 file does not exist, it will be created. The file must have a ``'.npy'`` extension to be recognized
                 correctly. Default is ``'descriptorData.npy'``.
+
+        Returns:
+            None
         """
 
         # Write descriptor data
@@ -1193,7 +1209,15 @@ def ward2ks2022(ward2017: np.ndarray) -> np.ndarray:
 def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
     """Destructively overwrites the prototype library with a custom one. Used by the ``appendPrototypeLibrary()`` function
     to persist its changes. The other main use is to restore the default one to the original state based on a backup
-    made earlier (see tests for an example)."""
+    made earlier (see tests for an example).
+
+    Args:
+        prototypeLibrary: Dictionary of prototypes to write. Keys are prototype names and values are dictionaries
+            containing ``'POSCAR'``, ``'structure'``, and ``'origin'`` entries.
+
+    Returns:
+        None
+    """
     yaml_customDumper = YAML()
     yaml_customDumper.top_level_colon_align = True
 

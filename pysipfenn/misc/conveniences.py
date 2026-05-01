@@ -1,4 +1,5 @@
 from importlib.resources import files
+import json
 
 def patchPymatgenForExoticElements(
         x: bool = True,
@@ -16,7 +17,6 @@ def patchPymatgenForExoticElements(
     Returns:
         None. The ``core/periodic_table.json`` file in local install of ``pymatgen`` is patched. Reinstall or upgrade 
         of ``pymatgen`` reverses the changes.
-
     """
 
     patchIUPAC = {
