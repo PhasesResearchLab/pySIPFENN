@@ -1049,9 +1049,9 @@ class Calculator:
         Returns:
             List of dictionaries with the predictions.
         """
-        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
-        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
-        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
+        assert self.toRun, 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions, 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties, 'No names of the predicted properties have been assigned.'
 
         return [dict(zip(self.predictedProperties, pred)) for pred in self.predictions]
 
@@ -1066,10 +1066,10 @@ class Calculator:
         Returns:
             List of dictionaries with the predictions.
         """
-        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
-        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
-        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
-        assert self.inputFiles is not [], 'No input file names were set. This is automatic using runFromDirectory() or has to be set manually.'
+        assert self.toRun, 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions, 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties, 'No names of the predicted properties have been assigned.'
+        assert self.inputFiles, 'No input file names were set. This is automatic using runFromDirectory() or has to be set manually.'
         assert len(self.inputFiles) == len(self.predictions), 'Number of input files does not match the number of predictions.'
 
         return [
@@ -1093,9 +1093,9 @@ class Calculator:
             None
         """
 
-        assert self.toRun is not [], 'No models have been selected to run. Please verify initialization and model loading.'
-        assert self.predictions is not [], 'No predictions have been made. Please run the models first.'
-        assert self.predictedProperties is not [], 'No names of the predicted properties have been assigned.'
+        assert self.toRun, 'No models have been selected to run. Please verify initialization and model loading.'
+        assert self.predictions, 'No predictions have been made. Please run the models first.'
+        assert self.predictedProperties, 'No names of the predicted properties have been assigned.'
 
         with open(file, 'w+', encoding="utf-8") as f:
             f.write('Name,' + ','.join(self.predictedProperties) + '\n')
@@ -1233,7 +1233,6 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
 
     with resources_files('pysipfenn.misc').joinpath('prototypeLibrary.yaml').open('w+') as f:
         # Restructure the prototype library back to the original format of a list of dictionaries
-        print(prototypeLibrary)
         prototypeList = [
             {
                 'name': key,
@@ -1241,7 +1240,6 @@ def overwritePrototypeLibrary(prototypeLibrary: dict) -> None:
                 'POSCAR': LiteralScalarString(str(value['POSCAR']))
             }
             for key, value in prototypeLibrary.items()]
-        print(prototypeList)
         # Persist the prototype library
         yaml_customDumper.dump(prototypeList, f)
         print(f'Updated prototype library persisted to {f.name}')
