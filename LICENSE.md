@@ -1,8 +1,7 @@
 # GNU LGPL v3.0
 
-Copyright (c) 2019-2023 Adam M. Krajewski and Jonathan Siegel
-through the Phases Research Lab (phaseslab.org) at the 
-Pennsylvania State University (PSU)
+Copyright (c) 2019-2026 Adam M. Krajewski, Jonathan Siegel, and 
+Ricardo Amaral through the Phases Research Lab (phaseslab.org)
 
 ## GNU LESSER GENERAL PUBLIC LICENSE
 
