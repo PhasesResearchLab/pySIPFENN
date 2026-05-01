@@ -389,7 +389,7 @@ class Calculator:
 
         compatibleList = []
         for net in self.models:
-            if descriptor in self.models[net]['descriptor']:
+            if descriptor == self.models[net]['descriptor']:
                 compatibleList.append(net)
         return compatibleList
 
@@ -1184,7 +1184,6 @@ class Calculator:
         self.inputFiles.clear()
         gc.collect()
         print("Calculator and all loaded models deallocated. All data cleared.")
-        del self
 
 
 # ************************  SATELLITE FUNCTIONS  ************************
