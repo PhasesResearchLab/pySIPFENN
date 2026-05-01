@@ -665,6 +665,8 @@ class Calculator:
                 pairedInputAndSettings,
                 max_workers=max_workers
             ))
+            descList = list(descList)
+            metaList = list(metaList)
         else:
             raise ValueError('Incorrect calculation mode selected. Must be either `serial` or `parallel`.')
 
