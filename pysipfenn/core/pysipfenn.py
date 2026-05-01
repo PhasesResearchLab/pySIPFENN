@@ -910,6 +910,7 @@ class Calculator:
         """
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
+        self.toRun = natsort.natsorted(self.toRun)
         if len(self.toRun) == 0:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not '
                   'defined/available, or if the selected descriptor does not correspond to any available network. '
@@ -992,7 +993,7 @@ class Calculator:
                                 descriptor: str,
                                 baseStruct: str = 'pure',
                                 mode: str = 'serial',
-                                max_workers: int = 8) -> None:
+                                max_workers: int = 8) -> List[list]:
         """Runs all loaded models on a list of dilute Structures it automatically imports from a specified directory.
         The directory must contain only atomic structures in formats such as ``'poscar'``, ``'cif'``, ``'json'``, ``'mcsqs'``, etc.,
         or a mix of these. The structures are automatically sorted using natsort library, so the order of the
@@ -1036,6 +1037,7 @@ class Calculator:
                               mode=mode,
                               max_workers=max_workers)
         print('Done!')
+        return self.predictions
 
 
     # *******************************  POST-PROCESSING  *******************************
