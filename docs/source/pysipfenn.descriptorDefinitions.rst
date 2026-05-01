@@ -18,7 +18,7 @@ descriptorDefinitions.KS2022\_dilute
    :show-inheritance:
 
 descriptorDefinitions.KS2022\_randomSolutions
-------------------------------------
+----------------------------------------------
 
 .. automodule:: pysipfenn.descriptorDefinitions.KS2022_randomSolutions
    :members:

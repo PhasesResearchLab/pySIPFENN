@@ -1,7 +1,7 @@
 # FAQ
 
 This page is not meant to be an extensive documentation of how to address all questions
-that may arrise when using pySIPFENN as a result of things outside our control, such as
+that may arise when using pySIPFENN as a result of things outside our control, such as
 interpreter configuration, permissions, operating system issues. These can often be 
 resolved by searching the internet for the error message you are receiving.
 
@@ -83,7 +83,7 @@ change the Conda environment. If you do, you will have to download them again.
 
 All default `pySIPFENN` models are hosted in our Zenodo repository (linked in the
 main page of this documentation and GitHub README). They are ready to be downloaded
-automatically by `pySIPFENN` by simply rinning the `downloadModels()` function over 
+automatically by `pySIPFENN` by simply running the `downloadModels()` function over 
 any `Calculator` instance and will be permanently stored in the `pySIPFENN` installation
 directory (inside the `models` folder). Printing the `Calculator` instance will show
 you the exact path where the models are stored if you want to check it.
@@ -115,7 +115,7 @@ replacing `Python 3.9` with your Python version):
 
 **RAM requirements to run:**
 
-While pySIPFENN shouldn't have much trouble running on most modern desktop and protable
+While pySIPFENN shouldn't have much trouble running on most modern desktop and portable
 computers, it may have issues on older machines or on machines with limited RAM such as
 VMs on cloud instances. In general, to run the models, you will need:   
 - 512MB of RAM for Light Model (NN24)
@@ -162,7 +162,7 @@ and enable it
 
 Now, you should have no memory issues with running all pySIPFENN networks as of the time 
 of writing (NN9, NN20, NN24, NN30). Please note that, as mentioned, this swap change is
-temporary and will disappear when ou reboot. To make it permanent, you can follow one of
+temporary and will disappear when you reboot. To make it permanent, you can follow one of
 many guides available online.
 
 ### Errors related to initializing OpenMP library

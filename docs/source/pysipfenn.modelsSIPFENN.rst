@@ -12,7 +12,7 @@ The model access is governed by the `models.json` file in the `pysipfenn/modelsS
 file needs to contain:
 
 * parent dictionary key matching the name of the model file (e.g. `SIPFENN_Krajewski2020_NN20`)
-* `name` filed: string of the full name of the model displayed to the user. It can be anything.
+* `name` field: string of the full name of the model displayed to the user. It can be anything.
 * `descriptor` field: string of which descriptor / feature vector is taken as input to the model.
 * `URL_ONNX` field: string of the URL to the ONNX model file.
 

@@ -15,8 +15,8 @@ FeO = Structure(
     coords=((0, 0, 0), (0.5, 0.5, 0.5)),
 )
 
-structure.to("FeO.json.gz")
-structure.to("FeO.json.bz2")
+FeO.to("FeO.json.gz")
+FeO.to("FeO.json.bz2")
 ```
 
 ## pySIPFENN Tricks
