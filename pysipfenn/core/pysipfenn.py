@@ -333,8 +333,8 @@ class Calculator:
                 })
             else:
                 raise ValueError(
-                    'Network not available. Please check the network name for typos or run downloadModels() '
-                    'to download the models. Currently available models are: ', self.network_list_available)
+                    f'Network not available. Please check the network name for typos or run downloadModels() '
+                    f'to download the models. Currently available models are: {self.network_list_available}')
 
     def loadModelCustom(
             self,
@@ -425,6 +425,8 @@ class Calculator:
             if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
+        else:
+            raise ValueError(f'Invalid mode: {mode!r}. Must be "serial" or "parallel".')
 
     def calculate_KS2022(
             self,
@@ -457,6 +459,8 @@ class Calculator:
             if self.verbose: print('Done!')
             self.descriptorData = descList
             return descList
+        else:
+            raise ValueError(f'Invalid mode: {mode!r}. Must be "serial" or "parallel".')
 
     def calculate_KS2022_dilute(
             self,
