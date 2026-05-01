@@ -9,19 +9,19 @@ from tqdm import tqdm
 
 class ONNXExporter:
     """Export models to the ONNX format (what they ship in by default) to allow (1) exporting modified pySIPFENN models,
-    (2) simplify the models using ONNX optimizer, and (3) convert them to `FP16` precision, cutting the size in half.
+    (2) simplifying the models using ONNX optimizer, and (3) converting them to `FP16` precision, cutting the size in half.
     
-    Note: Some of the dependencies (``onnxconverter_common`` and ``onnxsim``) are not installed by default. If you need them, 
-    you have to install pySIPFENN in `dev` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
+    Note: Some of the dependencies (``onnxconverter_common`` and ``onnxsim``) are not installed by default. If you need them,
+    you have to install pySIPFENN in ``dev`` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
 
     Args:
         calculator: A ``Calculator`` object with loaded models that has loaded PyTorch models (happens automatically
-        when the ``autoLoad`` argument is kept to its default value of ``True`` when initializing the Calculator). During the
-        initialization, the loaded PyTorch models are converted back to ONNX (in memory) to be then either adjusted or
-        persisted to disk.
+            when the ``autoLoad`` argument is kept to its default value of ``True`` when initializing the Calculator).
+            During the initialization, the loaded PyTorch models are converted back to ONNX (in memory) to be then
+            either adjusted or persisted to disk.
 
     Attributes:
-        calculator: A Calculator object with ONNX loaded models.
+        calculator: A ``Calculator`` object with ONNX loaded models.
         simplifiedDict: A boolean dictionary of models that have been simplified.
         fp16Dict: A boolean dictionary of models that have been converted to FP16.
     """
@@ -148,7 +148,7 @@ class ONNXExporter:
         print('*****  Done converting all models to FP16!  *****')
 
     def export(self, model: str, append: str = '') -> None:
-        """Export a loaded model to ``ONNX``format.
+        """Export a loaded model to ``ONNX`` format.
 
         Args:
             model: The name of the model to export (must be loaded in the ``Calculator``).
@@ -249,8 +249,8 @@ class TorchExporter:
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self, append: str = '') -> None:
-        """Exports all loaded models to PyTorch PT format with the export function. `append` can be passed to the export
-        function
+        """Export all loaded models to PyTorch PT format with the export function. ``append`` can be passed to the export
+        function to append to all exported model names.
         """
         for model in tqdm(self.calculator.loadedModels):
             self.export(model, append=append)
@@ -262,8 +262,8 @@ class CoreMLExporter:
     particularly valuable for Apple devices, as pySIPFENN models can be run using the Neural Engine accelerator
     with minimal power consumption and neat optimizations.
     
-    Note: Some of the dependencies (``coremltools``) are not installed by default. If you need them, 
-    you have to install pySIPFENN in `dev` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
+    Note: Some of the dependencies (``coremltools``) are not installed by default. If you need them,
+    you have to install pySIPFENN in ``dev`` mode like: ``pip install "pysipfenn[dev]"``, or like ``pip install -e ".[dev]"``.
 
     Args:
         calculator: A ``Calculator`` object with loaded models.
@@ -273,6 +273,7 @@ class CoreMLExporter:
     """
 
     def __init__(self, calculator: Calculator):
+        """Initialize the ``CoreMLExporter`` with a calculator object that has loaded models."""
         self.calculator = calculator
         assert len(self.calculator.loadedModels)>0, 'No models loaded in calculator. Nothing to export.'
         print(f'Initialized CoreMLExporter with models: {list(self.calculator.loadedModels.keys())}')
