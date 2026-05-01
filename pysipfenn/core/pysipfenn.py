@@ -836,6 +836,7 @@ class Calculator:
         """
 
         self.toRun = list(set(self.findCompatibleModels(descriptor)).intersection(set(self.network_list_available)))
+        self.toRun = natsort.natsorted(self.toRun)
         if len(self.toRun) == 0:
             print('The list of models to run is empty. This may be caused by selecting a descriptor not '
                   'defined/available, or if the selected descriptor does not correspond to any available network. '
