@@ -362,6 +362,13 @@ class Calculator:
             ``network_list_available`` attributes of the ``Calculator``.
         """
 
+        if networkName in self.network_list:
+            print(f'Model {networkName} is already loaded. Overwriting the existing model parameters.')
+            self.network_list_names[self.network_list.index(networkName)] = modelName
+        else:
+            self.network_list.append(networkName)
+            self.network_list_names.append(modelName)
+            self.network_list_available.append(networkName)
         self.loadedModels.update({
             networkName: onnx2torch.convert(onnx.load(f'{modelDirectory}/{networkName}.onnx')).float()
         })
@@ -370,9 +377,6 @@ class Calculator:
                 'name': modelName,
                 'descriptor': descriptor
             }})
-        self.network_list.append(networkName)
-        self.network_list_names.append(modelName)
-        self.network_list_available.append(networkName)
         print(f'Loaded model {modelName} ({networkName}) from {modelDirectory}')
 
     def findCompatibleModels(self, descriptor: str) -> List[str]:
