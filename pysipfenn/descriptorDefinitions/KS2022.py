@@ -29,7 +29,10 @@ from importlib.resources import files as resources_files
 from tqdm import tqdm
 import numpy as np
 from pymatgen.core import Structure, Element, PeriodicSite
-from pymatgen.analysis.local_env import VoronoiNN
+try:
+    from pymatgen.core.local_env import VoronoiNN
+except ImportError:
+    from pymatgen.analysis.local_env import VoronoiNN
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 # Certain hard-coded basic elemental properties used in the featurization (compatible with Magpie references).

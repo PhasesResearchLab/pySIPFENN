@@ -31,7 +31,10 @@ from importlib.resources import files as resources_files
 from tqdm.contrib.concurrent import process_map
 import numpy as np
 from pymatgen.core import Structure, Element, Composition, PeriodicSite
-from pymatgen.analysis.local_env import VoronoiNN
+try:
+    from pymatgen.core.local_env import VoronoiNN
+except ImportError:
+    from pymatgen.analysis.local_env import VoronoiNN
 
 # Certain hard-coded basic elemental properties used in the featurization (attribute_matrix is compatible with Magpie references,
 # and maxFeaturesInOQMD is based on the 2017 snapshot of OQMD, which was current when we started and will be retained in KS2022, but
