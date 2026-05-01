@@ -3,7 +3,7 @@ import os
 import gc
 import csv
 import json
-from time import perf_counter
+from time import perf_counter, sleep
 from typing import List, Union, Dict
 from importlib.resources import files as resources_files, as_file
 
@@ -264,11 +264,12 @@ class Calculator:
                             downloadObject = SmartDL(
                                 self.models[net]['URL_ONNX'],
                                 f'{modelPath}/{net}.onnx',
-                                threads=16,
+                                threads=8,
                                 request_args=downloadHeaders
                             )
                             downloadObject.start()
                             print('\nONNX Network Successfully Fetched.')
+                            sleep(1)  # Sleep for a second to prevent overwhelming the server with requests
                         else:
                             print(f'{net} not detected on disk and no ONNX URL has been provided.')
                     else:
@@ -284,11 +285,12 @@ class Calculator:
                 downloadObject = SmartDL(
                     self.models[network]['URL_ONNX'],
                     f'{modelPath}/{network}.onnx',
-                    threads=16,
+                    threads=8,
                     request_args=downloadHeaders
                 )
                 downloadObject.start()
                 print('\nONNX Network Successfully Fetched.')
+                sleep(1)  # Sleep for a second to prevent overwhelming the server with requests
             # Not recognized
             else:
                 print('Network name not recognized')
