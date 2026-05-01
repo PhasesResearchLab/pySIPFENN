@@ -515,6 +515,8 @@ class Calculator:
                     print('Done!')
                 self.descriptorData = descList
                 return descList
+            else:
+                raise ValueError(f'Invalid mode: {mode!r}. Must be "serial" or "parallel".')
 
         elif isinstance(baseStruct, List) and len(baseStruct) == len(structList):
             if mode == 'serial':
@@ -532,7 +534,13 @@ class Calculator:
                 self.descriptorData = descList
                 return descList
             else:
-                raise ValueError('`baseStruct` must be (1) `pure`, (2) `Structure` or a list of them.')
+                raise ValueError(f'Invalid mode: {mode!r}. Must be "serial" or "parallel".')
+
+        elif isinstance(baseStruct, List):
+            raise ValueError(
+                f'`baseStruct` list length ({len(baseStruct)}) does not match `structList` length ({len(structList)}).')
+        else:
+            raise ValueError('`baseStruct` must be (1) `"pure"`, (2) a `Structure`, or (3) a list of `Structure` objects.')
 
     def calculate_KS2022_randomSolutions(
             self,
