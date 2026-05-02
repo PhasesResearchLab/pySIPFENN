@@ -76,8 +76,12 @@ class ONNXExporter:
             self.calculator.loadedModels.update({
                 model: onnx.load(temp)
             })
+            # Free memory of the original PyTorch model and the temporary buffer immediately after 
+            # loading the ONNX model into the calculator's loadedModels dict, as they are no longer 
+            # needed and can be large. This is especially important if multiple models are being 
+            # converted in a loop, to prevent memory from ballooning.
+            del loadedModel
             del temp
-            # Force garbage collection to free memory immediately
             gc.collect()
         print(f'Initialized ONNXExporter with models: {list(self.calculator.loadedModels.keys())}')
 
@@ -105,6 +109,8 @@ class ONNXExporter:
         onnx_model_simp, check = simplify(loadedModel)
         assert check, "Simplified ONNX model could not be validated"
         self.calculator.loadedModels[model] = onnx_model_simp
+        del loadedModel
+        gc.collect()
         self.simplifiedDict[model] = True
         print(f'--> Simplified {model}', flush=True)
 
@@ -138,6 +144,10 @@ class ONNXExporter:
         # Convert to FP16
         onnx_model_fp16 = float16.convert_float_to_float16(loadedModel)
         self.calculator.loadedModels[model] = onnx_model_fp16
+        # Free memory of the original 32-bit ONNX model immediately after loading the FP16 model into the calculator's 
+        # loadedModels dict, as it is no longer needed and can be large.
+        del loadedModel
+        gc.collect()
         self.fp16Dict[model] = True
         print(f'--> Converted {model} to FP16', flush=True)
 
@@ -246,6 +256,8 @@ class TorchExporter:
 
         name = f"{model}{f'_{append}' if append else ''}.pt"
         tracedModel.save(name)
+        del tracedModel  # TorchScript copy no longer needed after save
+        gc.collect()
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self, append: str = '') -> None:
@@ -337,8 +349,12 @@ class CoreMLExporter:
             inputs=inputs_converter,
             outputs=[ct.TensorType(name='property')]
         )
+        del tracedModel  # TorchScript copy only needed for ct.convert(); free before save
+        gc.collect()
         name = f"{model}{f'_{append}' if append else ''}.mlpackage"
         coreml_model.save(name)
+        del coreml_model  # CoreML model no longer needed after save
+        gc.collect()
         print(f'--> Exported as {name}', flush=True)
 
     def exportAll(self, append: str = '') -> None:
