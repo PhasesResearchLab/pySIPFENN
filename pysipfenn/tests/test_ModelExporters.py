@@ -21,6 +21,22 @@ class TestExporters(unittest.TestCase):
         self.c = pysipfenn.Calculator()
         self.assertIsNotNone(self.c)
 
+    def tearDown(self):
+        '''Release all objects created during setUp and by individual tests to prevent memory
+        from accumulating across the test suite.  Exporter attributes (``onnxexp``,
+        ``torchexp``, ``coremlexp``) are deleted inside their respective tests on the happy
+        path, but a mid-test failure would skip those clean-ups; the ``hasattr`` guards here
+        ensure they are always freed.  The Calculator is deleted last because the exporters
+        hold a ``calculator`` reference into it.
+        '''
+        # Optional exporter objects — only present on the happy path when the test fails early
+        for attr in ('onnxexp', 'torchexp', 'coremlexp'):
+            if hasattr(self, attr):
+                delattr(self, attr)
+        # Core Calculator created in setUp
+        del self.c
+        gc.collect()
+
     def testInit(self):
         '''Test that the Calculator object is initialised correctly.'''
         self.assertEqual(self.c.predictions, [])
