@@ -1,6 +1,7 @@
 import unittest
 import pytest
 import os
+import gc
 import numpy as np
 
 import pysipfenn
@@ -23,6 +24,11 @@ class TestCore(unittest.TestCase):
         '''
         self.c = pysipfenn.Calculator()
         self.assertIsNotNone(self.c)
+
+    def tearDown(self):
+        self.c.destroy()
+        del self.c
+        gc.collect()
 
     def testInit(self):
         '''Test that the Calculator object is initialized correctly.'''
@@ -378,6 +384,11 @@ class TestCoreRSS(unittest.TestCase):
     def setUp(self):
         self.c = pysipfenn.Calculator()
         self.assertIsNotNone(self.c)
+
+    def tearDown(self):
+        self.c.destroy()
+        del self.c
+        gc.collect()
 
     def test_descriptorCalculate_KS2022_randomSolution_serial_pair(self):
         """Test successful execution of a composition-structure pair in series"""
