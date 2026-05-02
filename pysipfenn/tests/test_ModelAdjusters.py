@@ -50,6 +50,7 @@ class TestModelAdjusters(unittest.TestCase):
                 delattr(self, attr)
         # Core objects created in setUp — order matters: adjuster holds a ref into the Calculator
         del self.ma
+        self.c.destroy()
         del self.c
         gc.collect()
 

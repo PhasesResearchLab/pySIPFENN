@@ -34,6 +34,7 @@ class TestExporters(unittest.TestCase):
             if hasattr(self, attr):
                 delattr(self, attr)
         # Core Calculator created in setUp
+        self.c.destroy()
         del self.c
         gc.collect()
 

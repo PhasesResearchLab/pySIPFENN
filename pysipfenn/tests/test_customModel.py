@@ -1,4 +1,5 @@
 import unittest
+import gc
 from pymatgen.core import Structure
 from importlib.resources import files as resources_files, as_file
 import shutil
@@ -47,8 +48,10 @@ class TestCustomModel(unittest.TestCase):
 
     @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test depends on the ONNX network files")
     def tearDown(self) -> None:
-        '''Deletes the copied model.'''
-        self.c = None
+        '''Deletes the copied model and frees the Calculator.'''
+        self.c.destroy()
+        del self.c
+        gc.collect()
         print('\nTearing down')
         os.remove('MyFunNet.onnx')
         print('Removed MyFunNet')
