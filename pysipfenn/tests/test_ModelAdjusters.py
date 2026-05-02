@@ -1,6 +1,7 @@
 import unittest
 import pytest
 import os
+import gc
 import pysipfenn
 import torch
 from importlib.resources import files as resources_files, as_file
@@ -32,6 +33,25 @@ class TestModelAdjusters(unittest.TestCase):
         self.assertIn('SIPFENN_Krajewski2022_NN30', self.c.loadedModels)
 
         self.ma = pysipfenn.OPTIMADEAdjuster(self.c, "SIPFENN_Krajewski2022_NN30")
+
+    def tearDown(self):
+        """
+        Release all objects created during setUp and by individual tests to prevent memory
+        from accumulating across the test suite. Attributes that are only created by certain
+        test methods (``lma1``–``lma3``, ``ma2``) are guarded with ``hasattr`` so that a
+        test failure mid-way does not cause a spurious ``AttributeError`` here.  ``self.ma``
+        is deleted before ``self.c`` because it holds a direct reference to the PyTorch model
+        stored inside the Calculator, and releasing the referencing object first lets the
+        reference count drop to zero in the correct order.
+        """
+        # Optional attributes created only in specific test methods
+        for attr in ('lma1', 'lma2', 'lma3', 'lma4', 'lma5', 'ma2'):
+            if hasattr(self, attr):
+                delattr(self, attr)
+        # Core objects created in setUp — order matters: adjuster holds a ref into the Calculator
+        del self.ma
+        del self.c
+        gc.collect()
 
     def testInit(self):
         """
