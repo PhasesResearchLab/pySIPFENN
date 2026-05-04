@@ -3,19 +3,26 @@ import json
 
 def patchPymatgenForExoticElements(
         x: bool = True,
-        iupacOrder: bool = True
+        iupacOrder: bool = True,
+        radii: bool = True,
 ) -> None:
     """Patches pymatgen's ``core/periodic_table.json`` with (selectable) electronegativities and IUPAC ordering values
-    needed to correctly handle some exotic chemical elements. The IUPAC rules are followed exactly per Table VI in the 
-    same reference. The electronegativity values are `not` Pauling ones but based on Oganov 2021 and are meant to be 
+    needed to correctly handle some exotic chemical elements. The IUPAC rules are followed exactly per Table VI in the
+    same reference. The electronegativity values are `not` Pauling ones but based on Oganov 2021 and are meant to be
     used primarily for providing trend information for ML model deployment (has to be included in training).
+
+    Covalent radii are patched in memory only (for the lifetime of the current Python process), since they live as
+    a hardcoded ``dict`` literal in pymatgen's source rather than as loadable JSON. Call this function near the top
+    of any script that needs the extended radii.
 
     Args:
         x: Patch electronegativities.
         iupacOrder: Patch IUPAC ordering of elements in chemical formulas so that they can be handled at all.
+        radii: Patch ``CovalentRadius.radius`` in memory with covalent radii for elements past Cm. Effect is
+            session-scoped — call this function each time you start a new Python process that needs the extended set.
 
     Returns:
-        None. The ``core/periodic_table.json`` file in local install of ``pymatgen`` is patched. Reinstall or upgrade 
+        None. The ``core/periodic_table.json`` file in local install of ``pymatgen`` is patched. Reinstall or upgrade
         of ``pymatgen`` reverses the changes.
     """
 
@@ -58,6 +65,32 @@ def patchPymatgenForExoticElements(
         'Og': 2.59
     }
 
+    patchRadii = {
+        "Bk": 1.68,
+        "Cf": 1.68,
+        "Es": 1.65,
+        "Fm": 1.67,
+        "Md": 1.73,
+        "No": 1.76,
+        "Lr": 1.61,
+        "Rf": 1.57,
+        "Db": 1.49,
+        "Sg": 1.43,
+        "Bh": 1.41,
+        "Hs": 1.34,
+        "Mt": 1.29,
+        "Ds": 1.28,
+        "Rg": 1.21,
+        "Cn": 1.22,
+        "Nh": 1.36,
+        "Fl": 1.43,
+        "Mc": 1.62,
+        "Lv": 1.75,
+        "Ts": 1.65,
+        "Og": 1.57,
+    }
+
+
     with files("pymatgen").joinpath("core/periodic_table.json").open() as f:
         pt = json.load(f)
 
@@ -66,7 +99,13 @@ def patchPymatgenForExoticElements(
         if x:
             for el in patchX:
                 pt[el]["X"] = patchX[el]
-        if iupacOrder:        
+        if iupacOrder:
             for el in patchIUPAC:
                 pt[el]["IUPAC ordering"] = patchIUPAC[el]
         json.dump(pt, f)
+
+    # Patch covalent radii in memory for the current Python process. Lives as a hardcoded
+    # dict literal in pymatgen source, so on-disk patching isn't an option here.
+    if radii:
+        from pymatgen.analysis.molecule_structure_comparator import CovalentRadius
+        CovalentRadius.radius.update(patchRadii)
