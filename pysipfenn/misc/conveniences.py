@@ -1,8 +1,23 @@
-from importlib.resources import files
 import ast
 import inspect
 import json
+from importlib.resources import files
+from importlib import import_module
+import pkgutil
 from pymatgen.analysis.molecule_structure_comparator import CovalentRadius
+
+def _find_pymatgen_class(class_name: str):
+    """Locate a class anywhere in pymatgen, robust to module reorganization."""
+    import pymatgen
+    for _, modname, _ in pkgutil.walk_packages(pymatgen.__path__, prefix="pymatgen."):
+        try:
+            mod = import_module(modname)
+        except Exception:
+            continue
+        obj = getattr(mod, class_name, None)
+        if isinstance(obj, type) and obj.__module__.startswith("pymatgen"):
+            return obj
+    return None
 
 def patchPymatgenForExoticElements(
         x: bool = True,
