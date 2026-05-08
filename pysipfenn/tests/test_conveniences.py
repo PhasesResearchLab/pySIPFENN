@@ -1,16 +1,18 @@
 import inspect
+import json
 import warnings
 import subprocess
 import sys
 
 import pytest
+from importlib.resources import files
+
 
 from pysipfenn.misc.conveniences import (
     _find_pymatgen_class,
     patchCovalentRadiiForExoticElements,
     patchPymatgenForExoticElements,
 )
-
 
 
 EXPECTED_COVALENT_RADII = {
@@ -134,6 +136,49 @@ EXPECTED_COVALENT_RADII = {
     'Cm': 1.69
 }
 
+_SUBPROCESS_CODE = r"""
+import json, math
+from pysipfenn.misc.conveniences import _find_pymatgen_class
+from pymatgen.core import Element
+
+CovalentRadius = _find_pymatgen_class("CovalentRadius")
+if CovalentRadius is None:
+    raise RuntimeError("Could not locate CovalentRadius in pymatgen")
+
+def safe_float(x):
+    try:
+        f = float(x)
+        return None if math.isnan(f) else f
+    except (TypeError, ValueError):
+        return None
+
+state = {
+    'radii': dict(CovalentRadius.radius),
+    'X_Og':  safe_float(Element('Og').X),
+    'X_He':  safe_float(Element('He').X),
+    'X_Ar':  safe_float(Element('Ar').X),
+}
+print('===STATE===')
+print(json.dumps(state))
+"""
+
+
+def _read_pymatgen_state():
+    """Run pymatgen in a fresh interpreter and return the current state as a dict."""
+    result = subprocess.run(
+        [sys.executable, "-c", _SUBPROCESS_CODE],
+        capture_output=True, text=True, check=True,
+    )
+    lines = result.stdout.splitlines()
+    try:
+        idx = lines.index("===STATE===")
+    except ValueError:
+        raise RuntimeError(
+            f"Subprocess did not emit state marker.\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+    return json.loads(lines[idx + 1])
+
+
 def _warn_if_radii_drift(actual_radii):
     """Emit a UserWarning (not failure) if patched radii dict differs from the expected snapshot."""
     if actual_radii == EXPECTED_COVALENT_RADII:
@@ -150,6 +195,30 @@ def _warn_if_radii_drift(actual_radii):
         UserWarning,
         stacklevel=2,
     )
+
+@pytest.fixture
+def pymatgen_snapshot():
+    """Snapshot pymatgen's mutated files before the test, restore them after.
+
+    Captures the periodic table JSON and the .py file containing CovalentRadius.
+    Both are written back verbatim during teardown — even if the test raises —
+    so other tests in the suite are not affected by mutations.
+    """
+    radii_file = inspect.getsourcefile(_find_pymatgen_class("CovalentRadius"))
+    periodic_table_file = str(files("pymatgen").joinpath("core/periodic_table.json"))
+
+    originals = {}
+    for path in (radii_file, periodic_table_file):
+        with open(path, "rb") as f:
+            originals[path] = f.read()
+
+    yield
+
+    for path, content in originals.items():
+        with open(path, "wb") as f:
+            f.write(content)
+
+
 
 def test_find_pymatgen_class():
     cls = _find_pymatgen_class("CovalentRadius")
