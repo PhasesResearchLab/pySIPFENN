@@ -236,3 +236,16 @@ def test_patchCovalentRadiiForExoticElements(pymatgen_snapshot):
     missing = expected_patch_keys - set(state["radii"])
     assert not missing, f"Patched dict is missing keys: {sorted(missing)}"
     _warn_if_radii_drift(state["radii"])
+
+def test_patchPymatgenForExoticElements_all_flags(pymatgen_snapshot):
+    patchPymatgenForExoticElements()
+    state = _read_pymatgen_state()
+
+    assert state["X_Og"] == pytest.approx(2.59)
+    assert state["X_He"] == pytest.approx(4.42)
+    assert state["X_Ar"] == pytest.approx(3.57)
+
+    assert "Bk" in state["radii"]
+    assert state["radii"]["Og"] == pytest.approx(1.57)
+
+    _warn_if_radii_drift(state["radii"])
