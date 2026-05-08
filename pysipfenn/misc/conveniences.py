@@ -21,10 +21,10 @@ def patchPymatgenForExoticElements(
     used primarily for providing trend information for ML model deployment (has to be included in training).
 
     2. CovalentRadius.radius
-       - Adds missing covalent radii for elements Bk through Og.
-       - Uses `ast` to locate the dictionary definition in pymatgen's source
-         code, merge in the missing values, and write the updated literal back
-         to disk.
+    Adds missing covalent radii for elements Bk through Og using `ast` to locate the dictionary definition in
+    pymatgen's source code, merge in the missing values, and write the updated literal back to disk. Radii reference
+    values from Pekka Pyykkö, The Journal of Physical Chemistry A 2015 119 (11), 2326-2337,
+    DOI: 10.1021/jp5065819
 
     Args:
         x: Patch electronegativities.
@@ -32,8 +32,8 @@ def patchPymatgenForExoticElements(
         radii: Patch ``CovalentRadius.radius`` on disk with covalent radii for elements past Cm.
 
     Returns:
-        None. The ``core/periodic_table.json`` and ``analysis/molecule_structure_comparator.py`` files in the local
-        install of ``pymatgen`` are patched. Reinstall or upgrade of ``pymatgen`` reverses the changes.
+        None. The ``core/periodic_table.json`` files and the python file containing the ``CovalentRadius`` in the
+        local install of ``pymatgen`` are patched. Reinstall or upgrade ``pymatgen`` to reverses the changes.
     """
 
     patchIUPAC = {
