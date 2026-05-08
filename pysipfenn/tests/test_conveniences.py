@@ -195,13 +195,6 @@ def _warn_if_radii_drift(actual_radii):
         stacklevel=2,
     )
 
-def test_find_pymatgen_class():
-    cls = _find_pymatgen_class("CovalentRadius")
-    assert cls is not None
-    assert cls.__name__ == "CovalentRadius"
-    assert cls.__module__.startswith("pymatgen")
-    assert _find_pymatgen_class("DefinitelyNotAPymatgenClass_xyzzy") is None
-
 @pytest.fixture
 def pymatgen_snapshot():
     """Snapshot pymatgen's mutated files before the test, restore them after.
@@ -223,6 +216,13 @@ def pymatgen_snapshot():
     for path, content in originals.items():
         with open(path, "wb") as f:
             f.write(content)
+
+def test_find_pymatgen_class():
+    cls = _find_pymatgen_class("CovalentRadius")
+    assert cls is not None
+    assert cls.__name__ == "CovalentRadius"
+    assert cls.__module__.startswith("pymatgen")
+    assert _find_pymatgen_class("DefinitelyNotAPymatgenClass_xyzzy") is None
 
 def test_patchCovalentRadiiForExoticElements(pymatgen_snapshot):
     patchCovalentRadiiForExoticElements()
