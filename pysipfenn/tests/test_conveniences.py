@@ -158,3 +158,15 @@ def test_find_pymatgen_class():
     assert cls.__module__.startswith("pymatgen")
 
     assert _find_pymatgen_class("DefinitelyNotAPymatgenClass_xyzzy") is None
+
+def test_patchCovalentRadiiForExoticElements():
+    patchCovalentRadiiForExoticElements()
+    state = _read_pymatgen_state()
+
+    expected_patch_keys = {
+        "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg",
+        "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og",
+    }
+    missing = expected_patch_keys - set(state["radii"])
+    assert not missing, f"Patched dict is missing keys: {sorted(missing)}"
+    _warn_if_radii_drift(state["radii"])
