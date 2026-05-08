@@ -29,7 +29,7 @@ def patchPymatgenForExoticElements(
     Args:
         x: Patch electronegativities.
         iupacOrder: Patch IUPAC ordering of elements in chemical formulas so that they can be handled at all.
-        radii: Patch ``CovalentRadius.radius`` on disk with covalent radii for elements past Cm.
+        radii: Patch ``CovalentRadius.radius`` with covalent radii for elements past Cm.
 
     Returns:
         None. The ``core/periodic_table.json`` files and the python file containing the ``CovalentRadius`` in the
