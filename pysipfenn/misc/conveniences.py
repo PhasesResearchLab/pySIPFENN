@@ -4,7 +4,6 @@ import json
 from importlib.resources import files
 from importlib import import_module
 import pkgutil
-from pymatgen.analysis.molecule_structure_comparator import CovalentRadius
 
 def _find_pymatgen_class(class_name: str):
     """Locate a class anywhere in pymatgen, robust to module reorganization."""
@@ -132,6 +131,12 @@ def patchPymatgenForExoticElements(
     # Patch covalent radii on disk. 
     # We locate the dict with `ast` and splice a merged literal back in.
     if radii:
+        CovalentRadius = _find_pymatgen_class("CovalentRadius")
+        if CovalentRadius is None:
+            raise RuntimeError(
+                "Could not locate `CovalentRadius` class in pymatgen; "
+                "pymatgen's layout may have changed and this patch needs updating."
+            )
         source_file = inspect.getsourcefile(CovalentRadius)
         with open(source_file, "r") as f:
             src = f.read()
