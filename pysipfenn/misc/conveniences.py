@@ -18,6 +18,96 @@ def _find_pymatgen_class(class_name: str):
             return obj
     return None
 
+def patchCovalentRadiiForExoticElements() -> None:
+    """
+    """
+    patchRadii = {
+        "Bk": 1.68,
+        "Cf": 1.68,
+        "Es": 1.65,
+        "Fm": 1.67,
+        "Md": 1.73,
+        "No": 1.76,
+        "Lr": 1.61,
+        "Rf": 1.57,
+        "Db": 1.49,
+        "Sg": 1.43,
+        "Bh": 1.41,
+        "Hs": 1.34,
+        "Mt": 1.29,
+        "Ds": 1.28,
+        "Rg": 1.21,
+        "Cn": 1.22,
+        "Nh": 1.36,
+        "Fl": 1.43,
+        "Mc": 1.62,
+        "Lv": 1.75,
+        "Ts": 1.65,
+        "Og": 1.57,
+    }
+
+
+    CovalentRadius = _find_pymatgen_class("CovalentRadius")
+    if CovalentRadius is None:
+        raise RuntimeError(
+            "Could not locate `CovalentRadius` class in pymatgen; "
+            "pymatgen's layout may have changed and this patch needs updating."
+        )
+    source_file = inspect.getsourcefile(CovalentRadius)
+    with open(source_file, "r") as f:
+        src = f.read()
+
+    dict_node = None
+    for cls in ast.walk(ast.parse(src)):
+        if not (isinstance(cls, ast.ClassDef) and cls.name == "CovalentRadius"):
+            continue
+        for stmt in cls.body:
+            if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+                target, value = stmt.target.id, stmt.value
+            elif (isinstance(stmt, ast.Assign)
+                    and len(stmt.targets) == 1
+                    and isinstance(stmt.targets[0], ast.Name)):
+                target, value = stmt.targets[0].id, stmt.value
+            else:
+                continue
+            if target == "radius" and isinstance(value, ast.Dict):
+                dict_node = value
+                break
+        break
+
+    if dict_node is None:
+        raise RuntimeError(
+            f"Could not locate `CovalentRadius.radius` dict in {source_file}; "
+            "pymatgen's layout may have changed and this patch needs updating."
+        )
+
+    existing = ast.literal_eval(dict_node)
+    # Skip writing if the file is already up to date with our patch values.
+    if any(existing.get(el) is None for el in patchRadii):
+        merged = {**patchRadii, **existing}
+
+        # Match pymatgen's existing indentation by reading it from the source
+        # rather than hardcoding spaces, so the patch survives style changes.
+        src_lines = src.splitlines(keepends=True)
+        first_key = dict_node.keys[0]
+        entry_indent = src_lines[first_key.lineno - 1][:first_key.col_offset]
+        close_indent = src_lines[dict_node.end_lineno - 1][:dict_node.end_col_offset - 1]
+
+        new_literal = "{\n" + "".join(
+            f'{entry_indent}"{el}": {v},\n' for el, v in merged.items()
+        ) + close_indent + "}"
+
+        # Convert (line, col) bounds to byte offsets and splice.
+        line_starts = [0]
+        for line in src.splitlines(keepends=True):
+            line_starts.append(line_starts[-1] + len(line))
+        start = line_starts[dict_node.lineno - 1] + dict_node.col_offset
+        end = line_starts[dict_node.end_lineno - 1] + dict_node.end_col_offset
+
+        src = src[:start] + new_literal + src[end:]
+        with open(source_file, "w") as f:
+            f.write(src)
+
 def patchPymatgenForExoticElements(
         x: bool = True,
         iupacOrder: bool = True,
@@ -89,32 +179,6 @@ def patchPymatgenForExoticElements(
         'Og': 2.59
     }
 
-    patchRadii = {
-        "Bk": 1.68,
-        "Cf": 1.68,
-        "Es": 1.65,
-        "Fm": 1.67,
-        "Md": 1.73,
-        "No": 1.76,
-        "Lr": 1.61,
-        "Rf": 1.57,
-        "Db": 1.49,
-        "Sg": 1.43,
-        "Bh": 1.41,
-        "Hs": 1.34,
-        "Mt": 1.29,
-        "Ds": 1.28,
-        "Rg": 1.21,
-        "Cn": 1.22,
-        "Nh": 1.36,
-        "Fl": 1.43,
-        "Mc": 1.62,
-        "Lv": 1.75,
-        "Ts": 1.65,
-        "Og": 1.57,
-    }
-
-
     with files("pymatgen").joinpath("core/periodic_table.json").open() as f:
         pt = json.load(f)
 
@@ -131,64 +195,4 @@ def patchPymatgenForExoticElements(
     # Patch covalent radii on disk. 
     # We locate the dict with `ast` and splice a merged literal back in.
     if radii:
-        CovalentRadius = _find_pymatgen_class("CovalentRadius")
-        if CovalentRadius is None:
-            raise RuntimeError(
-                "Could not locate `CovalentRadius` class in pymatgen; "
-                "pymatgen's layout may have changed and this patch needs updating."
-            )
-        source_file = inspect.getsourcefile(CovalentRadius)
-        with open(source_file, "r") as f:
-            src = f.read()
-
-        dict_node = None
-        for cls in ast.walk(ast.parse(src)):
-            if not (isinstance(cls, ast.ClassDef) and cls.name == "CovalentRadius"):
-                continue
-            for stmt in cls.body:
-                if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
-                    target, value = stmt.target.id, stmt.value
-                elif (isinstance(stmt, ast.Assign)
-                      and len(stmt.targets) == 1
-                      and isinstance(stmt.targets[0], ast.Name)):
-                    target, value = stmt.targets[0].id, stmt.value
-                else:
-                    continue
-                if target == "radius" and isinstance(value, ast.Dict):
-                    dict_node = value
-                    break
-            break
-
-        if dict_node is None:
-            raise RuntimeError(
-                f"Could not locate `CovalentRadius.radius` dict in {source_file}; "
-                "pymatgen's layout may have changed and this patch needs updating."
-            )
-
-        existing = ast.literal_eval(dict_node)
-        # Skip writing if the file is already up to date with our patch values.
-        if any(existing.get(el) is None for el in patchRadii):
-            merged = {**patchRadii, **existing}
-
-            # Match pymatgen's existing indentation by reading it from the source
-            # rather than hardcoding spaces, so the patch survives style changes.
-            src_lines = src.splitlines(keepends=True)
-            first_key = dict_node.keys[0]
-            entry_indent = src_lines[first_key.lineno - 1][:first_key.col_offset]
-            close_indent = src_lines[dict_node.end_lineno - 1][:dict_node.end_col_offset - 1]
-
-            new_literal = "{\n" + "".join(
-                f'{entry_indent}"{el}": {v},\n' for el, v in merged.items()
-            ) + close_indent + "}"
-
-            # Convert (line, col) bounds to byte offsets and splice.
-            line_starts = [0]
-            for line in src.splitlines(keepends=True):
-                line_starts.append(line_starts[-1] + len(line))
-            start = line_starts[dict_node.lineno - 1] + dict_node.col_offset
-            end = line_starts[dict_node.end_lineno - 1] + dict_node.end_col_offset
-
-            src = src[:start] + new_literal + src[end:]
-            with open(source_file, "w") as f:
-                f.write(src)
-
+        patchCovalentRadiiForExoticElements()
