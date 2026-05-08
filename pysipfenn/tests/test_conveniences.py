@@ -7,7 +7,6 @@ import sys
 import pytest
 from importlib.resources import files
 
-
 from pysipfenn.misc.conveniences import (
     _find_pymatgen_class,
     patchCovalentRadiiForExoticElements,
@@ -249,3 +248,13 @@ def test_patchPymatgenForExoticElements_all_flags(pymatgen_snapshot):
     assert state["radii"]["Og"] == pytest.approx(1.57)
 
     _warn_if_radii_drift(state["radii"])
+
+def test_patchPymatgenForExoticElements_only_x(pymatgen_snapshot):
+    patchPymatgenForExoticElements(x=True, iupacOrder=False, radii=False)
+    state = _read_pymatgen_state()
+
+    assert state["X_Og"] == pytest.approx(2.59)
+    assert state["X_He"] == pytest.approx(4.42)
+
+    assert "Bk" not in state["radii"]
+    assert "Og" not in state["radii"]
