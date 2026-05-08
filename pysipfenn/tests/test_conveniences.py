@@ -150,3 +150,11 @@ def _warn_if_radii_drift(actual_radii):
         UserWarning,
         stacklevel=2,
     )
+
+def test_find_pymatgen_class():
+    cls = _find_pymatgen_class("CovalentRadius")
+    assert cls is not None
+    assert cls.__name__ == "CovalentRadius"
+    assert cls.__module__.startswith("pymatgen")
+
+    assert _find_pymatgen_class("DefinitelyNotAPymatgenClass_xyzzy") is None
