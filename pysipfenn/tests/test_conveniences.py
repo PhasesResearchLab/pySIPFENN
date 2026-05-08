@@ -13,7 +13,7 @@ from pysipfenn.misc.conveniences import (
 
 
 
-expected_covalent_radii = {
+EXPECTED_COVALENT_RADII = {
     'Bk': 1.68,
     'Cf': 1.68,
     'Es': 1.65,
@@ -133,3 +133,20 @@ expected_covalent_radii = {
     'Am': 1.8,
     'Cm': 1.69
 }
+
+def _warn_if_radii_drift(actual_radii):
+    """Emit a UserWarning (not failure) if patched radii dict differs from the expected snapshot."""
+    if actual_radii == EXPECTED_COVALENT_RADII:
+        return
+    diff = {
+        k: (actual_radii.get(k), EXPECTED_COVALENT_RADII.get(k))
+        for k in set(actual_radii) | set(EXPECTED_COVALENT_RADII)
+        if actual_radii.get(k) != EXPECTED_COVALENT_RADII.get(k)
+    }
+    warnings.warn(
+        f"CovalentRadius.radius after patching does not match `EXPECTED_COVALENT_RADII`. "
+        f"Differences (key: actual vs expected): {diff}"
+        "This may indicate that pymatgen updated their covalent radii dict and the patch is out of sync.",
+        UserWarning,
+        stacklevel=2,
+    )
