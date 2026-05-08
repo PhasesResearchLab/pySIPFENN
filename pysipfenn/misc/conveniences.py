@@ -33,7 +33,7 @@ def patchPymatgenForExoticElements(
 
     Returns:
         None. The ``core/periodic_table.json`` files and the python file containing the ``CovalentRadius`` in the
-        local install of ``pymatgen`` are patched. Reinstall or upgrade ``pymatgen`` to reverses the changes.
+        local install of ``pymatgen`` are patched. Reinstall or upgrade ``pymatgen`` to reverse the changes.
     """
 
     patchIUPAC = {
