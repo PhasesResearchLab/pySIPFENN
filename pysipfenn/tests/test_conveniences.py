@@ -189,7 +189,7 @@ def _warn_if_radii_drift(actual_radii):
     }
     warnings.warn(
         f"CovalentRadius.radius after patching does not match `EXPECTED_COVALENT_RADII`. "
-        f"Differences (key: actual vs expected): {diff}"
+        f"Differences (key: actual vs expected): {diff} \n"
         "This may indicate that pymatgen updated their covalent radii dict and the patch is out of sync.",
         UserWarning,
         stacklevel=2,
