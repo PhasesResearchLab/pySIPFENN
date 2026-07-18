@@ -17,7 +17,7 @@ class TestModelAdjusters(unittest.TestCase):
     Actions.
 
     The setup will load the Krajewski2022_NN30 model and create an ``OPTIMADEAdjuster`` object for testing that is by
-    default connected to the Materials Project ``OPTIMADE`` server and looks for their GGA+U formation energies. In the
+    default connected to the Alexandria PBE ``OPTIMADE`` server and looks for their formation energies. In the
     ``testFullRoutine`` test, the adjuster will be used to adjust the model to the Hf-Mo metallic system. The test will
     cover almost all adjuster functionalities in different ways to hit all anticipated code paths. It also tests the
     ``LocalAdjuster`` class for loading data from CSV and NPY files, which is a parent class of the ``OPTIMADEAdjuster``.
@@ -32,13 +32,17 @@ class TestModelAdjusters(unittest.TestCase):
         self.c.loadModels("SIPFENN_Krajewski2022_NN30")
         self.assertIn('SIPFENN_Krajewski2022_NN30', self.c.loadedModels)
 
-        self.ma = pysipfenn.OPTIMADEAdjuster(self.c, "SIPFENN_Krajewski2022_NN30")
+        self.ma = pysipfenn.OPTIMADEAdjuster(
+            self.c,
+            "SIPFENN_Krajewski2022_NN30",
+            maxResults = 256
+            )
 
     def tearDown(self):
         """
         Release all objects created during setUp and by individual tests to prevent memory
         from accumulating across the test suite. Attributes that are only created by certain
-        test methods (``lma1``–``lma3``, ``ma2``) are guarded with ``hasattr`` so that a
+        test methods (``lma1``-``lma3``, ``ma2``) are guarded with ``hasattr`` so that a
         test failure mid-way does not cause a spurious ``AttributeError`` here.  ``self.ma``
         is deleted before ``self.c`` because it holds a direct reference to the PyTorch model
         stored inside the Calculator, and releasing the referencing object first lets the
@@ -75,7 +79,7 @@ class TestModelAdjusters(unittest.TestCase):
 
     def testFullRoutine(self):
         """
-        Test the full routine of the adjuster based on the default values pointing to Materials Project. Get the data
+        Test the full routine of the adjuster based on the default values pointing to Alexandria database. Get the data
         using OPTIMADE to adjust the model to Hf-Mo metallic system. Matrix search is reduced to 4 cases to speed up
         the test and it is designed to explore all code paths in the search. The test will also check the highlighting
         and plotting functionalities of the adjuster.

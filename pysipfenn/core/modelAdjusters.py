@@ -667,8 +667,8 @@ class OPTIMADEAdjuster(LocalAdjuster):
         provider: String with the name of the provider to be used for the OPTIMADE queries. The type-hinting
             gives a list of providers available at the time of writing this code, but it is by no means limited to them.
             For the up-to-date list, along with their current status, please refer to the
-            `OPTIMADE Providers Dashboard <https://optimade.org/providers-dashboard>`_. The default is ``"mp"`` which
-            stands for the Materials Project, but we do not recommend any particular provider over any other. One has to
+            `OPTIMADE Providers Dashboard <https://optimade.org/providers-dashboard>`_. The default is ``"alexandria"`` which
+            stands for the Alexandria database, but we do not recommend any particular provider over any other. One has to
             be picked to work out of the box. Your choice should be based on the data you are interested in.
         targetPath: List of strings with the path to the target data in the OPTIMADE response. This will be dependent
             on the provider you choose, and you will need to identify it by looking at the response. The easiest way to
@@ -683,7 +683,7 @@ class OPTIMADEAdjuster(LocalAdjuster):
             ``GGAsol`` formation energy per atom in Alexandria, or ``('attributes', '_jarvis_formation_energy_peratom')``
             for the `optb88vdw` formation energy per atom in JARVIS, or ``('attributes',
             '_mpdd_formationenergy_sipfenn_krajewski2020_novelmaterialsmodel')`` for the formation energy predicted
-            by the SIPFENN_Krajewski2020_NovelMaterialsModel for every structure in MPDD. Default is the MP example.
+            by the SIPFENN_Krajewski2020_NovelMaterialsModel for every structure in MPDD. Default is the Alexandria example.
         targetSize: The length of the target data to be fetched from the OPTIMADE API. This is typically ``1`` for a single
             scalar property, but it can be more. Default is ``1``.
         device: Same as in the ``LocalAdjuster``. Default is ``"cpu"`` which is available on all systems. If you have a
@@ -744,8 +744,9 @@ class OPTIMADEAdjuster(LocalAdjuster):
                     "pcod",
                     "tcod",
                     "twodmatpedia"
-                ] = "mp",
-            targetPath: List[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+                ] = "alexandria",
+            #mp - targetPath: List[str] = ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'),
+            targetPath: List[str] = ('attributes', '_alexandria_formation_energy_per_atom'),
             targetSize: int = 1,
             device: Literal["cpu", "cuda", "mps"] = "cpu",
             descriptor: Literal["Ward2017", "KS2022"] = "KS2022",
@@ -762,9 +763,9 @@ class OPTIMADEAdjuster(LocalAdjuster):
         assert len(provider) != 0, "The provider must not be an empty string."
         assert targetPath and isinstance(targetPath, list) or isinstance(targetPath, tuple), "The target path must be a list of strings pointing to the target data in the OPTIMADE response."
         assert len(targetPath) > 0, "The target path must not be empty, i.e., it cannot point to no data."
-        if provider != "mp" and targetPath == ('attributes', '_mp_stability', 'gga_gga+u', 'formation_energy_per_atom'):
-            raise ValueError("You are utilizing the default (example) property target path specific to the Materials "
-                             "Project but you are connecting to a different provider. You must adjust the target path "
+        if provider != "alexandria" and targetPath == ('attributes', '_alexandria_formation_energy_per_atom'):
+            raise ValueError("You are utilizing the default (example) property target path specific to the Alexandria "
+                             "but you are connecting to a different provider. You must adjust the target path "
                              "to receive data from the provider you are connecting to based on what they serve through "
                              "their provider-specific OPTIMADE endpoint fields. See targetPath docstring for more info.")
 
