@@ -1207,9 +1207,19 @@ class Calculator:
         """Deallocates all loaded models and clears all data from the Calculator object."""
         self.loadedModels.clear()
         self.toRun.clear()
-        self.descriptorData.clear()
-        self.predictions.clear()
-        self.inputFiles.clear()
+        
+        if hasattr(self.descriptorData, 'clear'):
+            self.descriptorData.clear()
+        self.descriptorData = []
+        
+        if hasattr(self.predictions, 'clear'):
+            self.predictions.clear()
+        self.predictions = []
+        
+        if hasattr(self.inputFiles, 'clear'):
+            self.inputFiles.clear()
+        self.inputFiles = []
+        
         gc.collect()
         print("Calculator and all loaded models deallocated. All data cleared.")
 
