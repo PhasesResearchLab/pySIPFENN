@@ -308,8 +308,8 @@ class LocalAdjuster:
         assert len(self.targetData) != 0, "The target data must not be empty for the adjustment process."
         assert len(self.descriptorData) == len(self.targetData), "The descriptor and target data must have the same length."
 
-        ddTensor = torch.from_numpy(self.descriptorData).float().to(device=self.device)
-        tdTensor = torch.from_numpy(self.targetData).float().to(device=self.device)
+        ddTensor = torch.from_numpy(np.array(self.descriptorData)).float().to(device=self.device)
+        tdTensor = torch.from_numpy(np.array(self.targetData)).float().to(device=self.device)
         if validation > 0:
             split = int(len(ddTensor) * (1 - validation))
             self.validationLabels = ["Training"]*split + ["Validation"]*(len(ddTensor)-split)
