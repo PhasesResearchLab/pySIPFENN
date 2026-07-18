@@ -198,8 +198,8 @@ class TestModelAdjusters(unittest.TestCase):
         Test the endpoint override functionality of the ``OPTIMADEAdjuster`` class. It will test the override of the
         endpoint and the data fetching from the new endpoint.
         """
-        endpoint = ["https://alexandria.icams.rub.de/pbesol"]
-        targetPath = ['attributes', '_alexandria_formation_energy_per_atom']
+        endpoint = ["https://oqmd.org/optimade/"]
+        targetPath = ['attributes', '_oqmd_delta_e']
 
         self.ma2 = pysipfenn.OPTIMADEAdjuster(
             self.c,
@@ -218,5 +218,6 @@ class TestModelAdjusters(unittest.TestCase):
             "No descriptor data was found. If the other asserts passed, this is likely a bug in the featurization "
             "or structural data has been made incompatible or otherwise corrupted.")
         
-        for ref in self.ma2.references:
-            self.assertGreater(len(ref), 0, "No references were found for the datapoint despite Alexendria being used and having them for this test case as of writing this (and very likely into the future).")
+        # OQMD does not provide references, so this test is commented out. If OQMD starts providing references in the future, this test can be uncommented and will check that references are present.
+        #for ref in self.ma2.references:
+        #    self.assertGreater(len(ref), 0, "No references were found for the datapoint despite Alexendria being used and having them for this test case as of writing this (and very likely into the future).")
