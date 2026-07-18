@@ -842,8 +842,14 @@ class OPTIMADEAdjuster(LocalAdjuster):
 
         response = self.client.get(query)
         providerResponse = response['structures'][query]
-        respondingProviderURL = list(providerResponse.keys())[0]
-        data = providerResponse[respondingProviderURL]['data']
+        
+        # Get data from all endpoints served by this provider. We do need to iterate since some
+        # providers, like Alexandria, have multiple endpoints for different DFT settings and 
+        # give multiple items in the response.
+        data = []
+        for url, res in providerResponse.items():
+            if res.get('data'):
+                data.extend(res['data'])
 
         targetDataStage: List[List[float]] = []
         structs: List[Structure] = []
